@@ -1,6 +1,6 @@
 {
   "name": "SakoonApp User",
-  "description": "An admin panel to receive and manage user calls and chats.",
+  "description": "Talk to trained listeners and find emotional support. A safe space for your feelings.",
   "requestFramePermissions": [
     "microphone"
   ],

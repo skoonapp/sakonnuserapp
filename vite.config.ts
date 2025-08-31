@@ -10,7 +10,8 @@ import { defineConfig, loadEnv } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ mode }) => {
-    const env = loadEnv(mode, '.', '');
+    // FIX: Explicitly use `nodeProcess.cwd()` to ensure the correct directory is passed to loadEnv, resolving potential errors with `process.cwd()` in some environments.
+    const env = loadEnv(mode, nodeProcess.cwd(), '');
     return {
       plugins: [
         VitePWA({

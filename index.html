@@ -25,7 +25,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
-    <title>SakoonApp Admin</title>
+    <title>SakoonApp</title>
 
     <!-- PWA and Mobile Meta Tags -->
     <!-- The manifest link is now injected automatically by vite-plugin-pwa -->
@@ -33,7 +33,15 @@
     <meta name="theme-color" content="#0891B2">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
+    <script>
+      // This config script must be placed before the Tailwind CSS script.
+      // It tells Tailwind to use the 'class' strategy for dark mode,
+      // allowing our JavaScript to toggle it by adding/removing the 'dark' class
+      // from the <html> element.
+      tailwind.config = {
+        darkMode: 'class',
+      }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/zego-express-engine-webrtc/ZegoExpressEngine.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
