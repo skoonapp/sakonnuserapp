@@ -1,23 +1,23 @@
 
+
 // FIX: Changed to Firebase v8 compat imports to resolve module export errors.
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 
+// FIX: Inlined env type definition to avoid intermittent global type conflicts.
 // Define types for import.meta.env to handle Vite's environment variables.
-interface ImportMetaEnv {
-  readonly VITE_API_KEY?: string;
-  readonly VITE_AUTH_DOMAIN?: string;
-  readonly VITE_PROJECT_ID?: string;
-  readonly VITE_STORAGE_BUCKET?: string;
-  readonly VITE_MESSAGING_SENDER_ID?: string;
-  readonly VITE_APP_ID?: string;
-  readonly VITE_MEASUREMENT_ID?: string;
-}
-
 declare global {
   interface ImportMeta {
-    readonly env: ImportMetaEnv;
+    readonly env: {
+      readonly VITE_API_KEY?: string;
+      readonly VITE_AUTH_DOMAIN?: string;
+      readonly VITE_PROJECT_ID?: string;
+      readonly VITE_STORAGE_BUCKET?: string;
+      readonly VITE_MESSAGING_SENDER_ID?: string;
+      readonly VITE_APP_ID?: string;
+      readonly VITE_MEASUREMENT_ID?: string;
+    };
   }
 }
 

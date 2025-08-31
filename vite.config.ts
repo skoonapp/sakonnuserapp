@@ -1,4 +1,7 @@
+
 import path from 'path';
+// FIX: Imported `process` module to provide correct types for `process.cwd()`.
+import process from 'process';
 import { defineConfig, loadEnv } from 'vite';
 
 export default defineConfig(({ mode }) => {
@@ -12,6 +15,11 @@ export default defineConfig(({ mode }) => {
         alias: {
 // FIX: Replaced `__dirname` with `process.cwd()` to resolve the "Cannot find name '__dirname'" error in an ES module context.
           '@': path.resolve(process.cwd(), '.'),
+        }
+      },
+      build: {
+        rollupOptions: {
+          external: ['@google/genai']
         }
       }
     };
