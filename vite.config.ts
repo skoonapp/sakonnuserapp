@@ -1,6 +1,6 @@
 import path from 'path';
-// FIX: Removed explicit 'process' import to allow use of the global Node.js 'process' object,
-// which has the correct type definitions including 'cwd'.
+// FIX: Import `process` to provide correct type definitions for `process.cwd()` as the global type was not available.
+import process from 'process';
 import { defineConfig, loadEnv } from 'vite';
 
 export default defineConfig(({ mode }) => {

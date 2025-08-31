@@ -35,7 +35,7 @@ export const CALL_PLANS: Plan[] = [
     { duration: '15 मिनट', price: 145, tierName: 'Gold Pack' },
     { duration: '30 मिनट', price: 270, tierName: 'Platinum Pack' },
     { duration: '45 मिनट', price: 410, tierName: 'Diamond Pack' },
-    { duration: '1 घंटा', price: 540, tierName: 'Elite Pack' },
+    { duration: '60 मिनट', price: 540, tierName: 'Elite Pack' },
 ];
 
 export const CHAT_PLANS: Plan[] = [
@@ -44,7 +44,7 @@ export const CHAT_PLANS: Plan[] = [
     { duration: '15 मिनट', price: 50 },
     { duration: '30 मिनट', price: 90 },
     { duration: '45 मिनट', price: 135 },
-    { duration: '1 घंटा', price: 170 },
+    { duration: '60 मिनट', price: 170 },
 ];
 
 export const FAQ_DATA: FaqItem[] = [
@@ -78,17 +78,17 @@ export const FAQ_DATA: FaqItem[] = [
 export const TESTIMONIALS_DATA = [
     {
         name: 'प्रिया S.',
-        image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=128&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=128&auto=format&fit=crop&ixlib-rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         quote: 'जब मैं अकेला महसूस कर रही थी, तब SakoonApp ने मुझे एक दोस्त दिया जिससे मैं बात कर सकती थी। इसने वास्तव में मेरी मदद की।',
     },
     {
         name: 'अमित K.',
-        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=128&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=128&auto=format&fit=crop&ixlib-rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         quote: 'बिना किसी जजमेंट के किसी से बात करना बहुत ताज़गी भरा था। Listener बहुत समझदार और सहायक थे।',
     },
     {
         name: 'सुनीता M.',
-        image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=128&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=128&auto=format&fit=crop&ixlib-rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         quote: 'यह ऐप उन लोगों के लिए एक बेहतरीन पहल है जो सिर्फ अपने मन की बात कहना चाहते हैं। मैं इसकी बहुत सराहना करती हूँ।',
     },
 ];

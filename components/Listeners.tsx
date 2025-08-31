@@ -167,7 +167,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
               <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="Google Pay" className="h-6 object-contain" />
           </div>
         </div>
-        <p className="text-base font-semibold text-green-600 dark:text-green-400">
+        <p className="text-sm font-semibold text-green-600 dark:text-green-400">
           सभी लेन-देन 100% सुरक्षित और गोपनीय हैं।
         </p>
         <p className="mt-2 text-slate-600 dark:text-slate-400 max-w-lg mx-auto">
