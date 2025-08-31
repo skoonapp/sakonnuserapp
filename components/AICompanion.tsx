@@ -14,9 +14,8 @@ interface AICompanionProps {
 
 // --- Icons ---
 const SendIcon: React.FC<{className?: string}> = ({className}) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}>
-      <path d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.949a.75.75 0 00.95.826L11.25 8.25l-6.507-1.22-.938-3.284z" />
-      <path d="M11.25 8.25a.75.75 0 000 1.5h.008l.004-.001.004-.001.003-.001a.752.752 0 00.28-.043l3.248-.812a.75.75 0 000-1.383l-3.248-.812a.75.75 0 00-.28-.043l-.003-.001-.004-.001-.004-.001H11.25z" />
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+        <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
     </svg>
 );
 
@@ -27,10 +26,17 @@ const CloseIcon: React.FC<{ className?: string }> = ({ className }) => (
     </svg>
 );
 
+const ReadReceiptIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className={className} viewBox="0 0 16 16">
+    <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 1.854 7.146a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0l7-7zm-4.208 7-.896-.897.707-.707.543.543 6.646-6.647a.5.5 0 0 1 .708.708l-7 7a.5.5 0 0 1-.708 0z"/>
+    <path d="m5.354 7.146.896.897-.707.707-.897-.896a.5.5 0 1 1 .708-.708z"/>
+  </svg>
+);
+
 const MicrophoneIcon: React.FC<{className?: string}> = ({className}) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
         <path d="M8.25 4.5a3.75 3.75 0 117.5 0v8.25a3.75 3.75 0 11-7.5 0V4.5z" />
-        <path d="M6 10.5a.75.75 0 01.75.75v.5a5.25 5.25 0 001.5 0v.5a6.75 6.75 0 01-13.5 0v-.5a.75.75 0 01.75-.75z" />
+        <path d="M6 10.5a.75.75 0 01.75.75v.5a5.25 5.25 0 0010.5 0v-.5a.75.75 0 011.5 0v.5a6.75 6.75 0 01-13.5 0v-.5a.75.75 0 01.75-.75z" />
     </svg>
 );
 
@@ -61,12 +67,22 @@ const AICompanion: React.FC<AICompanionProps> = ({ user, onClose, onNavigateToSe
     const [error, setError] = useState<string | null>(null);
     const chatRef = useRef<Chat | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
     useEffect(scrollToBottom, [messages]);
+    
+    // Auto-resize textarea
+    useEffect(() => {
+        if (textareaRef.current) {
+            textareaRef.current.style.height = 'auto';
+            const scrollHeight = textareaRef.current.scrollHeight;
+            textareaRef.current.style.height = `${scrollHeight}px`;
+        }
+    }, [inputValue]);
     
     // Initialize Chat
     useEffect(() => {
@@ -134,7 +150,7 @@ ${plansToString(CHAT_PLANS, 'चैट')}
         }
     }, [onNavigateToServices]);
 
-    const handleSendMessage = async (e: React.FormEvent) => {
+    const handleSendMessage = async (e: React.FormEvent | React.KeyboardEvent) => {
         e.preventDefault();
         const text = inputValue.trim();
         if (!text || isLoading || !chatRef.current) return;
@@ -214,8 +230,14 @@ ${plansToString(CHAT_PLANS, 'चैट')}
                         const isSent = msg.sender.uid === user.uid;
                         return (
                             <div key={msg.id} className={`flex ${isSent ? 'justify-end' : 'justify-start'}`}>
-                                <div className={`max-w-xs md:max-w-md p-3 rounded-xl whitespace-pre-wrap ${isSent ? 'bg-[#dcf8c6] text-slate-800 dark:bg-emerald-900 dark:text-slate-200 rounded-tr-none' : 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-bl-none shadow-sm'}`}>
-                                    <MarkdownRenderer text={msg.text} />
+                                <div className={`max-w-xs md:max-w-md p-2.5 rounded-xl flex flex-col ${isSent ? 'bg-[#dcf8c6] dark:bg-emerald-900 text-slate-800 dark:text-slate-200 rounded-tr-none' : 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-bl-none shadow-sm'}`}>
+                                    <div className="whitespace-pre-wrap"><MarkdownRenderer text={msg.text} /></div>
+                                    <div className="flex items-center self-end gap-1.5 mt-1 text-slate-500 dark:text-slate-400">
+                                        <span className="text-xs">
+                                            {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </span>
+                                        {isSent && <ReadReceiptIcon className="w-4 h-4 text-blue-500" />}
+                                    </div>
                                 </div>
                             </div>
                         );
@@ -232,19 +254,26 @@ ${plansToString(CHAT_PLANS, 'चैट')}
             {/* Input Footer */}
             <footer className="bg-transparent p-2 flex-shrink-0">
                 <form onSubmit={handleSendMessage} className="flex items-end gap-2">
-                    <div className="flex-grow bg-white dark:bg-slate-800 rounded-full flex items-center px-2 py-1 shadow-sm">
-                        <button type="button" className="p-2 text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400">
+                    <div className="flex-grow bg-white dark:bg-slate-800 rounded-2xl flex items-end px-2 py-1 shadow-sm">
+                        <button type="button" className="p-2 text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 shrink-0">
                             <EmojiIcon className="w-6 h-6" />
                         </button>
-                        <input
-                            type="text"
+                        <textarea
+                            ref={textareaRef}
+                            rows={1}
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             placeholder="एक संदेश लिखें..."
-                            className="flex-grow bg-transparent p-2 focus:outline-none text-slate-900 dark:text-white"
+                            className="flex-grow bg-transparent p-2 focus:outline-none text-slate-900 dark:text-white resize-none max-h-28 overflow-y-auto"
                             disabled={isLoading}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    handleSendMessage(e);
+                                }
+                            }}
                         />
-                        <button type="button" className="p-2 text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400">
+                        <button type="button" className="p-2 text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 shrink-0">
                             <AttachmentIcon className="w-6 h-6" />
                         </button>
                     </div>

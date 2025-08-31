@@ -1,7 +1,7 @@
 import * as functions from "firebase-functions/v1";
 import * as admin from "firebase-admin";
-// FIX: Use explicit `Request`, `Response`, and `NextFunction` types from 'express' to resolve type conflicts and property access errors.
-import express, { Request, Response, NextFunction } from "express";
+// FIX: Use explicit types from 'express' by importing the default export and using it as a namespace to resolve type conflicts and property access errors.
+import express from "express";
 import cors from "cors";
 import {RtcTokenBuilder, RtcRole} from "zego-express-engine";
 import Razorpay from "razorpay";
@@ -48,11 +48,11 @@ const razorpayInstance = new Razorpay({
 });
 
 // Middleware to check Firebase Auth token
-// FIX: Changed types to the explicitly imported `Request`, `Response`, and `NextFunction` to fix property access errors.
+// FIX: Changed types to use explicit express namespace to fix property access errors.
 const authenticate = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
 ) => {
   if (
     !req.headers.authorization ||
@@ -166,8 +166,8 @@ const processPurchase = async (paymentNotes: any, paymentId: string) => {
 };
 
 // Zego Token Generation Endpoint
-// FIX: Changed types to the explicitly imported `Request` and `Response` to fix property access errors.
-app.post("/generateZegoToken", authenticate, async (req: Request, res: Response) => {
+// FIX: Changed types to use explicit express namespace to fix property access errors.
+app.post("/generateZegoToken", authenticate, async (req: express.Request, res: express.Response) => {
   const userId = req.user!.uid;
   const {planId} = req.body;
 
@@ -216,8 +216,8 @@ app.post("/generateZegoToken", authenticate, async (req: Request, res: Response)
 });
 
 
-// FIX: Changed types to the explicitly imported `Request` and `Response` to fix property access errors.
-app.post("/verifyPayment", authenticate, async (req: Request, res: Response) => {
+// FIX: Changed types to use explicit express namespace to fix property access errors.
+app.post("/verifyPayment", authenticate, async (req: express.Request, res: express.Response) => {
   const {razorpay_payment_id} = req.body;
   if (!razorpay_payment_id) {
     return res.status(400).send({error: "Payment ID is required."});
@@ -241,8 +241,8 @@ app.post("/verifyPayment", authenticate, async (req: Request, res: Response) => 
 
 
 // Razorpay Webhook Endpoint
-// FIX: Changed types to the explicitly imported `Request` and `Response` to fix property access errors.
-app.post("/razorpayWebhook", async (req: Request, res: Response) => {
+// FIX: Changed types to use explicit express namespace to fix property access errors.
+app.post("/razorpayWebhook", async (req: express.Request, res: express.Response) => {
   const secret = functions.config().razorpay.webhook_secret;
   const signature = req.headers["x-razorpay-signature"] as string;
 
