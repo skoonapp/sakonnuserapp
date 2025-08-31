@@ -17,7 +17,8 @@
     "express": "https://aistudiocdn.com/express@^5.1.0",
     "cors": "https://aistudiocdn.com/cors@^2.8.5",
     "razorpay": "https://aistudiocdn.com/razorpay@^2.9.6",
-    "process": "https://aistudiocdn.com/process@^0.11.10"
+    "process": "https://aistudiocdn.com/process@^0.11.10",
+    "vite-plugin-pwa": "https://aistudiocdn.com/vite-plugin-pwa@^1.0.3"
   }
 }
 </script>
@@ -27,9 +28,9 @@
     <title>SakoonApp Admin</title>
 
     <!-- PWA and Mobile Meta Tags -->
-    <link rel="manifest" href="/manifest.json">
+    <!-- The manifest link is now injected automatically by vite-plugin-pwa -->
     <link rel="apple-touch-icon" href="/icon.svg">
-    <meta name="theme-color" content="#0d9488">
+    <meta name="theme-color" content="#0891B2">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
@@ -117,18 +118,7 @@
     <div id="root" class="max-w-md mx-auto"></div>
     <script type="module" src="/index.tsx"></script>
 
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js', { scope: '/' })
-            .then(registration => {
-              console.log('ServiceWorker registration successful with scope: ', registration.scope);
-            })
-            .catch(error => {
-              console.log('ServiceWorker registration failed: ', error);
-            });
-        });
-      }
-    </script>
+    <!-- The service worker registration script has been removed. -->
+    <!-- vite-plugin-pwa will inject its own registration logic. -->
   </body>
 </html>

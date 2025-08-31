@@ -1,8 +1,10 @@
+
+
 import * as functions from "firebase-functions/v1";
 import * as admin from "firebase-admin";
-// FIX: Use default and named imports for express to resolve type conflicts with other libraries.
-// FIX: Aliased Request and Response to avoid type conflicts with other libraries.
-import express, { Request as ExpressRequest, Response as ExpressResponse, NextFunction } from "express";
+// FIX: Separate default import for express function from type imports to resolve type conflicts.
+import express from "express";
+import type { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import {RtcTokenBuilder, RtcRole} from "zego-express-engine";
 import Razorpay from "razorpay";
@@ -49,11 +51,10 @@ const razorpayInstance = new Razorpay({
 });
 
 // Middleware to check Firebase Auth token
-// FIX: Use named import types Request, Response, and NextFunction for correct typing.
-// FIX: Use aliased ExpressRequest and ExpressResponse types to fix property errors.
+// FIX: Use imported express types for correct typing.
 const authenticate = async (
-  req: ExpressRequest,
-  res: ExpressResponse,
+  req: Request,
+  res: Response,
   next: NextFunction,
 ) => {
   if (
@@ -168,9 +169,8 @@ const processPurchase = async (paymentNotes: any, paymentId: string) => {
 };
 
 // Zego Token Generation Endpoint
-// FIX: Use named import types Request and Response for correct typing.
-// FIX: Use aliased ExpressRequest and ExpressResponse types to fix property errors.
-app.post("/generateZegoToken", authenticate, async (req: ExpressRequest, res: ExpressResponse) => {
+// FIX: Use imported express types for correct typing.
+app.post("/generateZegoToken", authenticate, async (req: Request, res: Response) => {
   const userId = req.user!.uid;
   const {planId} = req.body;
 
@@ -219,9 +219,8 @@ app.post("/generateZegoToken", authenticate, async (req: ExpressRequest, res: Ex
 });
 
 
-// FIX: Use named import types Request and Response for correct typing.
-// FIX: Use aliased ExpressRequest and ExpressResponse types to fix property errors.
-app.post("/verifyPayment", authenticate, async (req: ExpressRequest, res: ExpressResponse) => {
+// FIX: Use imported express types for correct typing.
+app.post("/verifyPayment", authenticate, async (req: Request, res: Response) => {
   const {razorpay_payment_id} = req.body;
   if (!razorpay_payment_id) {
     return res.status(400).send({error: "Payment ID is required."});
@@ -245,9 +244,8 @@ app.post("/verifyPayment", authenticate, async (req: ExpressRequest, res: Expres
 
 
 // Razorpay Webhook Endpoint
-// FIX: Use named import types Request and Response for correct typing.
-// FIX: Use aliased ExpressRequest and ExpressResponse types to fix property errors.
-app.post("/razorpayWebhook", async (req: ExpressRequest, res: ExpressResponse) => {
+// FIX: Use imported express types for correct typing.
+app.post("/razorpayWebhook", async (req: Request, res: Response) => {
   const secret = functions.config().razorpay.webhook_secret;
   const signature = req.headers["x-razorpay-signature"] as string;
 
