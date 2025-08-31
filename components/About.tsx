@@ -116,6 +116,11 @@ const ProfileView: React.FC<ProfileViewProps> = ({
             <button onClick={onShowPrivacyPolicy} className="text-cyan-600 dark:text-cyan-400 font-semibold hover:underline">Privacy Policy</button>
             <button onClick={onShowCancellationPolicy} className="text-cyan-600 dark:text-cyan-400 font-semibold hover:underline">Cancellation/Refund Policy</button>
           </div>
+           <footer className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                © 2025 SakoonApp. All Rights Reserved.
+              </p>
+            </footer>
         </div>
 
       </div>

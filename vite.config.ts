@@ -1,11 +1,11 @@
 import path from 'path';
-// FIX: Use `process` from 'node:process' to ensure the correct Node.js built-in module and its types are imported, resolving the module export error on `cwd`.
+// FIX: Import 'process' from 'node:process' to ensure the correct Node.js built-in module and its types are imported, resolving the module export error on `cwd`.
 import process from 'node:process';
 import { defineConfig, loadEnv } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ mode }) => {
-    // FIX: Explicitly use `process.cwd()` to ensure the correct directory is passed to loadEnv, resolving potential errors with `process.cwd()` in some environments.
+    // FIX: Explicitly use `process.cwd()` to ensure the correct directory is passed to loadEnv.
     const env = loadEnv(mode, process.cwd(), '');
     return {
       plugins: [
@@ -54,8 +54,7 @@ export default defineConfig(({ mode }) => {
       },
       resolve: {
         alias: {
-// FIX: Replaced `__dirname` with `process.cwd()` to resolve the "Cannot find name '__dirname'" error in an ES module context.
-// FIX: Switched to `process.cwd()` to resolve module export errors.
+// FIX: Replaced `__dirname` with `process.cwd()` to resolve errors in an ES module context.
           '@': path.resolve(process.cwd(), '.'),
         }
       },
