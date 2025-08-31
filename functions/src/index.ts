@@ -2,11 +2,12 @@
 
 
 
+
+
 import * as functions from "firebase-functions/v1";
 import * as admin from "firebase-admin";
-// FIX: Separated express runtime and type imports to resolve type errors on Request and Response objects.
+// FIX: Use explicit `express.Request` and `express.Response` types to avoid conflicts.
 import express from "express";
-import type { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import {RtcTokenBuilder, RtcRole} from "zego-express-engine";
 import Razorpay from "razorpay";
@@ -53,11 +54,11 @@ const razorpayInstance = new Razorpay({
 });
 
 // Middleware to check Firebase Auth token
-// FIX: Use imported express types for correct typing.
+// FIX: Use namespaced express types (`express.Request`, `express.Response`) to ensure correct type resolution and fix property access errors.
 const authenticate = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
 ) => {
   if (
     !req.headers.authorization ||
@@ -171,8 +172,8 @@ const processPurchase = async (paymentNotes: any, paymentId: string) => {
 };
 
 // Zego Token Generation Endpoint
-// FIX: Use imported express types for correct typing.
-app.post("/generateZegoToken", authenticate, async (req: Request, res: Response) => {
+// FIX: Use namespaced express types (`express.Request`, `express.Response`) to ensure correct type resolution and fix property access errors.
+app.post("/generateZegoToken", authenticate, async (req: express.Request, res: express.Response) => {
   const userId = req.user!.uid;
   const {planId} = req.body;
 
@@ -221,8 +222,8 @@ app.post("/generateZegoToken", authenticate, async (req: Request, res: Response)
 });
 
 
-// FIX: Use imported express types for correct typing.
-app.post("/verifyPayment", authenticate, async (req: Request, res: Response) => {
+// FIX: Use namespaced express types (`express.Request`, `express.Response`) to ensure correct type resolution and fix property access errors.
+app.post("/verifyPayment", authenticate, async (req: express.Request, res: express.Response) => {
   const {razorpay_payment_id} = req.body;
   if (!razorpay_payment_id) {
     return res.status(400).send({error: "Payment ID is required."});
@@ -246,8 +247,8 @@ app.post("/verifyPayment", authenticate, async (req: Request, res: Response) => 
 
 
 // Razorpay Webhook Endpoint
-// FIX: Use imported express types for correct typing.
-app.post("/razorpayWebhook", async (req: Request, res: Response) => {
+// FIX: Use namespaced express types (`express.Request`, `express.Response`) to ensure correct type resolution and fix property access errors.
+app.post("/razorpayWebhook", async (req: express.Request, res: express.Response) => {
   const secret = functions.config().razorpay.webhook_secret;
   const signature = req.headers["x-razorpay-signature"] as string;
 
