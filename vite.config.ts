@@ -1,10 +1,11 @@
 
 
 
+
 import path from 'path';
 // FIX: Changed to use `process` from 'node:process' to ensure the correct Node.js built-in module and its types are imported, resolving the module export error on `cwd`.
 // FIX: Use an aliased import for 'node:process' to avoid a likely type collision that was causing an error on `process.cwd()`.
-import process from 'node:process';
+import * as nodeProcess from 'node:process';
 import { defineConfig, loadEnv } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
@@ -59,7 +60,8 @@ export default defineConfig(({ mode }) => {
         alias: {
 // FIX: Replaced `__dirname` with `process.cwd()` to resolve the "Cannot find name '__dirname'" error in an ES module context.
 // FIX: Switched to `process.cwd()` to resolve module export errors.
-          '@': path.resolve(process.cwd(), '.'),
+// FIX: Used aliased import `nodeProcess` to avoid type collision for `process.cwd()`.
+          '@': path.resolve(nodeProcess.cwd(), '.'),
         }
       },
       build: {
