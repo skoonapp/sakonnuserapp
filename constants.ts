@@ -27,7 +27,7 @@ export const INITIAL_ACTIVE_CHATS = []; // Placeholder, will be managed by state
 
 // FIX: Added missing constants required by multiple components.
 
-export const RAZORPAY_KEY_ID = "rzp_test_1DP0deJj2SjY8d"; // Replace with your actual Razorpay Test Key ID
+export const RAZORPAY_KEY_ID = "rzp_test_gV1tLH2ZnCWti9"; // Replace with your actual Razorpay Test Key ID
 
 export const CALL_PLANS: Plan[] = [
     { duration: '5 मिनट', price: 50, tierName: 'Bronze Pack' },
@@ -69,8 +69,19 @@ export const FAQ_DATA: FaqItem[] = [
         isPositive: true,
     },
     {
-        question: 'टोकन और DT प्लान में क्या अंतर है?',
-        answer: 'DT (डायरेक्ट टाइम) प्लान लंबी, निर्बाध बातचीत के लिए हैं। टोकन छोटी, कई बातचीत के लिए लचीलापन प्रदान करते हैं। आप अपनी सुविधानुसार चुन सकते हैं।',
+        question: 'टोकन और DT प्लान का उपयोग कैसे करें?',
+        answer: `यह बहुत आसान है! यहाँ बताया गया है कि दोनों कैसे काम करते हैं:
+1. **DT (डायरेक्ट टाइम) प्लान:** ये **लंबी, बिना रुकावट की बातचीत** के लिए सबसे अच्छे हैं।
+   - **कैसे खरीदें:** होम पेज से अपनी पसंद का DT प्लान (जैसे 30 मिनट) खरीदें।
+   - **कैसे उपयोग करें:** किसी भी Listener से बात करने के लिए, अपना खरीदा हुआ प्लान चुनें। आपका समय तभी कटेगा जब आप बात कर रहे होंगे।
+2. **टोकन:** ये **छोटी-छोटी या कई बार बात करने** के लिए बहुत सुविधाजनक हैं।
+   - **कैसे खरीदें:** होम पेज से टोकन पैक खरीदें।
+   - **कैसे उपयोग करें:** किसी भी Listener से सीधे कॉल या चैट करें। आपके टोकन अपने आप कट जाएंगे (कॉल के लिए **2 टोकन/मिनट** और चैट के लिए **1 टोकन में 2 मैसेज**)।`,
+        isPositive: true,
+    },
+    {
+        question: 'रिचार्ज या रिफंड में समस्या होने पर क्या करें?',
+        answer: 'अगर आपका भुगतान हो गया है लेकिन प्लान या टोकन नहीं मिले हैं, तो चिंता न करें। आमतौर पर, पैसा 5-7 व्यावसायिक दिनों में अपने आप वापस आ जाता है। अगर ऐसा नहीं होता है, तो कृपया हमें अपनी भुगतान रसीद (transaction receipt) के साथ **appsakoon@gmail.com** पर ईमेल करें। हम आपकी तुरंत मदद करेंगे।',
         isPositive: true,
     },
 ];

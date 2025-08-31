@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
 import type { Plan, User } from '../types';
 import { RAZORPAY_KEY_ID } from '../constants';
+import { auth } from '../utils/firebase';
 
 // Declare Razorpay on the window object for TypeScript
 declare global {
@@ -82,10 +82,37 @@ const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPop
         name: "SakoonApp",
         description: `एक ${type === 'chat' ? 'चैट' : 'कॉल'} प्लान खरीदें - ${plan.duration}`,
         image: "https://cdn-icons-png.flaticon.com/512/2966/2966472.png",
-        handler: function (response: any) {
-            console.log("Payment successful:", response);
-            alert(`आपका भुगतान सफल रहा! आपका ${plan.duration} का ${type === 'call' ? 'कॉल' : 'चैट'} प्लान जल्द ही आपके वॉलेट में दिखाई देगा।`);
-            setLoadingType(null);
+        handler: async (response: any) => {
+            const { razorpay_payment_id } = response;
+            try {
+                const user = auth.currentUser;
+                if (!user) throw new Error("User not authenticated");
+                const idToken = await user.getIdToken(true);
+
+                const verifyUrl = 'https://asia-south1-sakoonapp-9574c.cloudfunctions.net/api/verifyPayment';
+
+                const verifyResponse = await fetch(verifyUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${idToken}`,
+                    },
+                    body: JSON.stringify({ razorpay_payment_id }),
+                });
+
+                if (!verifyResponse.ok) {
+                    const errorData = await verifyResponse.json();
+                    throw new Error(errorData.error || 'Payment verification failed on server.');
+                }
+
+                alert(`आपका भुगतान सफल रहा! आपका ${plan.duration} का ${type === 'call' ? 'कॉल' : 'चैट'} प्लान जल्द ही आपके वॉलेट में दिखाई देगा।`);
+
+            } catch (error) {
+                console.error("Error during payment verification:", error);
+                alert("भुगतान सफल रहा, लेकिन आपके खाते को अपडेट करने में कोई त्रुटि हुई। कृपया सहायता से संपर्क करें।");
+            } finally {
+                setLoadingType(null);
+            }
         },
         prefill: {
             name: currentUser.name || '',

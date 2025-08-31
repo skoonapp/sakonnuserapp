@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PlanCard from './PlanCard';
 import { CALL_PLANS, CHAT_PLANS, RAZORPAY_KEY_ID } from '../constants';
 import type { User } from '../types';
+import { auth } from '../utils/firebase';
 
 declare global {
   interface Window {
@@ -51,10 +52,36 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
       name: "SakoonApp",
       description: `टोकन खरीदें - ${tokenOption.amount} टोकन`,
       image: "https://cdn-icons-png.flaticon.com/512/2966/2966472.png",
-      handler: function (response: any) {
-        console.log("Token purchase successful:", response);
-        alert(`आपका भुगतान सफल रहा! ${tokenOption.amount} टोकन जल्द ही आपके खाते में जोड़ दिए जाएंगे।`);
-        setLoading(null);
+      handler: async (response: any) => {
+        const { razorpay_payment_id } = response;
+        try {
+          const user = auth.currentUser;
+          if (!user) throw new Error("User not authenticated");
+          const idToken = await user.getIdToken(true);
+
+          const verifyUrl = 'https://asia-south1-sakoonapp-9574c.cloudfunctions.net/api/verifyPayment';
+
+          const verifyResponse = await fetch(verifyUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${idToken}`,
+            },
+            body: JSON.stringify({ razorpay_payment_id }),
+          });
+
+          if (!verifyResponse.ok) {
+            const errorData = await verifyResponse.json();
+            throw new Error(errorData.error || 'Payment verification failed on server.');
+          }
+
+          alert(`आपका भुगतान सफल रहा! ${tokenOption.amount} टोकन जल्द ही आपके खाते में जोड़ दिए जाएंगे।`);
+        } catch (error) {
+          console.error("Error during payment verification:", error);
+          alert("भुगतान सफल रहा, लेकिन आपके खाते को अपडेट करने में कोई त्रुटि हुई। कृपया सहायता से संपर्क करें।");
+        } finally {
+          setLoading(null);
+        }
       },
       prefill: {
         name: currentUser.name || '',
@@ -65,6 +92,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
         userId: currentUser.uid,
         purchaseType: 'tokens',
         tokensToBuy: tokenOption.amount,
+        planPrice: tokenOption.price, // For transaction record
       },
       theme: { color: "#0891B2" },
       modal: {
@@ -102,7 +130,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
         <div className="text-center mb-6">
             <h3 className="text-3xl font-bold text-slate-800 dark:text-slate-200 flex items-center justify-center gap-3">
                 <WalletIcon className="w-8 h-8 text-indigo-500"/>
-                <span>टोकन वॉलेट</span>
+                <span>Token Plans</span>
             </h3>
             <p className="text-slate-600 dark:text-slate-400 mt-2">टोकन खरीदें और अपनी सुविधानुसार कॉल या चैट के लिए उपयोग करें।</p>
         </div>
