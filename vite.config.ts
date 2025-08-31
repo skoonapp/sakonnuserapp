@@ -1,6 +1,6 @@
 import path from 'path';
-// FIX: Explicitly import `process` to provide Node.js type definitions and resolve error on `process.cwd()`.
-import process from 'process';
+// FIX: Changed to use `cwd` from 'node:process' to ensure the correct Node.js built-in module and its types are imported, resolving the type error on `process.cwd()`.
+import { cwd } from 'node:process';
 import { defineConfig, loadEnv } from 'vite';
 
 export default defineConfig(({ mode }) => {
@@ -13,7 +13,8 @@ export default defineConfig(({ mode }) => {
       resolve: {
         alias: {
 // FIX: Replaced `__dirname` with `process.cwd()` to resolve the "Cannot find name '__dirname'" error in an ES module context.
-          '@': path.resolve(process.cwd(), '.'),
+// FIX: Switched to `cwd()` to resolve "Property 'cwd' does not exist on type 'Process'".
+          '@': path.resolve(cwd(), '.'),
         }
       },
       build: {

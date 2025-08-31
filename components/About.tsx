@@ -85,6 +85,25 @@ const ProfileView: React.FC<ProfileViewProps> = ({
           </div>
           <Testimonials />
         </section>
+
+        {/* Install App Section */}
+        {deferredPrompt && (
+          <section id="install-app" className="mt-8 py-6 bg-white dark:bg-slate-800 rounded-xl shadow-md">
+            <div className="container mx-auto px-6 text-center">
+              <h3 className="text-2xl font-bold text-slate-700 dark:text-slate-200 mb-4">एक क्लिक में इंस्टॉल करें</h3>
+              <p className="text-slate-600 dark:text-slate-400 mb-6 max-w-md mx-auto">
+                SakoonApp को अपनी होम स्क्रीन पर जोड़ें ताकि आप इसे आसानी से और तेज़ी से इस्तेमाल कर सकें।
+              </p>
+              <button 
+                onClick={onInstallClick} 
+                className="flex w-full max-w-xs mx-auto justify-center items-center gap-3 bg-cyan-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-cyan-700 transition-colors shadow-lg transform hover:scale-105"
+              >
+                <InstallIcon className="w-6 h-6"/>
+                <span>ऐप इंस्टॉल करें</span>
+              </button>
+            </div>
+          </section>
+        )}
         
         <FAQ />
         
@@ -93,12 +112,6 @@ const ProfileView: React.FC<ProfileViewProps> = ({
         <div className="mt-6 text-center p-6 bg-white dark:bg-slate-800 rounded-xl shadow-md">
           <h3 className="text-2xl font-bold text-slate-700 dark:text-slate-200 mb-4">App & Policies</h3>
           <div className="flex flex-col sm:flex-row justify-center items-center flex-wrap gap-4">
-            {deferredPrompt && (
-              <button onClick={onInstallClick} className="flex items-center gap-2 bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300 font-bold py-2 px-4 rounded-lg hover:bg-green-200 dark:hover:bg-green-800 transition-colors">
-                <InstallIcon className="w-5 h-5"/>
-                ऐप इंस्टॉल करें
-              </button>
-            )}
             <button onClick={onShowTerms} className="text-cyan-600 dark:text-cyan-400 font-semibold hover:underline">Terms & Conditions</button>
             <button onClick={onShowPrivacyPolicy} className="text-cyan-600 dark:text-cyan-400 font-semibold hover:underline">Privacy Policy</button>
             <button onClick={onShowCancellationPolicy} className="text-cyan-600 dark:text-cyan-400 font-semibold hover:underline">Cancellation/Refund Policy</button>

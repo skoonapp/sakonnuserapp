@@ -23,6 +23,20 @@ import TermsAndConditions from './components/TermsAndConditions';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import CancellationRefundPolicy from './components/CancellationRefundPolicy';
 
+// --- Icons for Install Banner ---
+const InstallIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+        <path d="M12 1.5a.75.75 0 01.75.75V12h-1.5V2.25A.75.75 0 0112 1.5z" />
+        <path fillRule="evenodd" d="M3.75 13.5a.75.75 0 00-1.5 0v4.5a3 3 0 003 3h10.5a3 3 0 003-3v-4.5a.75.75 0 00-1.5 0v4.5a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-4.5zm5.03-3.03a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l2.25-2.25a.75.75 0 10-1.06-1.06L12 12.69 8.78 9.47z" clipRule="evenodd" />
+    </svg>
+);
+const CloseIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg className={className} stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+  </svg>
+);
+
+
 // Main App Component
 const App: React.FC = () => {
     // Auth State
@@ -49,6 +63,7 @@ const App: React.FC = () => {
 
     // PWA Install Prompt
     const [deferredInstallPrompt, setDeferredInstallPrompt] = useState<any>(null);
+    const [showInstallBanner, setShowInstallBanner] = useState(false);
 
     useEffect(() => {
         const handler = (e: Event) => {
@@ -58,6 +73,21 @@ const App: React.FC = () => {
         window.addEventListener('beforeinstallprompt', handler);
         return () => window.removeEventListener('beforeinstallprompt', handler);
     }, []);
+
+    // Logic to show/hide the install banner
+    useEffect(() => {
+        const expiryString = localStorage.getItem('pwaInstallDismissedExpiry');
+        if (expiryString && new Date().getTime() > Number(expiryString)) {
+            localStorage.removeItem('pwaInstallDismissed');
+            localStorage.removeItem('pwaInstallDismissedExpiry');
+        }
+        const isDismissed = localStorage.getItem('pwaInstallDismissed');
+        if (deferredInstallPrompt && !isDismissed) {
+            setShowInstallBanner(true);
+        } else {
+            setShowInstallBanner(false);
+        }
+    }, [deferredInstallPrompt]);
 
     const handleInstallClick = () => {
         if (deferredInstallPrompt) {
@@ -69,8 +99,16 @@ const App: React.FC = () => {
                     console.log('User dismissed the install prompt');
                 }
                 setDeferredInstallPrompt(null);
+                setShowInstallBanner(false);
             });
         }
+    };
+
+    const handleInstallDismiss = () => {
+        const expiry = new Date().getTime() + 7 * 24 * 60 * 60 * 1000; // 7 days
+        localStorage.setItem('pwaInstallDismissed', 'true');
+        localStorage.setItem('pwaInstallDismissedExpiry', String(expiry));
+        setShowInstallBanner(false);
     };
     
     // Dark Mode Effect
@@ -267,6 +305,28 @@ const App: React.FC = () => {
             <Footer activeView={activeView} setActiveView={setActiveView} />
             
             {/* Modals and Overlays */}
+            {showInstallBanner && (
+                <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-md z-40 animate-fade-in-up">
+                  <div className="bg-gradient-to-r from-cyan-600 to-teal-500 rounded-xl shadow-2xl p-4 flex items-center gap-4 text-white relative">
+                    <div className="bg-white/20 p-3 rounded-full shrink-0">
+                      <InstallIcon className="w-6 h-6" />
+                    </div>
+                    <div className="flex-grow">
+                      <p className="font-bold">SakoonApp इंस्टॉल करें</p>
+                      <p className="text-sm opacity-90">बेहतर अनुभव के लिए ऐप जोड़ें।</p>
+                    </div>
+                    <button
+                      onClick={handleInstallClick}
+                      className="bg-white text-cyan-700 font-bold py-2 px-4 rounded-lg text-sm shrink-0 hover:bg-cyan-100 transition-colors"
+                    >
+                      इंस्टॉल
+                    </button>
+                    <button onClick={handleInstallDismiss} className="absolute -top-2 -right-2 bg-slate-800/50 rounded-full p-1 hover:bg-slate-800/80 transition-colors">
+                      <CloseIcon className="w-4 h-4 text-white" />
+                    </button>
+                  </div>
+                </div>
+            )}
             <AICompanionButton onClick={() => setShowAICompanion(true)} />
             {showAICompanion && <AICompanion user={user} onClose={() => setShowAICompanion(false)} onNavigateToServices={() => { setActiveView('home'); setShowAICompanion(false); }} />}
             
