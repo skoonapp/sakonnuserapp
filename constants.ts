@@ -30,21 +30,21 @@ export const INITIAL_ACTIVE_CHATS = []; // Placeholder, will be managed by state
 export const RAZORPAY_KEY_ID = "rzp_test_1DP0deJj2SjY8d"; // Replace with your actual Razorpay Test Key ID
 
 export const CALL_PLANS: Plan[] = [
-    { duration: '5 मिनट', price: 25, tierName: 'Bronze Pack' },
-    { duration: '10 मिनट', price: 50, tierName: 'Silver Pack' },
-    { duration: '15 मिनट', price: 70, tierName: 'Gold Pack' },
-    { duration: '30 मिनट', price: 130, tierName: 'Platinum Pack' },
-    { duration: '45 मिनट', price: 190, tierName: 'Diamond Pack' },
-    { duration: '1 घंटा', price: 250, tierName: 'Elite Pack' },
+    { duration: '5 मिनट', price: 50, tierName: 'Bronze Pack' },
+    { duration: '10 मिनट', price: 100, tierName: 'Silver Pack' },
+    { duration: '15 मिनट', price: 145, tierName: 'Gold Pack' },
+    { duration: '30 मिनट', price: 270, tierName: 'Platinum Pack' },
+    { duration: '45 मिनट', price: 410, tierName: 'Diamond Pack' },
+    { duration: '1 घंटा', price: 540, tierName: 'Elite Pack' },
 ];
 
 export const CHAT_PLANS: Plan[] = [
-    { duration: '5 मिनट', price: 15 },
-    { duration: '10 मिनट', price: 30 },
-    { duration: '15 मिनट', price: 45 },
-    { duration: '30 मिनट', price: 80 },
-    { duration: '45 मिनट', price: 110 },
-    { duration: '1 घंटा', price: 140 },
+    { duration: '5 मिनट', price: 20 },
+    { duration: '10 मिनट', price: 36 },
+    { duration: '15 मिनट', price: 50 },
+    { duration: '30 मिनट', price: 90 },
+    { duration: '45 मिनट', price: 135 },
+    { duration: '1 घंटा', price: 170 },
 ];
 
 export const FAQ_DATA: FaqItem[] = [

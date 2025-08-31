@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import PlanCard from './PlanCard';
 import { CALL_PLANS, CHAT_PLANS, RAZORPAY_KEY_ID } from '../constants';
@@ -36,11 +34,11 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
 
   const tokenOptions = [
     { amount: 10, price: 50 },
-    { amount: 20, price: 100 },
-    { amount: 50, price: 240 },
-    { amount: 100, price: 470 },
-    { amount: 250, price: 1100 },
-    { amount: 500, price: 2100 },
+    { amount: 20, price: 95 },
+    { amount: 50, price: 230 },
+    { amount: 100, price: 450 },
+    { amount: 250, price: 1125 },
+    { amount: 500, price: 2250 },
   ];
 
   const handleTokenPurchase = (tokenOption: { amount: number; price: number }) => {
