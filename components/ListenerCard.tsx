@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import type { Listener } from '../types';
+import { LISTENER_IMAGES } from '../constants';
 
 interface ListenerCardProps {
   listener: Listener;
@@ -48,6 +49,7 @@ const ChatBubbleIcon: React.FC<{ className?: string }> = ({ className }) => (
 
 const ListenerCard: React.FC<ListenerCardProps> = ({ listener, onCallClick, onChatClick, variant = 'default', isFavorite, onToggleFavorite }) => {
     const [imageError, setImageError] = useState(false);
+    const listenerImage = LISTENER_IMAGES[listener.id % LISTENER_IMAGES.length];
 
     if (variant === 'compact') {
         return (
@@ -66,7 +68,7 @@ const ListenerCard: React.FC<ListenerCardProps> = ({ listener, onCallClick, onCh
                     <PlaceholderAvatar className="w-16 h-16" />
                 ) : (
                     <img 
-                        src={listener.image} 
+                        src={listenerImage} 
                         alt={listener.name} 
                         className="w-16 h-16 rounded-full object-cover" 
                         loading="lazy" decoding="async"
@@ -81,7 +83,7 @@ const ListenerCard: React.FC<ListenerCardProps> = ({ listener, onCallClick, onCh
                 <VerifiedIcon className="w-5 h-5 text-blue-500" />
               </div>
               <div className="flex items-center text-sm text-slate-500 dark:text-slate-400 mt-1">
-                <span>{listener.rating}★ ({listener.reviewsCount})</span>
+                <span>{listener.rating}★ {listener.reviewsCount}</span>
               </div>
             </div>
             <div className="flex gap-2 shrink-0">
@@ -127,7 +129,7 @@ const ListenerCard: React.FC<ListenerCardProps> = ({ listener, onCallClick, onCh
                     <PlaceholderAvatar className="w-24 h-24 md:w-28 md:h-28 mx-auto border-4 border-slate-100 dark:border-slate-700" />
                 ) : (
                     <img 
-                        src={listener.image} 
+                        src={listenerImage} 
                         alt={listener.name} 
                         className="w-24 h-24 md:w-28 md:h-28 rounded-full mx-auto border-4 border-slate-100 dark:border-slate-700 object-cover" 
                         loading="lazy" decoding="async"
@@ -146,7 +148,7 @@ const ListenerCard: React.FC<ListenerCardProps> = ({ listener, onCallClick, onCh
             <div className="flex justify-center items-center text-xs md:text-sm text-center mb-4 text-slate-600 bg-slate-50 dark:bg-slate-700/50 p-2 rounded-lg">
                 <div>
                     <span className="font-bold text-slate-800 dark:text-slate-200">{listener.rating}★</span>
-                    <span className="block text-slate-500 dark:text-slate-400 text-[10px] md:text-xs">({listener.reviewsCount})</span>
+                    <span className="block text-slate-500 dark:text-slate-400 text-[10px] md:text-xs">{listener.reviewsCount}</span>
                 </div>
             </div>
             

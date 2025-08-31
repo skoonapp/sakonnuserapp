@@ -1,11 +1,5 @@
-
-
-
-
-
-
 import path from 'path';
-// FIX: Changed to use `process` from 'node:process' to ensure the correct Node.js built-in module and its types are imported, resolving the module export error on `cwd`.
+// FIX: Use `process` from 'node:process' to ensure the correct Node.js built-in module and its types are imported, resolving the module export error on `cwd`.
 import process from 'node:process';
 import { defineConfig, loadEnv } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';

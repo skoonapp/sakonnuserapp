@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import type { CallSession, User } from '../types';
 import { fetchZegoToken } from '../utils/zego.ts';
+import { LISTENER_IMAGES } from '../constants';
 
 declare global {
   interface Window {
@@ -207,6 +208,7 @@ const CallUI: React.FC<CallUIProps> = ({ session, user, onLeave }) => {
   };
   
   const listener = session.listener;
+  const listenerImage = LISTENER_IMAGES[listener.id % LISTENER_IMAGES.length];
   
   const getStatusText = () => {
       switch(status) {
@@ -230,7 +232,7 @@ const CallUI: React.FC<CallUIProps> = ({ session, user, onLeave }) => {
     <div 
         className="fixed inset-0 bg-slate-900 text-white flex flex-col items-center justify-between p-8 z-50 transition-all duration-500 animate-fade-in"
         style={{
-            backgroundImage: `url(${imageError ? 'https://i.pinimg.com/736x/8c/98/99/8c98994518b575bfd8c949e91d20548b.jpg' : listener.image})`,
+            backgroundImage: `url(${imageError ? 'https://i.pinimg.com/736x/8c/98/99/8c98994518b575bfd8c949e91d20548b.jpg' : listenerImage})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
         }}
@@ -251,7 +253,7 @@ const CallUI: React.FC<CallUIProps> = ({ session, user, onLeave }) => {
                         <PlaceholderAvatar className="w-full h-full shadow-2xl border-4 border-white/20" />
                     ) : (
                         <img 
-                            src={listener.image} 
+                            src={listenerImage} 
                             alt={listener.name}
                             className="w-40 h-40 rounded-full object-cover shadow-2xl border-4 border-white/20"
                             loading="lazy" decoding="async"

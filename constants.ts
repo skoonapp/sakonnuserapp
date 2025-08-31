@@ -1,5 +1,22 @@
 import type { Plan, FaqItem } from './types';
 
+// Centralized array of listener images to ensure consistency.
+export const LISTENER_IMAGES = [
+    'https://images.unsplash.com/photo-1598128558393-70ff21433be0?q=80&w=256&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1615109398623-88346a601842?q=80&w=256&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1548142813-c348350df52b?q=80&w=256&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=256&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1607346256330-1689574ce33b?q=80&w=256&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1531746020798-57551c1bb8ae?q=80&w=256&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1599425483443-5e1e2a5c4314?q=80&w=256&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=256&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=256&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1521119989659-a83eee488004?q=80&w=256&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1554151228-14d9def656e4?q=80&w=256&auto=format&fit=crop'
+];
+
+
 // Other application constants
 export const AVATAR_EMOJIS = ['👨', '👩', '🎭', '🎪', '🎨', '🎵'];
 export const QUICK_REPLIES = [

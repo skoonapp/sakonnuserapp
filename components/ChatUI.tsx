@@ -5,6 +5,7 @@ import type { ChatSession, User, ChatMessage, PurchasedPlan } from '../types';
 import { fetchZegoToken } from '../utils/zego.ts';
 import { db } from '../utils/firebase.ts';
 import firebase from 'firebase/compat/app';
+import { LISTENER_IMAGES } from '../constants';
 
 declare global {
   interface Window {
@@ -75,6 +76,9 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
   const [status, setStatus] = useState<ConnectionStatus>('connecting');
   const [imageError, setImageError] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  const listener = session.listener;
+  const listenerImage = LISTENER_IMAGES[listener.id % LISTENER_IMAGES.length];
 
   const addSystemMessage = useCallback((text: string) => {
       setMessages(prev => [...prev, {
@@ -239,7 +243,6 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
     }
   };
   
-  const listener = session.listener;
 
   const getStatusText = () => {
       switch (status) {
@@ -270,7 +273,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
             <PlaceholderAvatar className="w-10 h-10 object-cover" />
         ) : (
             <img 
-                src={listener.image} 
+                src={listenerImage} 
                 alt={listener.name} 
                 className="w-10 h-10 rounded-full object-cover" 
                 loading="lazy" 
