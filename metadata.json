@@ -1,0 +1,8 @@
+{
+  "name": "SakoonApp User",
+  "description": "An admin panel to receive and manage user calls and chats.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "prompt": ""
+}
