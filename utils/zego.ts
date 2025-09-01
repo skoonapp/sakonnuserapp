@@ -1,4 +1,5 @@
 import { auth } from './firebase';
+import { FIREBASE_API_URL } from '../constants';
 
 // ZegoUIKitPrebuilt is loaded from a script tag in index.html
 declare global {
@@ -15,7 +16,7 @@ declare global {
  */
 export const fetchZegoToken = async (planId: string): Promise<string> => {
     // यह URL Zego टोकन जेनरेट करने के लिए आपके डिप्लॉय किए गए फायरबेस फंक्शन एंडपॉइंट को इंगित करता है।
-    const functionUrl = 'https://asia-south1-sakoonapp-9574c.cloudfunctions.net/api/generateZegoToken';
+    const functionUrl = `${FIREBASE_API_URL}/generateZegoToken`;
 
     try {
         const user = auth.currentUser;

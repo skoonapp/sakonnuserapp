@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PlanCard from './PlanCard';
-import { CALL_PLANS, CHAT_PLANS, RAZORPAY_KEY_ID } from '../constants';
+import { CALL_PLANS, CHAT_PLANS, RAZORPAY_KEY_ID, FIREBASE_API_URL } from '../constants';
 import type { User } from '../types';
 import { auth } from '../utils/firebase';
 
@@ -59,7 +59,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
           if (!user) throw new Error("User not authenticated");
           const idToken = await user.getIdToken(true);
 
-          const verifyUrl = 'https://asia-south1-sakoonapp-9574c.cloudfunctions.net/api/verifyPayment';
+          const verifyUrl = `${FIREBASE_API_URL}/verifyPayment`;
 
           const verifyResponse = await fetch(verifyUrl, {
             method: 'POST',

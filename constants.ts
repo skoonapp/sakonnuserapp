@@ -26,6 +26,7 @@ export const QUICK_REPLIES = [
     "Is there anything else I can help you with?",
 ];
 
+export const FIREBASE_API_URL = "https://us-central1-sakoonapp-9574c.cloudfunctions.net/api";
 
 // FIX: Added missing constants required by multiple components.
 
@@ -89,7 +90,7 @@ export const FAQ_DATA: FaqItem[] = [
 export const TESTIMONIALS_DATA = [
     {
         name: 'प्रिया S.',
-        image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=128&auto=format&fit=crop&ixlib-rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=128&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         quote: 'जब मैं अकेला महसूस कर रही थी, तब SakoonApp ने मुझे एक दोस्त दिया जिससे मैं बात कर सकती थी। इसने वास्तव में मेरी मदद की।',
     },
     {
