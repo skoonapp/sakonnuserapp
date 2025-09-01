@@ -1,7 +1,9 @@
 import * as functions from "firebase-functions/v1";
 import * as admin from "firebase-admin";
-// FIX: Use explicit types from 'express' by importing the default export and using it as a namespace to resolve type conflicts and property access errors.
-import express from "express";
+// FIX: Use `import = require()` syntax for Express. This is the correct way to import a CommonJS module
+// that uses `export =` (like Express's types) to ensure proper type resolution for the app,
+// request, and response objects, resolving all subsequent type errors in this file.
+import express = require("express");
 import cors from "cors";
 import {RtcTokenBuilder, RtcRole} from "zego-express-engine";
 import Razorpay from "razorpay";

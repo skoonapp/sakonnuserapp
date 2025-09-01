@@ -18,12 +18,13 @@ import ChatsView from './components/LiveFeedback'; // This is the chats view
 import ProfileView from './components/About';
 import AICompanionButton from './components/AICompanionButton';
 import AICompanion from './components/AICompanion';
-import PlanSelector from './components/PlanSelector';
 import CallUI from './components/CallUI';
 import ChatUI from './components/ChatUI';
 import TermsAndConditions from './components/TermsAndConditions';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import CancellationRefundPolicy from './components/CancellationRefundPolicy';
+import RechargeModal from './components/RechargeModal';
+
 
 // --- Icons for Install Banner ---
 const InstallIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -52,13 +53,13 @@ const App: React.FC = () => {
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [showAICompanion, setShowAICompanion] = useState(false);
     const [showPolicy, setShowPolicy] = useState<'terms' | 'privacy' | 'cancellation' | null>(null);
+    const [showRechargeModal, setShowRechargeModal] = useState(false);
 
     // Data State
     const [balances, setBalances] = useState({ tokenBalance: 0, callMinutes: 0, totalMessages: 0 });
     const [purchasedPlans, setPurchasedPlans] = useState<PurchasedPlan[]>([]);
     
     // Session State
-    const [sessionRequest, setSessionRequest] = useState<{ type: 'call' | 'chat', listener: Listener } | null>(null);
     const [selectedPlan, setSelectedPlan] = useState<PurchasedPlan | null>(null);
     const [activeCallSession, setActiveCallSession] = useState<CallSession | null>(null);
     const [activeChatSession, setActiveChatSession] = useState<ChatSession | null>(null);
@@ -208,43 +209,73 @@ const App: React.FC = () => {
     const handleLogout = useCallback(() => {
         auth.signOut();
     }, []);
-
-    const handleStartSession = useCallback((type: 'call' | 'chat', listener: Listener) => {
-        setSessionRequest({ type, listener });
-    }, []);
     
-    const handlePlanSelectedForSession = useCallback((plan: PurchasedPlan) => {
-        if (!sessionRequest) return;
+    const handleStartSession = useCallback((type: 'call' | 'chat', listener: Listener) => {
+        const now = Date.now();
         
-        const sessionDurationSeconds = (type: 'call' | 'chat') => {
-            if (plan.isTokenSession) return 3600; // 1 hour max for token sessions
-            if (type === 'call') return plan.remainingSeconds || 0;
-            return plan.remainingMessages ? plan.remainingMessages * 60 : 0; // Estimate for chat
-        };
+        // Priority 1: Find an active DT plan
+        const activePlans = purchasedPlans
+            .filter(p => 
+                p.type === type && 
+                p.expiryTimestamp > now && 
+                ((type === 'call' && (p.remainingSeconds || 0) > 10) || // At least 10s left
+                 (type === 'chat' && (p.remainingMessages || 0) > 0))
+            )
+            .sort((a, b) => a.purchaseTimestamp - b.purchaseTimestamp);
 
-        if (sessionRequest.type === 'call') {
-            setActiveCallSession({
-                type: 'call',
-                listener: sessionRequest.listener,
-                plan: plan.plan,
-                sessionDurationSeconds: sessionDurationSeconds('call'),
-                associatedPlanId: plan.id,
-                isTokenSession: !!plan.isTokenSession,
-            });
+        let planToUse: PurchasedPlan | null = null;
+
+        if (activePlans.length > 0) {
+            planToUse = activePlans[0];
         } else {
-
-            setActiveChatSession({
-                type: 'chat',
-                listener: sessionRequest.listener,
-                plan: plan.plan,
-                sessionDurationSeconds: sessionDurationSeconds('chat'),
-                associatedPlanId: plan.id,
-                isTokenSession: !!plan.isTokenSession,
-            });
+            // Priority 2: Check for tokens if no DT plan is available
+            const canUseTokens = (type === 'call' && balances.tokenBalance >= 2) || (type === 'chat' && balances.tokenBalance >= 1);
+            if (canUseTokens) {
+                planToUse = {
+                    id: `token_session_${now}`,
+                    type: type,
+                    plan: { duration: 'टोकन', price: 0 },
+                    purchaseTimestamp: now,
+                    expiryTimestamp: now + 24 * 3600 * 1000, // 24h validity
+                    ...(type === 'call' && { remainingSeconds: 3600, totalSeconds: 3600 }), // 1hr max
+                    ...(type === 'chat' && { remainingMessages: 9999, totalMessages: 9999 }), // Uncapped, balance checked per msg
+                    isTokenSession: true,
+                };
+            }
         }
-        setSessionRequest(null);
-        setSelectedPlan(plan);
-    }, [sessionRequest]);
+
+        if (planToUse) {
+            const sessionDurationSeconds = (p: PurchasedPlan) => {
+                if (p.isTokenSession) return 3600; // 1 hour max for token sessions
+                if (p.type === 'call') return p.remainingSeconds || 0;
+                return 3 * 3600; // 3 hours max for chat sessions, balance is per message
+            };
+
+            if (type === 'call') {
+                setActiveCallSession({
+                    type: 'call',
+                    listener: listener,
+                    plan: planToUse.plan,
+                    sessionDurationSeconds: sessionDurationSeconds(planToUse),
+                    associatedPlanId: planToUse.id,
+                    isTokenSession: !!planToUse.isTokenSession,
+                });
+            } else {
+                setActiveChatSession({
+                    type: 'chat',
+                    listener: listener,
+                    plan: planToUse.plan,
+                    sessionDurationSeconds: sessionDurationSeconds(planToUse),
+                    associatedPlanId: planToUse.id,
+                    isTokenSession: !!planToUse.isTokenSession,
+                });
+            }
+            setSelectedPlan(planToUse);
+        } else {
+            // No valid plan or tokens, show recharge modal
+            setShowRechargeModal(true);
+        }
+    }, [purchasedPlans, balances.tokenBalance]);
     
     const handleCallSessionEnd = useCallback(async (success: boolean, consumedSeconds: number) => {
         if (selectedPlan && user && activeCallSession) {
@@ -353,27 +384,15 @@ const App: React.FC = () => {
             <AICompanionButton onClick={() => setShowAICompanion(true)} />
             {showAICompanion && <AICompanion user={user} onClose={() => setShowAICompanion(false)} onNavigateToServices={() => { setActiveView('home'); setShowAICompanion(false); }} />}
             
-            {sessionRequest && sessionRequest.type === 'call' &&
-                <PlanSelector 
-                    type="call" 
-                    plans={purchasedPlans}
-                    tokenBalance={balances.tokenBalance}
-                    onSelect={handlePlanSelectedForSession} 
-                    onClose={() => setSessionRequest(null)}
-                    onNavigateHome={() => { setActiveView('home'); setSessionRequest(null); }}
+            {showRechargeModal && (
+                <RechargeModal
+                    onClose={() => setShowRechargeModal(false)}
+                    onNavigateHome={() => {
+                        setActiveView('home');
+                        setShowRechargeModal(false);
+                    }}
                 />
-            }
-            
-            {sessionRequest && sessionRequest.type === 'chat' &&
-                 <PlanSelector 
-                    type="chat" 
-                    plans={purchasedPlans}
-                    tokenBalance={balances.tokenBalance}
-                    onSelect={handlePlanSelectedForSession} 
-                    onClose={() => setSessionRequest(null)}
-                    onNavigateHome={() => { setActiveView('home'); setSessionRequest(null); }}
-                />
-            }
+            )}
 
             {showPolicy === 'terms' && <TermsAndConditions onClose={() => setShowPolicy(null)} />}
             {showPolicy === 'privacy' && <PrivacyPolicy onClose={() => setShowPolicy(null)} />}
