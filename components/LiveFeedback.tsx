@@ -1,6 +1,6 @@
 
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import ListenerCard from './ListenerCard';
 import { db } from '../utils/firebase';
 import firebase from 'firebase/compat/app';
@@ -26,37 +26,62 @@ interface ChatsViewProps {
 const ChatsView: React.FC<ChatsViewProps> = ({ onStartSession, currentUser }) => {
     const [listeners, setListeners] = useState<Listener[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [lastVisible, setLastVisible] = useState<firebase.firestore.QueryDocumentSnapshot<firebase.firestore.DocumentData> | null>(null);
+    const [hasMore, setHasMore] = useState(true);
+    const favorites = currentUser.favoriteListeners || [];
+    const PAGE_SIZE = 10;
+
+    const fetchListeners = useCallback(async (loadMore = false) => {
+        if (!hasMore && loadMore) return;
+        
+        setLoading(!loadMore);
+        setLoadingMore(loadMore);
+
+        try {
+            let query = db.collection('listeners')
+                .orderBy('online', 'desc')
+                .orderBy('rating', 'desc')
+                .limit(PAGE_SIZE);
+
+            if (loadMore && lastVisible) {
+                query = query.startAfter(lastVisible);
+            }
+
+            const documentSnapshots = await query.get();
+            const newListeners = documentSnapshots.docs.map(doc => doc.data() as Listener);
+
+            setLastVisible(documentSnapshots.docs[documentSnapshots.docs.length - 1]);
+            setHasMore(newListeners.length === PAGE_SIZE);
+
+            const allListeners = loadMore ? [...listeners, ...newListeners] : newListeners;
+            
+            // Custom sort to bring favorites to the top
+            allListeners.sort((a, b) => {
+                const aIsFav = favorites.includes(a.id);
+                const bIsFav = favorites.includes(b.id);
+                if (aIsFav !== bIsFav) return aIsFav ? -1 : 1;
+                if (a.online !== b.online) return a.online ? -1 : 1;
+                return b.rating - a.rating;
+            });
+
+            setListeners(allListeners);
+        } catch (error) {
+            console.error("Error fetching listeners:", error);
+        } finally {
+            setLoading(false);
+            setLoadingMore(false);
+        }
+    }, [favorites, hasMore, lastVisible, listeners]);
 
     useEffect(() => {
-        const unsubscribe = db.collection('listeners').onSnapshot((snapshot) => {
-          const listenersData = snapshot.docs.map(doc => doc.data() as Listener);
-          const favorites = currentUser.favoriteListeners || [];
-          
-          listenersData.sort((a, b) => {
-            const aIsFav = favorites.includes(a.id);
-            const bIsFav = favorites.includes(b.id);
-            const aIsOnline = a.online === true;
-            const bIsOnline = b.online === true;
-            
-            if (aIsFav !== bIsFav) return aIsFav ? -1 : 1;
-            if (aIsOnline !== bIsOnline) return aIsOnline ? -1 : 1;
-            return a.rating > b.rating ? -1 : 1;
-          });
-          
-          setListeners(listenersData);
-          setLoading(false);
-        }, (error) => {
-            console.error("Error fetching listeners:", error);
-            setLoading(false);
-        });
-
-        return () => unsubscribe();
-    }, [currentUser.favoriteListeners]);
+        // Initial fetch
+        fetchListeners();
+    }, [currentUser.favoriteListeners]); // Refetch if favorites change
 
     const handleToggleFavorite = async (listenerId: number) => {
         if (!currentUser) return;
         const userRef = db.collection('users').doc(currentUser.uid);
-        const favorites = currentUser.favoriteListeners || [];
         const isFavorite = favorites.includes(listenerId);
 
         try {
@@ -69,6 +94,8 @@ const ChatsView: React.FC<ChatsViewProps> = ({ onStartSession, currentUser }) =>
               favoriteListeners: firebase.firestore.FieldValue.arrayUnion(listenerId)
             });
           }
+           const updatedListeners = listeners.map(l => l);
+           setListeners(updatedListeners);
         } catch (error) {
           console.error("Failed to update favorites:", error);
           alert("Error updating favorites. Please try again.");
@@ -80,7 +107,7 @@ const ChatsView: React.FC<ChatsViewProps> = ({ onStartSession, currentUser }) =>
         return <ViewLoader />;
     }
 
-    if (listeners.length === 0) {
+    if (listeners.length === 0 && !loading) {
         return (
             <div className="text-center py-20 px-4">
                 <p className="text-lg font-semibold text-slate-600 dark:text-slate-400">अभी कोई Listener उपलब्ध नहीं है।</p>
@@ -98,11 +125,22 @@ const ChatsView: React.FC<ChatsViewProps> = ({ onStartSession, currentUser }) =>
                         listener={listener}
                         variant="compact"
                         onChatClick={() => onStartSession('chat', listener)}
-                        isFavorite={(currentUser.favoriteListeners || []).includes(listener.id)}
+                        isFavorite={favorites.includes(listener.id)}
                         onToggleFavorite={() => handleToggleFavorite(listener.id)}
                     />
                 ))}
             </div>
+             {hasMore && (
+                <div className="text-center mt-6">
+                    <button
+                        onClick={() => fetchListeners(true)}
+                        disabled={loadingMore}
+                        className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-6 rounded-lg transition-colors disabled:bg-slate-400"
+                    >
+                        {loadingMore ? 'Loading...' : 'Load More'}
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

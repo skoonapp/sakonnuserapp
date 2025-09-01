@@ -1,9 +1,8 @@
 import * as functions from "firebase-functions/v1";
 import * as admin from "firebase-admin";
-// FIX: Switched to require-style imports for Express and CORS to ensure correct type resolution
-// in the default Firebase Functions CommonJS environment, resolving multiple TS errors.
-import express = require("express");
-import cors = require("cors");
+// FIX: Switched to standard ES6 module imports to resolve module format errors.
+import express from "express";
+import cors from "cors";
 import {RtcTokenBuilder, RtcRole} from "zego-express-engine";
 import Razorpay from "razorpay";
 import * as crypto from "crypto";

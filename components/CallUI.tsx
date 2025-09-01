@@ -119,6 +119,9 @@ const CallUI: React.FC<CallUIProps> = ({ session, user, onLeave }) => {
             const zp = window.ZegoUIKitPrebuilt.create(kitToken);
             zpInstanceRef.current = zp;
 
+            // FIX: This ensures the underlying engine is exposed for speaker control.
+            await zp.addPlugins({ ZegoUIKitPrebuilt: window.ZegoUIKitPrebuilt });
+
             zp.joinRoom({
                 container: document.createElement('div'),
                 scenario: { mode: window.ZegoUIKitPrebuilt.VoiceCall },
@@ -134,7 +137,7 @@ const CallUI: React.FC<CallUIProps> = ({ session, user, onLeave }) => {
                 showNonVideoUser: false,
                 showRoomDetailsButton: false,
                 // We control speaker button manually now
-                showSpeakerButton: true, 
+                showSpeakerButton: false, 
                 showLeaveRoomConfirmDialog: false,
                 
                 onLeaveRoom: () => handleLeave(true),
@@ -189,18 +192,14 @@ const CallUI: React.FC<CallUIProps> = ({ session, user, onLeave }) => {
   };
   
   const toggleSpeaker = () => {
-    if (!zpInstanceRef.current) return;
+    if (!zpInstanceRef.current || !zpInstanceRef.current.zego) return;
     const newSpeakerState = !isSpeakerOn;
-    // Note: ZegoUIKitPrebuilt does not expose a direct speakerphone toggle.
-    // This is an approximation. A more robust solution might require the core SDK.
-    // We can try to use the underlying engine if available.
-    if (zpInstanceRef.current.zego.useSpeaker) {
+    try {
+        // FIX: This is the correct way to toggle the speaker using the underlying engine.
         zpInstanceRef.current.zego.useSpeaker(newSpeakerState);
         setIsSpeakerOn(newSpeakerState);
-    } else {
-        console.warn("Speaker toggle not available in this Zego version.");
-        // Fallback to just changing the icon state
-        setIsSpeakerOn(newSpeakerState);
+    } catch(e) {
+        console.warn("Speaker toggle failed.", e);
     }
   };
   

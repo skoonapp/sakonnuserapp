@@ -69,12 +69,14 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
   const planRef = useRef(db.collection('users').doc(user.uid).collection('purchasedPlans').doc(session.associatedPlanId)).current;
   const tokenRef = useRef(db.collection('users').doc(user.uid)).current;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const typingTimeoutRef = useRef<number | null>(null);
 
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [remainingMessages, setRemainingMessages] = useState<number | string>('...');
   const [status, setStatus] = useState<ConnectionStatus>('connecting');
+  const [isListenerTyping, setIsListenerTyping] = useState(false);
   const [imageError, setImageError] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [sentMessagesCount, setSentMessagesCount] = useState(0);
@@ -149,6 +151,20 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
         zp = window.ZegoUIKitPrebuilt.create(kitToken);
         zpInstanceRef.current = zp;
 
+        // Add custom event listener for typing indicators
+        zp.on('IMRecvCustomCommand', ({ fromUser, command }: { fromUser: { userID: string }, command: string }) => {
+            if (fromUser.userID === String(session.listener.id)) {
+                const cmdData = JSON.parse(command);
+                if (cmdData.type === 'typing_status') {
+                    setIsListenerTyping(cmdData.isTyping);
+                    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+                    if (cmdData.isTyping) {
+                        typingTimeoutRef.current = window.setTimeout(() => setIsListenerTyping(false), 3000); // Hide after 3s
+                    }
+                }
+            }
+        });
+
         await zp.joinRoom({
           container: document.createElement('div'), // Hidden container
           showMyCameraToggleButton: false, showAudioVideoSettingsButton: false, showScreenSharingButton: false, showMicrophoneToggleButton: false,
@@ -196,6 +212,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
     initZego();
 
     return () => {
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
       if (zpInstanceRef.current) { zpInstanceRef.current.destroy(); }
     };
   }, [session.associatedPlanId, session.listener.id, session.listener.name, addSystemMessage, handleLeave]);
@@ -243,6 +260,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
   const listener = session.listener;
 
   const getStatusText = () => {
+      if (isListenerTyping) return 'Listener is typing...';
       switch (status) {
           case 'connecting': return 'Connecting...';
           case 'waiting': return listener.online ? 'Waiting...' : 'Offline';
@@ -254,6 +272,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
   };
   
   const getStatusColor = () => {
+       if (isListenerTyping) return 'text-yellow-600 dark:text-yellow-400';
        switch (status) {
           case 'connected': return 'text-green-600 dark:text-green-400';
           case 'error': case 'ended': return 'text-red-600 dark:text-red-400';
