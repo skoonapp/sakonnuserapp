@@ -270,11 +270,11 @@ app.post("/razorpayWebhook", async (req: express.Request, res: express.Response)
 });
 
 
-export const api = functions.region("asia-south1").https.onRequest(app);
+export const api = functions.region("us-central1").https.onRequest(app);
 
 // --- FIX: Added the missing addEarning callable function ---
 export const addEarning = functions
-  .region("asia-south1")
+  .region("us-central1")
   .https.onCall(async (data, context) => {
     // Check if the user is authenticated.
     if (!context.auth) {
@@ -332,7 +332,7 @@ export const addEarning = functions
 
 
 export const onListenerStatusChange = functions
-  .region("asia-south1")
+  .region("us-central1")
   .firestore.document("listeners/{listenerId}")
   .onUpdate(async (change) => {
     const beforeData = change.before.data();
