@@ -1,10 +1,12 @@
+
 import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+// FIX: Import `process` to provide proper TypeScript types for `process.cwd()`,
+// which resolves the "Property 'cwd' does not exist on type 'Process'" error.
+import process from 'process';
 
 export default defineConfig(({ mode }) => {
-    // FIX: The import `import { cwd } from 'process'` is incorrect as 'cwd' is not a named export.
-    // Use the global `process.cwd()` instead, which is available in Node.js environments like vite.config.ts.
     const env = loadEnv(mode, process.cwd(), '');
     return {
       plugins: [
@@ -53,7 +55,6 @@ export default defineConfig(({ mode }) => {
       },
       resolve: {
         alias: {
-          // FIX: Replaced incorrect `cwd()` with `process.cwd()`.
           '@': path.resolve(process.cwd(), '.'),
         }
       },

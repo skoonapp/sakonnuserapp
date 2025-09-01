@@ -1,16 +1,21 @@
 import * as functions from "firebase-functions/v1";
 import * as admin from "firebase-admin";
-// FIX: Use `import = require()` syntax for Express. This is the correct way to import a CommonJS module
-// that uses `export =` (like Express's types) to ensure proper type resolution for the app,
-// request, and response objects, resolving all subsequent type errors in this file.
+// FIX: Switched to require-style imports for Express and CORS to ensure correct type resolution
+// in the default Firebase Functions CommonJS environment, resolving multiple TS errors.
 import express = require("express");
-import cors from "cors";
+import cors = require("cors");
 import {RtcTokenBuilder, RtcRole} from "zego-express-engine";
 import Razorpay from "razorpay";
 import * as crypto from "crypto";
 
 admin.initializeApp();
 const db = admin.firestore();
+
+// FIX: Initialized the missing razorpayInstance with credentials from function config.
+const razorpayInstance = new Razorpay({
+  key_id: functions.config().razorpay.key_id,
+  key_secret: functions.config().razorpay.key_secret,
+});
 
 // Declaration merging to add 'user' to Express Request
 declare global {
@@ -44,13 +49,8 @@ const app = express();
 app.use(cors({origin: true}));
 app.use(express.json());
 
-const razorpayInstance = new Razorpay({
-  key_id: functions.config().razorpay.key_id,
-  key_secret: functions.config().razorpay.key_secret,
-});
-
 // Middleware to check Firebase Auth token
-// FIX: Changed types to use explicit express namespace to fix property access errors.
+// FIX: Explicitly typed req, res, and next with express.* types for correct type inference.
 const authenticate = async (
   req: express.Request,
   res: express.Response,
@@ -168,7 +168,7 @@ const processPurchase = async (paymentNotes: any, paymentId: string) => {
 };
 
 // Zego Token Generation Endpoint
-// FIX: Changed types to use explicit express namespace to fix property access errors.
+// FIX: Explicitly typed req and res with express.* types for correct type inference.
 app.post("/generateZegoToken", authenticate, async (req: express.Request, res: express.Response) => {
   const userId = req.user!.uid;
   const {planId} = req.body;
@@ -218,7 +218,7 @@ app.post("/generateZegoToken", authenticate, async (req: express.Request, res: e
 });
 
 
-// FIX: Changed types to use explicit express namespace to fix property access errors.
+// FIX: Explicitly typed req and res with express.* types for correct type inference.
 app.post("/verifyPayment", authenticate, async (req: express.Request, res: express.Response) => {
   const {razorpay_payment_id} = req.body;
   if (!razorpay_payment_id) {
@@ -243,7 +243,7 @@ app.post("/verifyPayment", authenticate, async (req: express.Request, res: expre
 
 
 // Razorpay Webhook Endpoint
-// FIX: Changed types to use explicit express namespace to fix property access errors.
+// FIX: Explicitly typed req and res with express.* types for correct type inference.
 app.post("/razorpayWebhook", async (req: express.Request, res: express.Response) => {
   const secret = functions.config().razorpay.webhook_secret;
   const signature = req.headers["x-razorpay-signature"] as string;

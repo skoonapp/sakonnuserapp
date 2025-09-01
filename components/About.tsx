@@ -52,10 +52,13 @@ const ProfileView: React.FC<ProfileViewProps> = ({
           <div className="container mx-auto px-6">
             <div className="text-center mb-8">
               <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-200">
-                Listener बनें
+                Listener बनें – दूसरों की मदद करें और घर बैठे कमाएँ!
               </h2>
               <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mt-2">
-                क्या आप दूसरों की मदद करना पसंद करते हैं? हमारे समुदाय में शामिल हों और एक सकारात्मक बदलाव लाएं।
+                क्या आप दूसरों की सुनना पसंद करते हैं? हमारे समुदाय में शामिल हों और एक सकारात्मक बदलाव लाएँ।
+              </p>
+              <p className="mt-4 text-xl font-semibold text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/50 inline-block px-4 py-2 rounded-full border border-green-200 dark:border-green-700">
+                💰 10,000–15,000 रु. महीना घर बैठे कमाएँ।
               </p>
             </div>
             <div className="max-w-xl mx-auto">

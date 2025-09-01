@@ -366,14 +366,17 @@ const App: React.FC = () => {
                       <InstallIcon className="w-6 h-6" />
                     </div>
                     <div className="flex-grow">
-                      <p className="font-bold">SakoonApp इंस्टॉल करें</p>
-                      <p className="text-sm opacity-90">बेहतर अनुभव के लिए ऐप जोड़ें।</p>
+                      <p className="font-bold">Install SakoonApp</p>
+                      <p className="text-sm opacity-90">Install from the Profile tab for the best experience.</p>
                     </div>
                     <button
-                      onClick={handleInstallClick}
+                      onClick={() => {
+                        setActiveView('profile');
+                        handleInstallDismiss(); // Hide banner after navigating
+                      }}
                       className="bg-white text-cyan-700 font-bold py-2 px-4 rounded-lg text-sm shrink-0 hover:bg-cyan-100 transition-colors"
                     >
-                      इंस्टॉल
+                      Go to Profile
                     </button>
                     <button onClick={handleInstallDismiss} className="absolute -top-2 -right-2 bg-slate-800/50 rounded-full p-1 hover:bg-slate-800/80 transition-colors">
                       <CloseIcon className="w-4 h-4 text-white" />
