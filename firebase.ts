@@ -5,6 +5,7 @@ import 'firebase/compat/firestore';
 
 // FIX: Augmented the global ImportMetaEnv to add type definitions for Vite's
 // environment variables, resolving conflicts with Vite's client types.
+// FIX: Added ImportMeta interface to declare the 'env' property on import.meta.
 declare global {
   interface ImportMetaEnv {
     readonly VITE_API_KEY?: string;
@@ -14,6 +15,9 @@ declare global {
     readonly VITE_MESSAGING_SENDER_ID?: string;
     readonly VITE_APP_ID?: string;
     readonly VITE_MEASUREMENT_ID?: string;
+  }
+  interface ImportMeta {
+    readonly env: ImportMetaEnv;
   }
 }
 

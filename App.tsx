@@ -1,9 +1,11 @@
 
 
+
 import React, { useState, useEffect, useCallback } from 'react';
 import type { User, Listener, PurchasedPlan, CallSession, ChatSession, ActiveView } from './types';
 import { auth, db } from './utils/firebase';
 import firebase from 'firebase/compat/app';
+import { handleCallEnd, handleChat } from './utils/earnings';
 
 // Import Components
 import SplashScreen from './components/SplashScreen';
@@ -219,7 +221,7 @@ const App: React.FC = () => {
             if (type === 'call') return plan.remainingSeconds || 0;
             return plan.remainingMessages ? plan.remainingMessages * 60 : 0; // Estimate for chat
         };
-// FIX: Correctly construct the session object with a narrowed 'type' property to satisfy the CallSession type.
+
         if (sessionRequest.type === 'call') {
             setActiveCallSession({
                 type: 'call',
@@ -230,7 +232,7 @@ const App: React.FC = () => {
                 isTokenSession: !!plan.isTokenSession,
             });
         } else {
-// FIX: Correctly construct the session object with a narrowed 'type' property to satisfy the ChatSession type.
+
             setActiveChatSession({
                 type: 'chat',
                 listener: sessionRequest.listener,
@@ -244,20 +246,41 @@ const App: React.FC = () => {
         setSelectedPlan(plan);
     }, [sessionRequest]);
     
-    const handleSessionEnd = useCallback(async (success: boolean, consumedSeconds: number) => {
-        if (selectedPlan && user && !selectedPlan.isTokenSession) {
-            const planRef = db.collection('users').doc(user.uid).collection('purchasedPlans').doc(selectedPlan.id);
-            if (selectedPlan.type === 'call') {
-                await planRef.update({
-                    remainingSeconds: firebase.firestore.FieldValue.increment(-consumedSeconds)
-                });
+    const handleCallSessionEnd = useCallback(async (success: boolean, consumedSeconds: number) => {
+        if (selectedPlan && user && activeCallSession) {
+            if (success && consumedSeconds > 0) {
+                 if (!selectedPlan.isTokenSession) {
+                    const planRef = db.collection('users').doc(user.uid).collection('purchasedPlans').doc(selectedPlan.id);
+                    await planRef.update({
+                        remainingSeconds: firebase.firestore.FieldValue.increment(-consumedSeconds)
+                    });
+                }
+                
+                await handleCallEnd(
+                    activeCallSession.listener.id.toString(),
+                    user.uid,
+                    Math.ceil(consumedSeconds / 60)
+                );
             }
         }
-        // Token consumption is handled inside Call/Chat UI via functions.
         setActiveCallSession(null);
+        setSelectedPlan(null);
+    }, [selectedPlan, user, activeCallSession]);
+
+    const handleChatSessionEnd = useCallback(async (success: boolean, consumedMessages: number) => {
+        if (user && activeChatSession) {
+             if (success && consumedMessages > 0) {
+                // Plan/token consumption is handled per-message in ChatUI
+                await handleChat(
+                    activeChatSession.listener.id.toString(),
+                    user.uid,
+                    consumedMessages
+                );
+            }
+        }
         setActiveChatSession(null);
         setSelectedPlan(null);
-    }, [selectedPlan, user]);
+    }, [user, activeChatSession]);
     
     const renderActiveView = () => {
         if (!user) return null;
@@ -289,11 +312,11 @@ const App: React.FC = () => {
     }
     
     if (activeCallSession) {
-        return <CallUI session={activeCallSession} user={user} onLeave={handleSessionEnd} />;
+        return <CallUI session={activeCallSession} user={user} onLeave={handleCallSessionEnd} />;
     }
 
     if (activeChatSession) {
-        return <ChatUI session={activeChatSession} user={user} onLeave={handleSessionEnd} />;
+        return <ChatUI session={activeChatSession} user={user} onLeave={handleChatSessionEnd} />;
     }
     
     return (

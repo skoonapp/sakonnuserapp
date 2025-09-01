@@ -3,6 +3,7 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 import 'firebase/compat/messaging';
+import 'firebase/compat/functions';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -35,6 +36,7 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
 export const auth = firebase.auth();
 export const db = firebase.firestore();
 export const serverTimestamp = firebase.firestore.FieldValue.serverTimestamp;
+export const functions = firebase.functions();
 
 // Initialize and export messaging, checking for browser support.
 export const messaging = firebase.messaging.isSupported() ? firebase.messaging() : null;

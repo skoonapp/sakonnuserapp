@@ -1,5 +1,6 @@
 
 
+
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import type { ChatSession, User, ChatMessage, PurchasedPlan } from '../types';
 import { fetchZegoToken } from '../utils/zego.ts';
@@ -15,7 +16,7 @@ declare global {
 interface ChatUIProps {
   session: ChatSession;
   user: User;
-  onLeave: (success: boolean, consumedSeconds: number) => void;
+  onLeave: (success: boolean, consumedMessages: number) => void;
 }
 
 const PlaceholderAvatar: React.FC<{className?: string}> = ({className}) => (
@@ -75,6 +76,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
   const [status, setStatus] = useState<ConnectionStatus>('connecting');
   const [imageError, setImageError] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [sentMessagesCount, setSentMessagesCount] = useState(0);
 
   const addSystemMessage = useCallback((text: string) => {
       setMessages(prev => [...prev, {
@@ -89,8 +91,8 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
     if (hasLeftRef.current) return;
     hasLeftRef.current = true;
     setStatus('ended');
-    onLeave(isSuccess, 0); // Consumed seconds are no longer tracked here
-  }, [onLeave]);
+    onLeave(isSuccess, sentMessagesCount);
+  }, [onLeave, sentMessagesCount]);
 
 
   const endSessionDueToBalance = useCallback(() => {
@@ -232,6 +234,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
         };
         setMessages(prev => [...prev, localMessage]);
         setInputValue('');
+        setSentMessagesCount(prev => prev + 1);
 
     } catch (error) {
         console.error('Failed to send message or update balance:', error);
