@@ -54,6 +54,7 @@ export interface ChatMessage {
   text: string;
   sender: ChatMessageSender;
   timestamp: number;
+  status?: 'sending' | 'sent' | 'delivered' | 'read' | 'failed';
 }
 
 export interface BaseSession {

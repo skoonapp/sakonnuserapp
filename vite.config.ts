@@ -53,7 +53,7 @@ export default defineConfig(({ mode }) => {
       },
       resolve: {
         alias: {
-// FIX: Replaced incorrect `cwd()` with `process.cwd()`.
+          // FIX: Replaced incorrect `cwd()` with `process.cwd()`.
           '@': path.resolve(process.cwd(), '.'),
         }
       },
