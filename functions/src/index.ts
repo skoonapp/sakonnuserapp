@@ -271,6 +271,65 @@ app.post("/razorpayWebhook", async (req: express.Request, res: express.Response)
 
 export const api = functions.region("asia-south1").https.onRequest(app);
 
+// --- FIX: Added the missing addEarning callable function ---
+export const addEarning = functions
+  .region("asia-south1")
+  .https.onCall(async (data, context) => {
+    // Check if the user is authenticated.
+    if (!context.auth) {
+      throw new functions.https.HttpsError(
+        "unauthenticated",
+        "The function must be called while authenticated.",
+      );
+    }
+
+    const {listener_id, user_id, type, duration_minutes, messages} = data;
+    const callingUserId = context.auth.uid;
+
+    // Validate that the user calling the function is the user the earning is for.
+    if (callingUserId !== user_id) {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "You can only record earnings for your own sessions.",
+      );
+    }
+
+    // Basic validation of input data
+    const isInvalidCall = type === "call" && typeof duration_minutes !== "number";
+    const isInvalidChat = type === "chat" && typeof messages !== "number";
+
+    if (!listener_id || !type || isInvalidCall || isInvalidChat) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Missing or invalid required earning data.",
+      );
+    }
+
+    try {
+      const earningRecord = {
+        listenerId: listener_id,
+        userId: user_id,
+        type: type, // 'call' or 'chat'
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        // Conditionally add fields based on type
+        ...(type === "call" && {durationMinutes: duration_minutes}),
+        ...(type === "chat" && {messageCount: messages}),
+        processed: false, // Flag for a later payout processing job
+      };
+
+      await db.collection("earnings").add(earningRecord);
+
+      return {status: "success", message: "Earning recorded successfully."};
+    } catch (error) {
+      console.error("Error recording earning:", error);
+      throw new functions.https.HttpsError(
+        "internal",
+        "An error occurred while trying to record the earning.",
+      );
+    }
+  });
+
+
 export const onListenerStatusChange = functions
   .region("asia-south1")
   .firestore.document("listeners/{listenerId}")

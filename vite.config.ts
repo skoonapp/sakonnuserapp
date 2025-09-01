@@ -1,6 +1,8 @@
 import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+// FIX: Explicitly import 'process' to provide correct types for process.cwd() in the Vite config environment.
+import process from 'process';
 
 export default defineConfig(({ mode }) => {
     // FIX: The import `import { cwd } from 'process'` is incorrect as 'cwd' is not a named export.
