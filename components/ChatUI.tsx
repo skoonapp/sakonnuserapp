@@ -1,11 +1,8 @@
-
-
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import type { ChatSession, User, ChatMessage, PurchasedPlan } from '../types';
 import { fetchZegoToken } from '../utils/zego.ts';
 import { db } from '../utils/firebase.ts';
 import firebase from 'firebase/compat/app';
-import { LISTENER_IMAGES } from '../constants';
 
 declare global {
   interface Window {
@@ -16,7 +13,7 @@ declare global {
 interface ChatUIProps {
   session: ChatSession;
   user: User;
-  onLeave: (success: boolean, consumedSeconds: number) => void;
+  onLeave: (success: boolean, consumedMessages: number) => void;
 }
 
 const PlaceholderAvatar: React.FC<{className?: string}> = ({className}) => (
@@ -33,13 +30,6 @@ const VerifiedIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}>
       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
     </svg>
-);
-
-const ReadReceiptIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className={className} viewBox="0 0 16 16">
-    <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 1.854 7.146a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0l7-7zm-4.208 7-.896-.897.707-.707.543.543 6.646-6.647a.5.5 0 0 1 .708.708l-7 7a.5.5 0 0 1-.708 0z"/>
-    <path d="m5.354 7.146.896.897-.707.707-.897-.896a.5.5 0 1 1 .708-.708z"/>
-  </svg>
 );
 
 const SendIcon: React.FC<{className?: string}> = ({className}) => (
@@ -83,10 +73,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
   const [status, setStatus] = useState<ConnectionStatus>('connecting');
   const [imageError, setImageError] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  
-  const listener = session.listener;
-  const listenerImage = LISTENER_IMAGES[listener.id % LISTENER_IMAGES.length];
+  const [sentMessagesCount, setSentMessagesCount] = useState(0);
 
   const addSystemMessage = useCallback((text: string) => {
       setMessages(prev => [...prev, {
@@ -101,8 +88,8 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
     if (hasLeftRef.current) return;
     hasLeftRef.current = true;
     setStatus('ended');
-    onLeave(isSuccess, 0); // Consumed seconds are no longer tracked here
-  }, [onLeave]);
+    onLeave(isSuccess, sentMessagesCount);
+  }, [onLeave, sentMessagesCount]);
 
 
   const endSessionDueToBalance = useCallback(() => {
@@ -113,14 +100,6 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
-  
-  // Auto-resize textarea
-  useEffect(() => {
-    if (textareaRef.current) {
-        textareaRef.current.style.height = 'auto';
-        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-    }
-  }, [inputValue]);
 
   useEffect(scrollToBottom, [messages]);
   
@@ -228,7 +207,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
     };
   }, [session.associatedPlanId, session.listener.id, session.listener.name, addSystemMessage, handleLeave]);
 
-  const handleSendMessage = async (e: React.FormEvent | React.KeyboardEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim() || !zpInstanceRef.current || status !== 'connected') return;
 
@@ -252,6 +231,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
         };
         setMessages(prev => [...prev, localMessage]);
         setInputValue('');
+        setSentMessagesCount(prev => prev + 1);
 
     } catch (error) {
         console.error('Failed to send message or update balance:', error);
@@ -259,6 +239,8 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
     }
   };
   
+  const listener = session.listener;
+
   const getStatusText = () => {
       switch (status) {
           case 'connecting': return 'कनेक्ट हो रहा है...';
@@ -288,7 +270,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
             <PlaceholderAvatar className="w-10 h-10 object-cover" />
         ) : (
             <img 
-                src={listenerImage} 
+                src={listener.image} 
                 alt={listener.name} 
                 className="w-10 h-10 rounded-full object-cover" 
                 loading="lazy" 
@@ -333,14 +315,11 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
             }
             return (
               <div key={msg.id} className={`flex ${isSent ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-xs md:max-w-md p-2.5 rounded-xl flex flex-col ${isSent ? 'bg-[#dcf8c6] dark:bg-emerald-900 text-slate-800 dark:text-slate-200 rounded-tr-none' : 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-bl-none shadow-sm'}`}>
+                <div className={`max-w-xs md:max-w-md p-3 rounded-xl ${isSent ? 'bg-[#dcf8c6] dark:bg-emerald-900 text-slate-800 dark:text-slate-200 rounded-tr-none' : 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-bl-none shadow-sm'}`}>
                   <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
-                  <div className={`flex items-center self-end gap-1.5 mt-1 ${isSent ? 'text-green-950/70 dark:text-slate-400' : 'text-slate-400'}`}>
-                    <span className="text-xs">
-                        {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                    {isSent && <ReadReceiptIcon className="w-4 h-4 text-blue-500" />}
-                  </div>
+                  <p className={`text-xs mt-1 ${isSent ? 'text-green-950/70 dark:text-slate-400' : 'text-slate-400'}`}>
+                    {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </p>
                 </div>
               </div>
             );
@@ -352,27 +331,25 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
       {/* Input Footer */}
       <footer className="bg-transparent p-2">
         <form onSubmit={handleSendMessage} className="flex items-end gap-2">
-            <div className="flex-grow bg-white dark:bg-slate-800 rounded-2xl flex items-end px-2 py-1 shadow-sm">
-                <button type="button" className="p-2 text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 shrink-0">
+            <div className="flex-grow bg-white dark:bg-slate-800 rounded-full flex items-center px-2 py-1 shadow-sm">
+                <button type="button" className="p-2 text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400">
                     <EmojiIcon className="w-6 h-6" />
                 </button>
-                <textarea
-                    ref={textareaRef}
-                    rows={1}
+                <input
+                    type="text"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     placeholder={status === 'connected' ? "संदेश लिखें..." : "कनेक्ट होने की प्रतीक्षा करें..."}
-                    className="flex-grow bg-transparent p-2 focus:outline-none text-slate-900 dark:text-white resize-none max-h-28 overflow-y-auto"
+                    className="flex-grow bg-transparent p-2 focus:outline-none text-slate-900 dark:text-white"
                     disabled={status !== 'connected'}
                     maxLength={session.isFreeTrial ? 75 : undefined}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            handleSendMessage(e);
-                        }
-                    }}
                 />
-                <button type="button" className="p-2 text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 shrink-0">
+                {session.isFreeTrial && (
+                    <span className="text-xs font-mono text-slate-400 dark:text-slate-500 pr-2 whitespace-nowrap">
+                        {inputValue.length} / 75
+                    </span>
+                )}
+                <button type="button" className="p-2 text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400">
                     <AttachmentIcon className="w-6 h-6" />
                 </button>
             </div>

@@ -1,12 +1,12 @@
 import path from 'path';
-// FIX: Import 'process' from 'process' to ensure the correct Node.js built-in module is used, resolving errors where 'cwd' is not found.
-import process from 'process';
+// FIX: Import 'cwd' from 'process' to ensure the correct Node.js built-in module is used, resolving errors where 'cwd' is not found on 'process'.
+import { cwd } from 'process';
 import { defineConfig, loadEnv } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ mode }) => {
-    // FIX: Explicitly use `process.cwd()` to ensure the correct directory is passed to loadEnv.
-    const env = loadEnv(mode, process.cwd(), '');
+    // FIX: Explicitly use `cwd()` to ensure the correct directory is passed to loadEnv.
+    const env = loadEnv(mode, cwd(), '');
     return {
       plugins: [
         VitePWA({
@@ -54,8 +54,8 @@ export default defineConfig(({ mode }) => {
       },
       resolve: {
         alias: {
-// FIX: Replaced `__dirname` with `process.cwd()` to resolve errors in an ES module context.
-          '@': path.resolve(process.cwd(), '.'),
+// FIX: Replaced `process.cwd()` with `cwd()` to resolve errors in an ES module context.
+          '@': path.resolve(cwd(), '.'),
         }
       },
       build: {

@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import type { CallSession, User } from '../types';
 import { fetchZegoToken } from '../utils/zego.ts';
