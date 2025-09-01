@@ -357,7 +357,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
       {/* Input Footer */}
        <footer className="bg-transparent p-2 flex-shrink-0">
                 <form onSubmit={handleSendMessage} className="flex items-end gap-2">
-                    <div className="flex-grow bg-white dark:bg-slate-800 rounded-2xl flex items-end px-3 py-1 shadow-sm">
+                    <div className="flex-grow bg-white dark:bg-slate-800 rounded-2xl flex items-end px-3 py-1 shadow-sm min-w-0">
                         <textarea
                             ref={textareaRef}
                             rows={1}
