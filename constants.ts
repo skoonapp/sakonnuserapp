@@ -27,21 +27,6 @@ export const QUICK_REPLIES = [
 ];
 
 
-// Dummy data has been removed as the app now connects to Firestore for live data.
-// The initial state for calls, chats, and history is now handled as an empty array in App.tsx.
-
-import { RecentActivity, CallHistoryItem, ChatHistoryItem as ChatHistoryType } from './types';
-
-// These can be kept if you want some placeholder history on first load,
-// but for a real app, this would also come from Firestore.
-export const INITIAL_RECENT_ACTIVITIES: RecentActivity[] = [];
-
-export const INITIAL_CALL_HISTORY: CallHistoryItem[] = [];
-
-export const INITIAL_CHAT_HISTORY: ChatHistoryType[] = [];
-
-export const INITIAL_ACTIVE_CHATS = []; // Placeholder, will be managed by state
-
 // FIX: Added missing constants required by multiple components.
 
 export const RAZORPAY_KEY_ID = "rzp_test_gV1tLH2ZnCWti9"; // Replace with your actual Razorpay Test Key ID

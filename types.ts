@@ -1,4 +1,5 @@
 
+
 export type ActiveView = 'home' | 'calls' | 'chats' | 'profile';
 
 export interface User {
@@ -76,93 +77,4 @@ export interface FaqItem {
     question: string;
     answer: string;
     isPositive: boolean;
-}
-
-
-// --- Admin Panel Types (Kept for reference, but unused by new App.tsx) ---
-
-export type Screen = 'login' | 'dashboard' | 'call' | 'chat' | 'settings' | 'listeners' | 'callHistory' | 'leaderboard' | 'rules' | 'blocked' | 'support' | 'tickets' | 'regulations';
-
-export type ActivityStatus = 'Active' | 'Waiting' | 'Completed';
-
-export interface RecentActivity {
-    id: string;
-    avatar: string;
-    name: string;
-    plan: string;
-    status: ActivityStatus;
-    timestamp: string;
-}
-
-export interface AdminStats {
-  activeCalls: number;
-  activeChats: number;
-  waitingQueue: number;
-  todaysEarnings: number;
-}
-
-// Call Management types
-export interface ActiveCall {
-    id: string;
-    name:string;
-    planDuration: number; // in seconds
-    endTime: number; // timestamp
-    avatar: string;
-}
-
-export interface WaitingCall {
-    id: string;
-    name: string;
-    plan: string;
-    startTime: number; // timestamp
-    avatar: string;
-    isNew: boolean;
-}
-
-export interface CallHistoryItem {
-    id: string;
-    name: string;
-    plan: string;
-    duration: string;
-    avatar: string;
-}
-
-export interface ActiveChat {
-    id: string;
-    name: string;
-    planDuration: number; // in seconds
-    endTime: number; // timestamp
-    avatar: string;
-    messages: {
-        id: number;
-        sender: 'user' | 'admin';
-        text: string;
-        timestamp: string;
-    }[];
-}
-
-export interface WaitingChat {
-    id: string;
-    name: string;
-    plan: string;
-    startTime: number; // timestamp
-    avatar: string;
-    isNew: boolean;
-}
-
-export interface ChatHistoryItem {
-    id: string;
-    name: string;
-    plan: string;
-    duration: string;
-    avatar: string;
-}
-
-export interface Earning {
-    id: string;
-    userName: string;
-    type: 'Call' | 'Chat';
-    duration: string;
-    amount: number;
-    timestamp: string;
 }

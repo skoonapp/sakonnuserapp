@@ -1,6 +1,6 @@
 import path from 'path';
-// FIX: Import 'process' from 'node:process' to ensure the correct Node.js built-in module is used, resolving errors where 'cwd' is not found.
-import process from 'node:process';
+// FIX: Import 'process' from 'process' to ensure the correct Node.js built-in module is used, resolving errors where 'cwd' is not found.
+import process from 'process';
 import { defineConfig, loadEnv } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
