@@ -21,11 +21,11 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ onClose }) => {
       role="dialog"
     >
       <div 
-        className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white dark:bg-slate-900 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="sticky top-0 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-200">
+        <div className="sticky top-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100">
             🔒 Privacy Policy
           </h2>
           <button 
@@ -37,7 +37,7 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ onClose }) => {
           </button>
         </div>
 
-        <div className="p-6 md:p-8 space-y-4 text-slate-700 dark:text-slate-300 leading-relaxed">
+        <div className="p-6 md:p-8 space-y-4 text-slate-700 dark:text-slate-200 leading-relaxed">
             <p className="font-semibold">प्रभावी तिथि: 1 अगस्त 2025</p>
             <p>SakoonApp आपकी गोपनीयता का सम्मान करता है और उसकी सुरक्षा के लिए प्रतिबद्ध है। यह नीति बताती है कि हम आपकी कौन सी जानकारी एकत्र करते हैं और उसका उपयोग कैसे करते हैं।</p>
 
@@ -81,11 +81,11 @@ const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ onClose }) => {
             
             <div>
               <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100 mb-1">6. हमसे संपर्क करें</h3>
-              <p>यदि इस नीति के बारे में आपके कोई प्रश्न हैं, तो कृपया हमें <a href="mailto:appsakoon@gmail.com" className="text-cyan-600 dark:text-cyan-400 hover:underline">appsakoon@gmail.com</a> पर संपर्क करें।</p>
+              <p>यदि इस नीति के बारे में आपके कोई प्रश्न हैं, तो कृपया हमें <a href="mailto:appsakoon@gmail.com" className="text-cyan-600 dark:text-cyan-300 hover:underline">appsakoon@gmail.com</a> पर संपर्क करें।</p>
             </div>
         </div>
         
-        <div className="sticky bottom-0 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-4 text-right border-t border-slate-200 dark:border-slate-700">
+        <div className="sticky bottom-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm p-4 text-right border-t border-slate-200 dark:border-slate-800">
              <button
                 onClick={onClose}
                 className="bg-cyan-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-cyan-700 transition-colors"

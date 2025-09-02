@@ -44,20 +44,20 @@ const ProfileView: React.FC<ProfileViewProps> = ({
 }) => {
 
   return (
-    <div className="bg-slate-50 dark:bg-slate-900">
+    <div className="bg-slate-50 dark:bg-slate-950">
       <div className="container mx-auto px-4 py-6">
 
         {/* Highlighted Apply as Listener Section */}
-        <section id="apply" className="mt-4 py-6 bg-gradient-to-br from-cyan-50 to-blue-100 dark:from-cyan-900/50 dark:to-blue-900/50 rounded-xl shadow-lg border-2 border-cyan-200 dark:border-cyan-700">
+        <section id="apply" className="mt-4 py-6 bg-gradient-to-br from-cyan-50 to-blue-100 dark:from-cyan-950/50 dark:to-blue-950/50 rounded-xl shadow-lg border-2 border-cyan-200 dark:border-cyan-600">
           <div className="container mx-auto px-6">
             <div className="text-center mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-200">
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-100">
                 Listener बनें – दूसरों की मदद करें और घर बैठे कमाएँ!
               </h2>
               <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mt-2">
                 क्या आप दूसरों की सुनना पसंद करते हैं? हमारे समुदाय में शामिल हों और एक सकारात्मक बदलाव लाएँ।
               </p>
-              <p className="mt-4 text-xl font-semibold text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/50 inline-block px-4 py-2 rounded-full border border-green-200 dark:border-green-700">
+              <p className="mt-4 text-xl font-semibold text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-500/10 inline-block px-4 py-2 rounded-full border border-green-200 dark:border-green-500/30">
                 💰 10,000–15,000 रु. महीना घर बैठे कमाएँ।
               </p>
             </div>
@@ -68,15 +68,15 @@ const ProfileView: React.FC<ProfileViewProps> = ({
         </section>
 
         {/* About Section with Logout button */}
-        <section id="about" className="mt-8 py-6 bg-white dark:bg-slate-800 rounded-xl shadow-md">
+        <section id="about" className="mt-8 py-6 bg-white dark:bg-slate-900 rounded-xl shadow-md">
           <div className="container mx-auto px-6">
             <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-200 text-center sm:text-left">
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-100 text-center sm:text-left">
                 हमारे बारे में
               </h2>
               <button
                 onClick={onLogout}
-                className="flex items-center gap-2 bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 font-bold py-2 px-4 rounded-lg hover:bg-red-200 dark:hover:bg-red-800 transition-colors"
+                className="flex items-center gap-2 bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 font-bold py-2 px-4 rounded-lg hover:bg-red-200 dark:hover:bg-red-500/20 transition-colors"
               >
                 <LogoutIcon className="w-5 h-5" />
                 <span>लॉगआउट</span>
@@ -91,9 +91,9 @@ const ProfileView: React.FC<ProfileViewProps> = ({
 
         {/* Install App Section */}
         {deferredPrompt && (
-          <section id="install-app" className="mt-8 py-6 bg-white dark:bg-slate-800 rounded-xl shadow-md">
+          <section id="install-app" className="mt-8 py-6 bg-white dark:bg-slate-900 rounded-xl shadow-md">
             <div className="container mx-auto px-6 text-center">
-              <h3 className="text-2xl font-bold text-slate-700 dark:text-slate-200 mb-4">एक क्लिक में इंस्टॉल करें</h3>
+              <h3 className="text-2xl font-bold text-slate-700 dark:text-slate-100 mb-4">एक क्लिक में इंस्टॉल करें</h3>
               <p className="text-slate-600 dark:text-slate-400 mb-6 max-w-md mx-auto">
                 SakoonApp को अपनी होम स्क्रीन पर जोड़ें ताकि आप इसे आसानी से और तेज़ी से इस्तेमाल कर सकें।
               </p>
@@ -112,14 +112,14 @@ const ProfileView: React.FC<ProfileViewProps> = ({
         
         <Contact />
         
-        <div className="mt-6 text-center p-6 bg-white dark:bg-slate-800 rounded-xl shadow-md">
-          <h3 className="text-2xl font-bold text-slate-700 dark:text-slate-200 mb-4">App & Policies</h3>
+        <div className="mt-6 text-center p-6 bg-white dark:bg-slate-900 rounded-xl shadow-md">
+          <h3 className="text-2xl font-bold text-slate-700 dark:text-slate-100 mb-4">App & Policies</h3>
           <div className="flex flex-col sm:flex-row justify-center items-center flex-wrap gap-4">
-            <button onClick={onShowTerms} className="text-cyan-600 dark:text-cyan-400 font-semibold hover:underline">Terms & Conditions</button>
-            <button onClick={onShowPrivacyPolicy} className="text-cyan-600 dark:text-cyan-400 font-semibold hover:underline">Privacy Policy</button>
-            <button onClick={onShowCancellationPolicy} className="text-cyan-600 dark:text-cyan-400 font-semibold hover:underline">Cancellation/Refund Policy</button>
+            <button onClick={onShowTerms} className="text-cyan-600 dark:text-cyan-300 font-semibold hover:underline">Terms & Conditions</button>
+            <button onClick={onShowPrivacyPolicy} className="text-cyan-600 dark:text-cyan-300 font-semibold hover:underline">Privacy Policy</button>
+            <button onClick={onShowCancellationPolicy} className="text-cyan-600 dark:text-cyan-300 font-semibold hover:underline">Cancellation/Refund Policy</button>
           </div>
-           <footer className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
+           <footer className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800">
               <p className="text-sm text-slate-500 dark:text-slate-400">
                 © 2025 SakoonApp. All Rights Reserved.
               </p>

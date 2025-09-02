@@ -21,11 +21,11 @@ const TermsAndConditions: React.FC<TermsAndConditionsProps> = ({ onClose }) => {
       role="dialog"
     >
       <div 
-        className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white dark:bg-slate-900 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="sticky top-0 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-200">
+        <div className="sticky top-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100">
             📘 Terms & Conditions
           </h2>
           <button 
@@ -37,7 +37,7 @@ const TermsAndConditions: React.FC<TermsAndConditionsProps> = ({ onClose }) => {
           </button>
         </div>
 
-        <div className="p-6 md:p-8 space-y-4 text-slate-700 dark:text-slate-300 leading-relaxed">
+        <div className="p-6 md:p-8 space-y-4 text-slate-700 dark:text-slate-200 leading-relaxed">
             <p className="font-semibold">प्रभावी तिथि: 1 अगस्त 2025</p>
 
             <div>
@@ -80,7 +80,7 @@ const TermsAndConditions: React.FC<TermsAndConditionsProps> = ({ onClose }) => {
             </div>
         </div>
         
-        <div className="sticky bottom-0 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-4 text-right border-t border-slate-200 dark:border-slate-700">
+        <div className="sticky bottom-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm p-4 text-right border-t border-slate-200 dark:border-slate-800">
              <button
                 onClick={onClose}
                 className="bg-cyan-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-cyan-700 transition-colors"

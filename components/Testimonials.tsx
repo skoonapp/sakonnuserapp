@@ -29,7 +29,7 @@ const Testimonials: React.FC = () => {
 
   return (
     <div className="mt-8 md:mt-12 text-center">
-      <h3 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-200 mb-2">यूज़र्स क्या कहते हैं</h3>
+      <h3 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-2">यूज़र्स क्या कहते हैं</h3>
       <p className="text-lg text-slate-600 dark:text-slate-400 mb-8 px-4">हमारे खुश यूज़र्स के कुछ अनुभव।</p>
       
       <div className="relative max-w-2xl mx-auto">
@@ -44,13 +44,13 @@ const Testimonials: React.FC = () => {
                   <img 
                     src={testimonial.image} 
                     alt={testimonial.name} 
-                    className="w-20 h-20 rounded-full object-cover mb-4 shadow-md border-4 border-white dark:border-slate-600"
+                    className="w-20 h-20 rounded-full object-cover mb-4 shadow-md border-4 border-white dark:border-slate-700"
                     loading="lazy" decoding="async"
                   />
                   <blockquote className="text-lg text-slate-600 dark:text-slate-400 italic leading-relaxed mb-4 max-w-lg">
                     "{testimonial.quote}"
                   </blockquote>
-                  <cite className="font-semibold text-slate-800 dark:text-slate-200 not-italic">- {testimonial.name}</cite>
+                  <cite className="font-semibold text-slate-800 dark:text-slate-100 not-italic">- {testimonial.name}</cite>
                 </div>
               </div>
             ))}
@@ -63,7 +63,7 @@ const Testimonials: React.FC = () => {
             <button
               key={index}
               onClick={() => setCurrentIndex(index)}
-              className={`w-3 h-3 rounded-full transition-colors ${currentIndex === index ? 'bg-cyan-600' : 'bg-slate-300 dark:bg-slate-600'}`}
+              className={`w-3 h-3 rounded-full transition-colors ${currentIndex === index ? 'bg-cyan-600' : 'bg-slate-300 dark:bg-slate-700'}`}
               aria-label={`Go to testimonial ${index + 1}`}
             />
           ))}

@@ -253,7 +253,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
   return (
     <div className="fixed inset-0 bg-stone-100 dark:bg-slate-900 flex flex-col h-full" style={{backgroundImage: `url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')`}}>
       {/* Header */}
-      <header className="bg-white dark:bg-slate-800 shadow-md z-10 flex items-center p-3 gap-3">
+      <header className="bg-white dark:bg-slate-900 shadow-md z-10 flex items-center p-3 gap-3">
         <img 
             src={listener.image} 
             alt={listener.name} 
@@ -262,7 +262,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
         />
         <div className="flex-grow">
             <div className="flex items-center gap-1.5">
-                <h1 className="font-bold text-slate-800 dark:text-slate-200">{listener.name}</h1>
+                <h1 className="font-bold text-slate-800 dark:text-slate-100">{listener.name}</h1>
                 <VerifiedIcon className="w-5 h-5 text-blue-500" />
             </div>
           <p className={`text-xs font-semibold ${getStatusColor()}`}>{getStatusText()}</p>
@@ -289,7 +289,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
               <Fragment key={msg.id}>
                 {showDateSeparator && (
                   <div className="text-center my-3">
-                    <span className="bg-slate-200/80 text-slate-600 text-xs font-semibold px-2.5 py-1 rounded-full dark:bg-slate-700/80 dark:text-slate-300 backdrop-blur-sm">
+                    <span className="bg-slate-200/80 text-slate-600 text-xs font-semibold px-2.5 py-1 rounded-full dark:bg-slate-800/80 dark:text-slate-300 backdrop-blur-sm">
                       {formatDateSeparator(new Date(msg.timestamp))}
                     </span>
                   </div>
@@ -300,7 +300,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
                     </div>
                 ) : (
                   <div className={`flex ${isSent ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-xs md:max-w-md p-2.5 rounded-xl flex flex-col ${isSent ? 'bg-[#dcf8c6] dark:bg-emerald-900 text-slate-800 dark:text-slate-200 rounded-tr-none' : 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-bl-none shadow-sm'}`}>
+                    <div className={`max-w-xs md:max-w-md p-2.5 rounded-xl flex flex-col ${isSent ? 'bg-[#dcf8c6] dark:bg-cyan-900 text-slate-800 dark:text-slate-100 rounded-tr-none' : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-bl-none shadow-sm'}`}>
                       <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
                       <div className="flex items-center self-end gap-1.5 mt-1 text-slate-500 dark:text-slate-400">
                           <span className="text-xs">
@@ -320,7 +320,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
 
        <footer className="bg-transparent p-2 flex-shrink-0">
                 <form onSubmit={handleSendMessage} className="flex items-end gap-2">
-                    <div className="flex-grow bg-white dark:bg-slate-800 rounded-2xl flex items-end px-3 py-1 shadow-sm min-w-0">
+                    <div className="flex-grow bg-white dark:bg-slate-900 rounded-2xl flex items-end px-3 py-1 shadow-sm min-w-0">
                         <textarea
                             ref={textareaRef}
                             rows={1}

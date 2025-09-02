@@ -252,7 +252,7 @@ const CallUI: React.FC<CallUIProps> = ({ session, user, onLeave }) => {
             backgroundPosition: 'center',
         }}
     >
-        <div className="absolute inset-0 bg-black/70 backdrop-blur-xl"></div>
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-2xl"></div>
 
         {/* Main Content */}
         <div className="relative z-10 flex flex-col items-center justify-center text-center flex-grow">
@@ -285,7 +285,7 @@ const CallUI: React.FC<CallUIProps> = ({ session, user, onLeave }) => {
             <div className="flex flex-col items-center group">
                 <button 
                     onClick={toggleSpeaker}
-                    className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors duration-300 ${isSpeakerOn ? 'bg-cyan-500' : 'bg-white/10 group-hover:bg-white/20'}`}
+                    className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors duration-300 ${isSpeakerOn ? 'bg-cyan-500' : 'bg-slate-800/60 group-hover:bg-slate-800/90'}`}
                     aria-label={isSpeakerOn ? "Turn Speaker Off" : "Turn Speaker On"}
                 >
                     {isSpeakerOn ? <SpeakerOnIcon className="w-8 h-8"/> : <SpeakerOffIcon className="w-8 h-8"/>}
@@ -305,7 +305,7 @@ const CallUI: React.FC<CallUIProps> = ({ session, user, onLeave }) => {
             <div className="flex flex-col items-center group">
                  <button 
                     onClick={toggleMute}
-                    className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors duration-300 ${isMuted ? 'bg-yellow-500' : 'bg-white/10 group-hover:bg-white/20'}`}
+                    className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors duration-300 ${isMuted ? 'bg-yellow-500' : 'bg-slate-800/60 group-hover:bg-slate-800/90'}`}
                     aria-label={isMuted ? "Unmute" : "Mute"}
                 >
                     {isMuted ? <MicOffIcon className="w-8 h-8"/> : <MicOnIcon className="w-8 h-8"/>}

@@ -128,13 +128,14 @@ ${allPlansInfo}
 *   **Language:** Converse primarily in Hinglish (Hindi using the Roman script) or Hindi (Devanagari script), matching the user's language. Be natural and friendly.
 *   **Keep it Concise:** Your answers should be helpful but not overly long.
 `,
-                },
-                tools: [{
-                    functionDeclarations: [{
-                        name: 'navigateToServices',
-                        description: 'Navigates the user to the services (listeners) page.'
+                    // FIX: Moved 'tools' property inside the 'config' object.
+                    tools: [{
+                        functionDeclarations: [{
+                            name: 'navigateToServices',
+                            description: 'Navigates the user to the services (listeners) page.'
+                        }]
                     }]
-                }]
+                },
             });
             
             setMessages([{
@@ -196,14 +197,14 @@ ${allPlansInfo}
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex flex-col bg-slate-100 dark:bg-slate-900 animate-fade-in-up transition-transform duration-300">
-            <header className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 shadow-sm flex-shrink-0 border-b border-slate-200 dark:border-slate-700">
+        <div className="fixed inset-0 z-50 flex flex-col bg-slate-100 dark:bg-slate-950 animate-fade-in-up transition-transform duration-300">
+            <header className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 shadow-sm flex-shrink-0 border-b border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-3">
                     <div className="bg-gradient-to-br from-cyan-500 to-teal-400 p-2 rounded-full">
                         <RobotIcon className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                        <h2 className="font-bold text-lg text-slate-800 dark:text-slate-200">सकून AI दोस्त</h2>
+                        <h2 className="font-bold text-lg text-slate-800 dark:text-slate-100">सकून AI दोस्त</h2>
                         <p className="text-sm text-slate-500 dark:text-slate-400">आपका सहायक गाइड</p>
                     </div>
                 </div>
@@ -223,7 +224,7 @@ ${allPlansInfo}
                                         <RobotIcon className="w-5 h-5 text-white" />
                                     </div>
                                 )}
-                                <div className={`max-w-xs md:max-w-md p-3 rounded-2xl ${isAI ? 'bg-white dark:bg-slate-700 rounded-bl-none shadow-sm' : 'bg-cyan-500 text-white rounded-br-none'}`}>
+                                <div className={`max-w-xs md:max-w-md p-3 rounded-2xl ${isAI ? 'bg-white dark:bg-slate-800 rounded-bl-none shadow-sm' : 'bg-cyan-500 text-white rounded-br-none'}`}>
                                     <div className="text-sm prose prose-sm dark:prose-invert max-w-none">
                                         <MarkdownRenderer text={msg.text} />
                                     </div>
@@ -236,7 +237,7 @@ ${allPlansInfo}
                             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-teal-400 flex items-center justify-center shrink-0">
                                 <RobotIcon className="w-5 h-5 text-white" />
                             </div>
-                            <div className="max-w-xs md:max-w-md p-3 rounded-2xl bg-white dark:bg-slate-700 rounded-bl-none shadow-sm">
+                            <div className="max-w-xs md:max-w-md p-3 rounded-2xl bg-white dark:bg-slate-800 rounded-bl-none shadow-sm">
                                 <div className="flex items-center gap-2">
                                     <span className="h-2 w-2 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
                                     <span className="h-2 w-2 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
@@ -250,9 +251,9 @@ ${allPlansInfo}
                 <div ref={messagesEndRef} />
             </main>
             
-            <footer className="p-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm flex-shrink-0 border-t border-slate-200 dark:border-slate-700">
+            <footer className="p-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm flex-shrink-0 border-t border-slate-200 dark:border-slate-800">
                 <form onSubmit={handleSendMessage} className="flex items-end gap-2">
-                    <div className="flex-grow min-w-0 bg-white dark:bg-slate-700 rounded-2xl flex items-end px-3 py-1 shadow-inner">
+                    <div className="flex-grow min-w-0 bg-white dark:bg-slate-800 rounded-2xl flex items-end px-3 py-1 shadow-inner">
                         <button type="button" className="p-2 text-slate-500 hover:text-cyan-600 dark:hover:text-cyan-400">
                             <EmojiIcon className="w-6 h-6"/>
                         </button>

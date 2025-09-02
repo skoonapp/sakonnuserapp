@@ -99,7 +99,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
       {/* Token Purchase Section */}
       <section className="mb-8">
         <div className="text-center mb-6">
-            <h3 className="text-3xl font-bold text-slate-800 dark:text-slate-200 flex items-center justify-center gap-3">
+            <h3 className="text-3xl font-bold text-slate-800 dark:text-slate-100 flex items-center justify-center gap-3">
                 <WalletIcon className="w-8 h-8 text-indigo-500"/>
                 <span>Token Plans</span>
             </h3>
@@ -108,11 +108,11 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
         
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
             {tokenOptions.map(option => (
-                <div key={option.tokens} className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-between transition-all hover:shadow-lg hover:scale-105">
+                <div key={option.tokens} className="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-between transition-all hover:shadow-lg hover:scale-105">
                     <div className="text-center">
                         <div className="flex items-center justify-center gap-2">
                             <TokenIcon className="w-6 h-6"/>
-                            <span className="text-2xl font-bold text-slate-800 dark:text-slate-200">{option.tokens}</span>
+                            <span className="text-2xl font-bold text-slate-800 dark:text-slate-100">{option.tokens}</span>
                         </div>
                         <p className="text-slate-500 dark:text-slate-400 mb-4">टोकन</p>
                     </div>
@@ -127,14 +127,14 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
             ))}
         </div>
 
-        <div className="text-center mt-6 bg-slate-100 dark:bg-slate-800/50 p-4 rounded-lg max-w-md mx-auto border border-slate-200 dark:border-slate-700">
-            <p className="font-semibold text-slate-700 dark:text-slate-300">📞 कॉल = 2 टोकन/मिनट</p>
-            <p className="font-semibold text-slate-700 dark:text-slate-300 mt-1">💬 चैट = 1 टोकन/2 मैसेज</p>
+        <div className="text-center mt-6 bg-slate-100 dark:bg-slate-900/50 p-4 rounded-lg max-w-md mx-auto border border-slate-200 dark:border-slate-800">
+            <p className="font-semibold text-slate-700 dark:text-slate-200">📞 कॉल = 2 टोकन/मिनट</p>
+            <p className="font-semibold text-slate-700 dark:text-slate-200 mt-1">💬 चैट = 1 टोकन/2 मैसेज</p>
         </div>
       </section>
 
       <div className="text-center my-8">
-        <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-200">DT Plans</h2>
+        <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-100">DT Plans</h2>
         <p className="text-lg text-slate-600 dark:text-slate-400 mt-2">सभी प्लान 30 दिन के मान्य होंगे</p>
       </div>
 
@@ -154,8 +154,8 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
       </div>
 
       {/* Secure Payments Section */}
-      <section className="mt-16 text-center bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 max-w-3xl mx-auto">
-        <h3 className="text-3xl font-bold text-slate-800 dark:text-slate-200 mb-2">सुरक्षित पेमेंट</h3>
+      <section className="mt-16 text-center bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 max-w-3xl mx-auto">
+        <h3 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">सुरक्षित पेमेंट</h3>
         <div className="flex flex-col items-center gap-y-3 my-4">
           <div className="flex justify-center items-center gap-x-6 sm:gap-x-8">
               <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-6 object-contain" />

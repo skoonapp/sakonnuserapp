@@ -32,19 +32,19 @@ const getTierStyles = (tierName: string): string => {
   const tier = tierName.split(' ')[0].toLowerCase();
   switch (tier) {
     case 'bronze':
-      return 'text-amber-700 dark:text-amber-500';
+      return 'text-amber-700 dark:text-amber-400';
     case 'silver':
-      return 'text-slate-500 dark:text-slate-400';
+      return 'text-slate-500 dark:text-slate-300';
     case 'gold':
       return 'text-yellow-500 dark:text-yellow-400';
     case 'platinum':
-      return 'text-cyan-600 dark:text-cyan-400';
+      return 'text-cyan-600 dark:text-cyan-300';
     case 'diamond':
       return 'bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-cyan-300 font-extrabold';
     case 'elite':
       return 'bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500 font-extrabold';
     default:
-      return 'text-slate-800 dark:text-slate-200';
+      return 'text-slate-800 dark:text-slate-100';
   }
 };
 
@@ -52,8 +52,8 @@ const getTierStyles = (tierName: string): string => {
 const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPopular = false, onPurchase, loadingPlan }) => {
   
   const popularContainerStyles = isPopular 
-    ? 'bg-gradient-to-br from-cyan-50 to-blue-200 dark:from-cyan-900/50 dark:to-blue-900/50 border-cyan-400 dark:border-cyan-600 scale-105 shadow-2xl shadow-cyan-500/30' 
-    : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-md';
+    ? 'bg-gradient-to-br from-cyan-50 to-blue-200 dark:from-cyan-950/60 dark:to-blue-950/60 border-cyan-400 dark:border-cyan-500 scale-105 shadow-2xl shadow-cyan-500/30' 
+    : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-md';
 
   const tierStyles = getTierStyles(tierName);
   
@@ -74,7 +74,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPop
         {isPopular && <StarIcon className="w-6 h-6 text-amber-400" />}
       </div>
       
-      <div className="w-full grid grid-cols-2 gap-3 divide-x divide-slate-200 dark:divide-slate-700">
+      <div className="w-full grid grid-cols-2 gap-3 divide-x divide-slate-200 dark:divide-slate-800">
         {/* Call Option */}
         <div className="flex flex-col items-center px-2">
             <div className="flex-grow flex flex-col items-center text-center justify-center py-3">
@@ -92,7 +92,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPop
             <button
               onClick={() => onPurchase(callPlan, 'call')}
               disabled={isAnyPlanLoading}
-              className="w-full mt-auto bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
+              className="w-full mt-auto bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-500 dark:hover:bg-cyan-400 text-white font-bold py-2 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
             >
               {loadingPlan === callPlanKey ? 'प्रोसेसिंग...' : `₹${callPlan.price} खरीदें`}
             </button>

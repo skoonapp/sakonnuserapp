@@ -51,7 +51,7 @@ const Contact: React.FC = () => {
     return (
       <section id="contact" className="py-6 bg-white dark:bg-slate-900">
         <div className="container mx-auto px-6 text-center">
-          <div className="max-w-xl mx-auto bg-teal-50 dark:bg-teal-900/50 border border-teal-200 dark:border-teal-700 p-8 rounded-lg shadow-md">
+          <div className="max-w-xl mx-auto bg-teal-50 dark:bg-teal-500/10 border border-teal-200 dark:border-teal-500/30 p-8 rounded-lg shadow-md">
             <h2 className="text-3xl font-bold text-teal-700 dark:text-teal-300 mb-3">धन्यवाद!</h2>
             <p className="text-lg text-teal-600 dark:text-teal-400">आपका संदेश सफलतापूर्वक भेज दिया गया है। हम जल्द ही आपसे संपर्क करेंगे।</p>
           </div>
@@ -63,14 +63,14 @@ const Contact: React.FC = () => {
   return (
     <section id="contact" className="py-6 bg-white dark:bg-slate-900">
       <div className="container mx-auto px-6">
-        <div className="max-w-xl mx-auto bg-slate-50 dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div className="max-w-xl mx-auto bg-slate-50 dark:bg-slate-900 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 overflow-hidden">
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="w-full flex justify-between items-center text-left p-6"
             aria-expanded={isOpen}
           >
             <div>
-              <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200">अपना संदेश भेजें</h2>
+              <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">अपना संदेश भेजें</h2>
               <p className="text-slate-500 dark:text-slate-400">कोई सवाल या सुझाव है? हमें बताएं।</p>
             </div>
             <span className={`transform transition-transform duration-300 ${isOpen ? 'rotate-180' : 'rotate-0'}`}>
@@ -83,28 +83,28 @@ const Contact: React.FC = () => {
           <div className={`transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
             <div className="p-6 pt-0">
                 <p className="text-md text-slate-500 dark:text-slate-400 mb-6">
-                आप हमें <a href="mailto:appsakoon@gmail.com" className="text-cyan-600 dark:text-cyan-400 font-semibold hover:underline">appsakoon@gmail.com</a> पर ईमेल भी कर सकते हैं।
+                आप हमें <a href="mailto:appsakoon@gmail.com" className="text-cyan-600 dark:text-cyan-300 font-semibold hover:underline">appsakoon@gmail.com</a> पर ईमेल भी कर सकते हैं।
                 </p>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label htmlFor="name" className="block text-md font-medium text-slate-700 dark:text-slate-300 mb-2">नाम <span className="text-red-500">*</span></label>
-                  <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required className="w-full p-3 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition text-slate-900 dark:text-white" placeholder="आपका पूरा नाम" />
+                  <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required className="w-full p-3 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition text-slate-900 dark:text-white" placeholder="आपका पूरा नाम" />
                 </div>
                 
                 <div className="grid md:grid-cols-2 gap-6">
                      <div>
                         <label htmlFor="email" className="block text-md font-medium text-slate-700 dark:text-slate-300 mb-2">ईमेल <span className="text-red-500">*</span></label>
-                        <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required className="w-full p-3 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition text-slate-900 dark:text-white" placeholder="आपका ईमेल पता" />
+                        <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required className="w-full p-3 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition text-slate-900 dark:text-white" placeholder="आपका ईमेल पता" />
                     </div>
                     <div>
                         <label htmlFor="mobile" className="block text-md font-medium text-slate-700 dark:text-slate-300 mb-2">मोबाइल नंबर <span className="text-red-500">*</span></label>
-                        <input type="tel" id="mobile" name="mobile" value={formData.mobile} onChange={handleChange} required maxLength={10} className="w-full p-3 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition text-slate-900 dark:text-white" placeholder="10-अंकीय मोबाइल नंबर" />
+                        <input type="tel" id="mobile" name="mobile" value={formData.mobile} onChange={handleChange} required maxLength={10} className="w-full p-3 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition text-slate-900 dark:text-white" placeholder="10-अंकीय मोबाइल नंबर" />
                     </div>
                 </div>
 
                 <div>
                   <label htmlFor="message" className="block text-md font-medium text-slate-700 dark:text-slate-300 mb-2">संदेश <span className="text-red-500">*</span></label>
-                  <textarea id="message" name="message" value={formData.message} onChange={handleChange} required rows={5} className="w-full p-3 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition text-slate-900 dark:text-white" placeholder="आपका संदेश यहाँ लिखें..."></textarea>
+                  <textarea id="message" name="message" value={formData.message} onChange={handleChange} required rows={5} className="w-full p-3 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition text-slate-900 dark:text-white" placeholder="आपका संदेश यहाँ लिखें..."></textarea>
                 </div>
                 
                 {status === 'error' && <p className="text-red-500 dark:text-red-400 bg-red-100 dark:bg-red-900/50 p-3 rounded-lg text-center">{error}</p>}

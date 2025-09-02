@@ -54,11 +54,11 @@ const Header: React.FC<HeaderProps> = ({ currentUser, isDarkMode, toggleDarkMode
       .reduce((sum, p) => sum + (p.messages || 0), 0);
 
   return (
-    <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm shadow-sm sticky top-0 z-20">
+    <header className="bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm shadow-sm sticky top-0 z-20">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
         {/* Left Section */}
         <div className="flex items-center">
-            <h1 className="text-2xl md:text-3xl font-bold text-cyan-700 dark:text-cyan-400 whitespace-nowrap">
+            <h1 className="text-2xl md:text-3xl font-bold text-cyan-700 dark:text-cyan-300 whitespace-nowrap">
               SakoonApp
             </h1>
         </div>
@@ -66,26 +66,26 @@ const Header: React.FC<HeaderProps> = ({ currentUser, isDarkMode, toggleDarkMode
         {/* Right Section */}
         <div className="flex items-center gap-2">
             {currentUser && (
-              <div className="flex items-center space-x-2 md:space-x-3 bg-slate-100 dark:bg-slate-800 px-2 py-1.5 rounded-full">
+              <div className="flex items-center space-x-2 md:space-x-3 bg-slate-100 dark:bg-slate-900 px-2 py-1.5 rounded-full">
                   <div className="flex items-center space-x-1" title={`${tokenBalance} टोकन`}>
                       <CustomTokenIcon className="w-5 h-5"/>
-                      <span className="font-bold text-sm text-slate-700 dark:text-slate-200">{tokenBalance}</span>
+                      <span className="font-bold text-sm text-slate-700 dark:text-slate-100">{tokenBalance}</span>
                   </div>
-                  <div className="w-px h-4 bg-slate-300 dark:bg-slate-600"></div>
+                  <div className="w-px h-4 bg-slate-300 dark:bg-slate-700"></div>
                   <div className="flex items-center space-x-1" title={`${callMinutes} मिनट कॉल`}>
                       <CallIcon className="w-5 h-5 text-green-500"/>
-                      <span className="font-bold text-sm text-slate-700 dark:text-slate-200">{callMinutes}</span>
+                      <span className="font-bold text-sm text-slate-700 dark:text-slate-100">{callMinutes}</span>
                   </div>
-                  <div className="w-px h-4 bg-slate-300 dark:bg-slate-600"></div>
+                  <div className="w-px h-4 bg-slate-300 dark:bg-slate-700"></div>
                   <div className="flex items-center space-x-1" title={`${totalMessages} मैसेज`}>
                       <ChatIcon className="w-5 h-5 text-cyan-500"/>
-                      <span className="font-bold text-sm text-slate-700 dark:text-slate-200">{totalMessages}</span>
+                      <span className="font-bold text-sm text-slate-700 dark:text-slate-100">{totalMessages}</span>
                   </div>
               </div>
             )}
              <button
                 onClick={toggleDarkMode}
-                className="text-slate-600 dark:text-yellow-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full p-2 transition-colors shrink-0"
+                className="text-slate-600 dark:text-amber-400 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full p-2 transition-colors shrink-0"
                 aria-label={isDarkMode ? "लाइट मोड" : "डार्क मोड"}
             >
                 {isDarkMode ? <SunIcon className="w-6 h-6"/> : <MoonIcon className="w-6 h-6"/>}

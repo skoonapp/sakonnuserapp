@@ -101,7 +101,7 @@ const ApplyAsListener: React.FC = () => {
 
   if (applied) {
     return (
-      <div className="text-center p-8 bg-green-50 dark:bg-green-900/50 border border-green-200 dark:border-green-700 rounded-lg">
+      <div className="text-center p-8 bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 rounded-lg">
         <h3 className="text-2xl font-bold text-green-700 dark:text-green-300">✅ धन्यवाद! आपका आवेदन जमा हो गया है।</h3>
         <p className="text-lg text-green-600 dark:text-green-400 mt-2">
           आपके फॉर्म का स्टेटस अगले 24 घंटों के भीतर आपके मोबाइल नंबर या WhatsApp पर सूचित कर दिया जाएगा।
@@ -127,7 +127,7 @@ const ApplyAsListener: React.FC = () => {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Warning Note */}
-      <div className="bg-yellow-50 dark:bg-yellow-900/40 border-l-4 border-yellow-400 dark:border-yellow-500 text-yellow-800 dark:text-yellow-200 p-4 rounded-r-lg" role="alert">
+      <div className="bg-yellow-50 dark:bg-amber-500/10 border-l-4 border-yellow-400 dark:border-amber-500/30 text-yellow-800 dark:text-amber-300 p-4 rounded-r-lg" role="alert">
         <div className="flex items-center">
             <WarningIcon className="w-6 h-6 mr-3"/>
             <h4 className="font-bold">महत्वपूर्ण सूचना</h4>
@@ -151,7 +151,7 @@ const ApplyAsListener: React.FC = () => {
               value={formData.fullName}
               onChange={handleChange}
               placeholder="बैंक में जो नाम है वही डालें"
-              className="w-full p-3 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-cyan-500 transition"
+              className="w-full p-3 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-cyan-500 transition"
               required
             />
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">आपका असली नाम लोगों को नहीं दिखाया जाएगा।</p>
@@ -167,7 +167,7 @@ const ApplyAsListener: React.FC = () => {
               value={formData.displayName}
               onChange={handleChange}
               placeholder="लोगो को यही नाम दिखेगा"
-              className="w-full p-3 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-cyan-500 transition"
+              className="w-full p-3 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-cyan-500 transition"
               required
             />
           </div>
@@ -187,7 +187,7 @@ const ApplyAsListener: React.FC = () => {
                 onChange={handleChange}
                 maxLength={10}
                 placeholder="10-अंकीय मोबाइल नंबर"
-                className="w-full p-3 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-cyan-500 transition"
+                className="w-full p-3 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-cyan-500 transition"
                 required
             />
             <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -204,7 +204,7 @@ const ApplyAsListener: React.FC = () => {
                 name="profession"
                 value={formData.profession}
                 onChange={handleChange}
-                className="w-full p-3 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-cyan-500 transition"
+                className="w-full p-3 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-cyan-500 transition"
                 required
             >
                 <option value="">-- चुनें --</option>
@@ -218,20 +218,20 @@ const ApplyAsListener: React.FC = () => {
 
 
       {/* Payment Details */}
-      <fieldset className="border border-slate-300 dark:border-slate-600 rounded-lg p-4">
+      <fieldset className="border border-slate-300 dark:border-slate-700 rounded-lg p-4">
         <legend className="px-2 font-semibold text-slate-700 dark:text-slate-300">भुगतान के लिए बैंक/UPI विवरण <span className="text-red-500">*</span></legend>
         <div className="space-y-4 mt-2">
-            <input type="text" name="bankAccount" value={formData.bankAccount} onChange={handleChange} placeholder="बैंक खाता संख्या" className="w-full p-3 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-cyan-500 transition"/>
+            <input type="text" name="bankAccount" value={formData.bankAccount} onChange={handleChange} placeholder="बैंक खाता संख्या" className="w-full p-3 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-cyan-500 transition"/>
             <div className="grid grid-cols-2 gap-4">
-                <input type="text" name="ifsc" value={formData.ifsc} onChange={handleChange} placeholder="IFSC कोड" className="w-full p-3 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-cyan-500 transition"/>
-                <input type="text" name="bankName" value={formData.bankName} onChange={handleChange} placeholder="बैंक का नाम" className="w-full p-3 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-cyan-500 transition"/>
+                <input type="text" name="ifsc" value={formData.ifsc} onChange={handleChange} placeholder="IFSC कोड" className="w-full p-3 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-cyan-500 transition"/>
+                <input type="text" name="bankName" value={formData.bankName} onChange={handleChange} placeholder="बैंक का नाम" className="w-full p-3 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-cyan-500 transition"/>
             </div>
             <div className="flex items-center">
-                <hr className="flex-grow border-slate-300 dark:border-slate-600" />
+                <hr className="flex-grow border-slate-300 dark:border-slate-700" />
                 <span className="px-4 text-slate-500">या</span>
-                <hr className="flex-grow border-slate-300 dark:border-slate-600" />
+                <hr className="flex-grow border-slate-300 dark:border-slate-700" />
             </div>
-            <input type="text" name="upiId" value={formData.upiId} onChange={handleChange} placeholder="UPI ID" className="w-full p-3 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-cyan-500 transition"/>
+            <input type="text" name="upiId" value={formData.upiId} onChange={handleChange} placeholder="UPI ID" className="w-full p-3 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-cyan-500 transition"/>
         </div>
       </fieldset>
       

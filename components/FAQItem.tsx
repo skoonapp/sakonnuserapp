@@ -26,7 +26,7 @@ const AnswerRenderer: React.FC<{ text: string }> = ({ text }) => {
                         <li key={index}>
                             {itemParts.map((part, partIndex) => {
                                 if (part.startsWith('**') && part.endsWith('**')) {
-                                    return <strong key={partIndex} className="font-semibold text-slate-700 dark:text-slate-300">{part.slice(2, -2)}</strong>;
+                                    return <strong key={partIndex} className="font-semibold text-slate-700 dark:text-slate-200">{part.slice(2, -2)}</strong>;
                                 }
                                 return part;
                             })}
@@ -57,12 +57,12 @@ const FAQItem: React.FC<FaqItem> = ({ question, answer, isPositive }) => {
 
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+    <div className="bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex justify-between items-center text-left p-5 focus:outline-none"
       >
-        <span className="text-lg font-medium text-slate-800 dark:text-slate-200">{question}</span>
+        <span className="text-lg font-medium text-slate-800 dark:text-slate-100">{question}</span>
         <span className="text-cyan-600 dark:text-cyan-400 transform transition-transform duration-300" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
