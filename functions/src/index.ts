@@ -1,7 +1,7 @@
 import * as functions from "firebase-functions/v1";
 import * as admin from "firebase-admin";
-// FIX: Switched to standard ES6 module imports to resolve module format errors.
-import express from "express";
+// FIX: Switched to standard ES6 module imports and imported specific types to resolve module format errors.
+import express, {Request, Response, NextFunction} from "express";
 import cors from "cors";
 import {RtcTokenBuilder, RtcRole} from "zego-express-engine";
 import Razorpay from "razorpay";
@@ -49,11 +49,11 @@ app.use(cors({origin: true}));
 app.use(express.json());
 
 // Middleware to check Firebase Auth token
-// FIX: Explicitly typed req, res, and next with express.* types for correct type inference.
+// FIX: Explicitly typed req, res, and next with imported express types for correct type inference.
 const authenticate = async (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
+  req: Request,
+  res: Response,
+  next: NextFunction
 ) => {
   if (
     !req.headers.authorization ||
@@ -133,8 +133,8 @@ const processPurchase = async (paymentNotes: any, paymentId: string) => {
 
 
 // Zego Token Generation Endpoint
-// FIX: Explicitly typed req and res with express.* types for correct type inference.
-app.post("/generateZegoToken", authenticate, async (req: express.Request, res: express.Response) => {
+// FIX: Explicitly typed req and res with imported express types for correct type inference.
+app.post("/generateZegoToken", authenticate, async (req: Request, res: Response) => {
   const userId = req.user!.uid;
   const {planId} = req.body;
 
@@ -168,8 +168,8 @@ app.post("/generateZegoToken", authenticate, async (req: express.Request, res: e
 
 
 // Razorpay Webhook Endpoint
-// FIX: Explicitly typed req and res with express.* types for correct type inference.
-app.post("/razorpayWebhook", async (req: express.Request, res: express.Response) => {
+// FIX: Explicitly typed req and res with imported express types for correct type inference.
+app.post("/razorpayWebhook", async (req: Request, res: Response) => {
   const secret = functions.config().razorpay.webhook_secret;
   const signature = req.headers["x-razorpay-signature"] as string;
 

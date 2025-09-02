@@ -103,7 +103,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
                 <WalletIcon className="w-8 h-8 text-indigo-500"/>
                 <span>MT Plans</span>
             </h3>
-            <p className="text-slate-600 dark:text-slate-400 mt-2">MT खरीदें और अपनी सुविधानुसार कॉल या चैट के लिए उपयोग करें।</p>
+            <p className="text-slate-600 dark:text-slate-400 mt-2">Money Token खरीदें और अपनी सुविधानुसार कॉल या चैट के लिए उपयोग करें।</p>
         </div>
         
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
