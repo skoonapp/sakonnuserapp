@@ -1,8 +1,8 @@
 import * as functions from "firebase-functions/v1";
 import * as admin from "firebase-admin";
-// FIX: Changed to a default import for express and used explicit types (express.Request, express.Response) 
-// to avoid type conflicts with firebase-functions' own Request/Response types.
-import express from "express";
+// FIX: Use require-style import for Express to handle CommonJS modules correctly and avoid type conflicts
+// with firebase-functions' own Request/Response types.
+import express = require("express");
 import cors from "cors";
 import {RtcTokenBuilder, RtcRole} from "zego-express-engine";
 import Razorpay from "razorpay";

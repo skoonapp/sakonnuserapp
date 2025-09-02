@@ -254,12 +254,6 @@ ${allPlansInfo}
             <footer className="p-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm flex-shrink-0 border-t border-slate-200 dark:border-slate-800">
                 <form onSubmit={handleSendMessage} className="flex items-end gap-2">
                     <div className="flex-grow min-w-0 bg-white dark:bg-slate-800 rounded-2xl flex items-end px-3 py-1 shadow-inner">
-                        <button type="button" className="p-2 text-slate-500 hover:text-cyan-600 dark:hover:text-cyan-400">
-                            <EmojiIcon className="w-6 h-6"/>
-                        </button>
-                        <button type="button" className="p-2 text-slate-500 hover:text-cyan-600 dark:hover:text-cyan-400">
-                            <AttachmentIcon className="w-6 h-6"/>
-                        </button>
                         <textarea
                             ref={textareaRef}
                             rows={1}

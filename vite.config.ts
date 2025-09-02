@@ -1,12 +1,7 @@
 
-
-
 import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
-// FIX: The `process` global from Node.js is not always available by default in Vite's TypeScript environment.
-// Importing it directly from the 'process' module ensures that `process.cwd()` is correctly typed and available.
-import process from 'process';
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), '');
