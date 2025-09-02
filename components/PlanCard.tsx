@@ -1,14 +1,6 @@
 import React, { useState } from 'react';
 import type { Plan, User } from '../types';
-import { RAZORPAY_KEY_ID, FIREBASE_API_URL } from '../constants';
-import { auth } from '../utils/firebase';
-
-// Declare Razorpay on the window object for TypeScript
-declare global {
-  interface Window {
-    Razorpay: any;
-  }
-}
+import { auth, functions } from '../utils/firebase';
 
 interface PlanCardProps {
   tierName: string;
@@ -72,83 +64,36 @@ const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPop
   };
   const messages = messageMapping[chatPlan.duration] || 0;
   
-  const handlePurchase = (plan: Plan, type: 'call' | 'chat') => {
+  const handlePurchase = async (plan: Plan, type: 'call' | 'chat') => {
     setLoadingType(type);
 
-    const options = {
-        key: RAZORPAY_KEY_ID,
-        amount: plan.price * 100, // Amount is in paise
-        currency: "INR",
-        name: "SakoonApp",
-        description: `एक ${type === 'chat' ? 'चैट' : 'कॉल'} प्लान खरीदें - ${plan.duration}`,
-        image: "https://cdn-icons-png.flaticon.com/512/2966/2966472.png",
-        handler: async (response: any) => {
-            const { razorpay_payment_id } = response;
-            try {
-                const user = auth.currentUser;
-                if (!user) throw new Error("User not authenticated");
-                const idToken = await user.getIdToken(true);
-
-                const verifyUrl = `${FIREBASE_API_URL}/verifyPayment`;
-
-                const verifyResponse = await fetch(verifyUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${idToken}`,
-                    },
-                    body: JSON.stringify({ razorpay_payment_id }),
-                });
-
-                if (!verifyResponse.ok) {
-                    const errorData = await verifyResponse.json();
-                    throw new Error(errorData.error || 'Payment verification failed on server.');
-                }
-
-                alert(`आपका भुगतान सफल रहा! आपका ${plan.duration} का ${type === 'call' ? 'कॉल' : 'चैट'} प्लान जल्द ही आपके वॉलेट में दिखाई देगा।`);
-
-            } catch (error) {
-                console.error("Error during payment verification:", error);
-                alert("भुगतान सफल रहा, लेकिन आपके खाते को अपडेट करने में कोई त्रुटि हुई। कृपया सहायता से संपर्क करें।");
-            } finally {
-                setLoadingType(null);
-            }
-        },
-        prefill: {
-            name: currentUser.name || '',
-            email: currentUser.email || '',
-            contact: currentUser.mobile || ''
-        },
-        notes: {
-            userId: currentUser.uid,
-            planDuration: plan.duration,
-            planPrice: plan.price,
-            planType: type,
-            ...(type === 'chat' && { messages: messages })
-        },
-        theme: {
-            color: "#0891B2" // Cyan-600
-        },
-        modal: {
-            ondismiss: function() {
-                console.log('Payment modal was closed.');
-                setLoadingType(null);
-            }
-        }
-    };
-
     try {
-        const rzp = new window.Razorpay(options);
-        rzp.on('payment.failed', function (response: any){
-            console.error("Payment failed:", response);
-            alert(`Oops! Something went wrong. Payment Failed\nReason: ${response.error.description}\nPlease try again.`);
-            setLoadingType(null);
-        });
-        rzp.open();
-    } catch(error) {
-        console.error("Razorpay error:", error);
-        alert("भुगतान शुरू करने में एक त्रुटि हुई। कृपया अपनी इंटरनेट कनेक्टिविटी जांचें और पुनः प्रयास करें।");
-        setLoadingType(null);
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error("You must be logged in to make a purchase.");
+      }
+
+      const processDummyPayment = functions.httpsCallable("processDummyPayment");
+
+      const planDetails = {
+        planType: type,
+        planDuration: plan.duration,
+        planPrice: String(plan.price),
+        ...(type === 'chat' && { messages: String(messages) })
+      };
+      
+      await processDummyPayment({
+          purchaseType: 'plan',
+          planDetails: planDetails
+      });
+
+      alert(`आपका भुगतान सफल रहा! आपका ${plan.duration} का ${type === 'call' ? 'कॉल' : 'चैट'} प्लान जल्द ही आपके वॉलेट में दिखाई देगा।`);
+
+    } catch (error) {
+      console.error("Dummy payment failed:", error);
+      alert("भुगतान करने में कोई त्रुटि हुई। कृपया पुनः प्रयास करें।");
+    } finally {
+      setLoadingType(null);
     }
   };
 

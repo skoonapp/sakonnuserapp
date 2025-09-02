@@ -330,6 +330,48 @@ export const addEarning = functions
     }
   });
 
+// Callable function for dummy payments
+export const processDummyPayment = functions
+  .region("us-central1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      throw new functions.https.HttpsError(
+        "unauthenticated",
+        "The function must be called while authenticated."
+      );
+    }
+
+    const userId = context.auth.uid;
+    const { purchaseType, planDetails } = data;
+
+    if (!purchaseType || !planDetails) {
+        throw new functions.https.HttpsError(
+            "invalid-argument",
+            "Missing purchase type or plan details."
+        );
+    }
+    
+    // Create a dummy payment ID for idempotency check
+    const dummyPaymentId = `dummy_${userId}_${Date.now()}`;
+
+    const paymentNotes = {
+        userId: userId,
+        purchaseType: purchaseType,
+        ...planDetails,
+    };
+    
+    try {
+        await processPurchase(paymentNotes, dummyPaymentId);
+        return { status: "success", message: "Dummy payment processed successfully." };
+    } catch (error) {
+        console.error("Error processing dummy payment:", error);
+        throw new functions.https.HttpsError(
+            "internal",
+            "An error occurred while processing the payment."
+        );
+    }
+  });
+
 
 export const onListenerStatusChange = functions
   .region("us-central1")

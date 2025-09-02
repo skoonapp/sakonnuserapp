@@ -1,14 +1,9 @@
 import React, { useState } from 'react';
 import PlanCard from './PlanCard';
-import { CALL_PLANS, CHAT_PLANS, RAZORPAY_KEY_ID, FIREBASE_API_URL } from '../constants';
+import { CALL_PLANS, CHAT_PLANS } from '../constants';
 import type { User } from '../types';
-import { auth } from '../utils/firebase';
+import { auth, functions } from '../utils/firebase';
 
-declare global {
-  interface Window {
-    Razorpay: any;
-  }
-}
 
 interface PlansViewProps {
   currentUser: User;
@@ -42,76 +37,33 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
     { amount: 500, price: 2250 },
   ];
 
-  const handleTokenPurchase = (tokenOption: { amount: number; price: number }) => {
+  const handleTokenPurchase = async (tokenOption: { amount: number; price: number }) => {
     setLoading(tokenOption.amount);
-    
-    const options = {
-      key: RAZORPAY_KEY_ID,
-      amount: tokenOption.price * 100,
-      currency: "INR",
-      name: "SakoonApp",
-      description: `टोकन खरीदें - ${tokenOption.amount} टोकन`,
-      image: "https://cdn-icons-png.flaticon.com/512/2966/2966472.png",
-      handler: async (response: any) => {
-        const { razorpay_payment_id } = response;
-        try {
-          const user = auth.currentUser;
-          if (!user) throw new Error("User not authenticated");
-          const idToken = await user.getIdToken(true);
-
-          const verifyUrl = `${FIREBASE_API_URL}/verifyPayment`;
-
-          const verifyResponse = await fetch(verifyUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${idToken}`,
-            },
-            body: JSON.stringify({ razorpay_payment_id }),
-          });
-
-          if (!verifyResponse.ok) {
-            const errorData = await verifyResponse.json();
-            throw new Error(errorData.error || 'Payment verification failed on server.');
-          }
-
-          alert(`आपका भुगतान सफल रहा! ${tokenOption.amount} टोकन जल्द ही आपके खाते में जोड़ दिए जाएंगे।`);
-        } catch (error) {
-          console.error("Error during payment verification:", error);
-          alert("भुगतान सफल रहा, लेकिन आपके खाते को अपडेट करने में कोई त्रुटि हुई। कृपया सहायता से संपर्क करें।");
-        } finally {
-          setLoading(null);
-        }
-      },
-      prefill: {
-        name: currentUser.name || '',
-        email: currentUser.email || '',
-        contact: currentUser.mobile || ''
-      },
-      notes: {
-        userId: currentUser.uid,
-        purchaseType: 'tokens',
-        tokensToBuy: tokenOption.amount,
-        planPrice: tokenOption.price, // For transaction record
-      },
-      theme: { color: "#0891B2" },
-      modal: {
-        ondismiss: function() {
-          setLoading(null);
-        }
-      }
-    };
 
     try {
-      const rzp = new window.Razorpay(options);
-      rzp.on('payment.failed', function (response: any){
-          alert(`Oops! Payment Failed: ${response.error.description}`);
-          setLoading(null);
-      });
-      rzp.open();
-    } catch(error) {
-      alert("भुगतान शुरू करने में एक त्रुटि हुई।");
-      setLoading(null);
+        const user = auth.currentUser;
+        if (!user) {
+            throw new Error("You must be logged in to make a purchase.");
+        }
+
+        const processDummyPayment = functions.httpsCallable("processDummyPayment");
+        
+        const planDetails = {
+            tokensToBuy: String(tokenOption.amount),
+            planPrice: String(tokenOption.price),
+        };
+
+        await processDummyPayment({
+            purchaseType: 'tokens',
+            planDetails: planDetails,
+        });
+
+        alert(`आपका भुगतान सफल रहा! ${tokenOption.amount} टोकन जल्द ही आपके खाते में जोड़ दिए जाएंगे।`);
+    } catch (error) {
+        console.error("Dummy token purchase failed:", error);
+        alert("टोकन खरीदने में कोई त्रुटि हुई। कृपया पुनः प्रयास करें।");
+    } finally {
+        setLoading(null);
     }
   };
 
