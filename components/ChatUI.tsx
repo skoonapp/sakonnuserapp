@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback, Fragment } from 'react';
-import type { ChatSession, User, ChatMessage, PurchasedPlan } from '../types';
+import type { ChatSession, User, ChatMessage } from '../types';
 import { fetchZegoToken } from '../utils/zego.ts';
-import { db } from '../utils/firebase.ts';
-import firebase from 'firebase/compat/app';
+import { functions } from '../utils/firebase.ts';
 
 declare global {
   interface Window {
@@ -66,15 +65,12 @@ const formatDateSeparator = (date: Date) => {
 const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
   const zpInstanceRef = useRef<any>(null);
   const hasLeftRef = useRef(false);
-  const planRef = useRef(db.collection('users').doc(user.uid).collection('purchasedPlans').doc(session.associatedPlanId)).current;
-  const tokenRef = useRef(db.collection('users').doc(user.uid)).current;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const typingTimeoutRef = useRef<number | null>(null);
-
+  const associatedPlanIdRef = useRef(session.associatedPlanId);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
-  const [remainingMessages, setRemainingMessages] = useState<number | string>('...');
   const [status, setStatus] = useState<ConnectionStatus>('connecting');
   const [isListenerTyping, setIsListenerTyping] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -97,19 +93,12 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
     onLeave(isSuccess, sentMessagesCount);
   }, [onLeave, sentMessagesCount]);
 
-
-  const endSessionDueToBalance = useCallback(() => {
-    addSystemMessage('Your message balance has finished. This chat will now end.');
-    setTimeout(() => handleLeave(true), 3000); // Wait 3s for user to read
-  }, [addSystemMessage, handleLeave]);
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
    
     useEffect(scrollToBottom, [messages]);
     
-    // Auto-resize textarea
     useEffect(() => {
         if (textareaRef.current) {
             textareaRef.current.style.height = 'auto';
@@ -118,29 +107,6 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
         }
     }, [inputValue]);
   
-  // Firestore listener for real-time plan/token updates
-  useEffect(() => {
-    let unsubscribe: () => void;
-    if (session.isTokenSession) {
-        unsubscribe = tokenRef.onSnapshot((doc) => {
-            if (!doc.exists) { handleLeave(true); return; }
-            const tokenBalance = (doc.data()?.tokenBalance || 0) as number;
-            setRemainingMessages(Math.floor(tokenBalance * 2));
-             if (tokenBalance < 1 && status !== 'ended') { endSessionDueToBalance(); }
-        });
-    } else {
-        unsubscribe = planRef.onSnapshot((doc) => {
-            if (!doc.exists) { handleLeave(true); return; }
-            const planData = doc.data() as PurchasedPlan;
-            const messagesLeft = planData.remainingMessages || 0;
-            setRemainingMessages(messagesLeft);
-            if (messagesLeft <= 0 && status !== 'ended') { endSessionDueToBalance(); }
-        });
-    }
-
-    return () => unsubscribe();
-  }, [session.isTokenSession, session.associatedPlanId, planRef, tokenRef, endSessionDueToBalance, handleLeave, status]);
-
   // Zego setup effect
   useEffect(() => {
     let zp: any;
@@ -151,7 +117,6 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
         zp = window.ZegoUIKitPrebuilt.create(kitToken);
         zpInstanceRef.current = zp;
 
-        // Add custom event listener for typing indicators
         zp.on('IMRecvCustomCommand', ({ fromUser, command }: { fromUser: { userID: string }, command: string }) => {
             if (fromUser.userID === String(session.listener.id)) {
                 const cmdData = JSON.parse(command);
@@ -166,7 +131,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
         });
 
         await zp.joinRoom({
-          container: document.createElement('div'), // Hidden container
+          container: document.createElement('div'),
           showMyCameraToggleButton: false, showAudioVideoSettingsButton: false, showScreenSharingButton: false, showMicrophoneToggleButton: false,
           showPreJoinView: false, turnOnCameraWhenJoining: false, turnOnMicrophoneWhenJoining: false, showCallTimer: false, showLeaveRoomConfirmDialog: false,
           onInRoomMessageReceived: (messageList: any[]) => {
@@ -175,7 +140,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
                   text: msg.message,
                   sender: { uid: msg.fromUser.userID, name: msg.fromUser.userName },
                   timestamp: msg.sendTime,
-                  status: 'read' // Assume received messages are read
+                  status: 'read'
               }));
               setMessages(prev => [...prev, ...newMessages]);
           },
@@ -235,10 +200,12 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
     setMessages(prev => [...prev, localMessage]);
     
     try {
-        if (session.isTokenSession) {
-            await tokenRef.update({ tokenBalance: firebase.firestore.FieldValue.increment(-0.5) });
-        } else {
-            await planRef.update({ remainingMessages: firebase.firestore.FieldValue.increment(-1) });
+        const deductUsage = functions.httpsCallable("deductUsage");
+        const result: any = await deductUsage({ type: 'chat', messages: 1, associatedPlanId: associatedPlanIdRef.current });
+        
+        // If deduction was from tokens, the associatedPlanId might change for subsequent deductions
+        if (result.data.planId && result.data.planId.startsWith('token_session')) {
+            associatedPlanIdRef.current = result.data.planId;
         }
 
         await zpInstanceRef.current.sendRoomMessage(textToSend);
@@ -250,10 +217,13 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
         setTimeout(() => setMessages(prev => prev.map(m => m.id === localMessageId ? {...m, status: 'delivered'} : m)), 1000);
         setTimeout(() => setMessages(prev => prev.map(m => m.id === localMessageId ? {...m, status: 'read'} : m)), 2500);
 
-    } catch (error) {
-        console.error('Failed to send message or update balance:', error);
+    } catch (error: any) {
+        console.error('Failed to send message or deduct balance:', error);
         setMessages(prev => prev.map(m => m.id === localMessageId ? {...m, status: 'failed'} : m));
-        addSystemMessage('Failed to send message. Please check your balance.');
+        addSystemMessage(error.message || 'Failed to send message. Please check your balance.');
+        if(error.code === 'functions/failed-precondition') {
+             setTimeout(() => handleLeave(true), 3000);
+        }
     }
   };
   
@@ -296,12 +266,6 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
                 <VerifiedIcon className="w-5 h-5 text-blue-500" />
             </div>
           <p className={`text-xs font-semibold ${getStatusColor()}`}>{getStatusText()}</p>
-        </div>
-        <div className="text-right">
-            <span className="font-mono font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded">
-                {remainingMessages}
-            </span>
-            <p className="text-xs text-slate-500 dark:text-slate-400">{session.isTokenSession ? 'Token Msgs' : 'Messages Left'}</p>
         </div>
         <button 
           onClick={() => handleLeave(true)} 
@@ -354,7 +318,6 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
         </div>
       </main>
 
-      {/* Input Footer */}
        <footer className="bg-transparent p-2 flex-shrink-0">
                 <form onSubmit={handleSendMessage} className="flex items-end gap-2">
                     <div className="flex-grow bg-white dark:bg-slate-800 rounded-2xl flex items-end px-3 py-1 shadow-sm min-w-0">

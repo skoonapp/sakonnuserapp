@@ -76,20 +76,15 @@ const authenticate = async (
 
 /**
  * Processes a purchase by updating the user's balance in Firestore.
- * Includes an idempotency check to prevent processing the same payment twice.
+ * This now updates the new schema with 'tokens' and 'activePlans' array.
  * @param {any} paymentNotes - The notes object from the Razorpay payment.
  * @param {string} paymentId - The unique Razorpay payment ID.
  */
 const processPurchase = async (paymentNotes: any, paymentId: string) => {
   const {
     userId,
-    purchaseType,
-    tokensToBuy,
     planType,
-    planDuration,
-    planPrice,
-    messages,
-    planId,
+    planDetails, // This is an object now
   } = paymentNotes;
 
   if (!userId) {
@@ -103,59 +98,29 @@ const processPurchase = async (paymentNotes: any, paymentId: string) => {
     return;
   }
 
-  if (purchaseType === "tokens") {
-    const tokens = parseInt(tokensToBuy, 10);
+  const userRef = db.collection("users").doc(userId);
+
+  if (planType === "token") {
+    const tokens = parseInt(planDetails.tokens, 10);
     if (isNaN(tokens) || tokens <= 0) {
-      throw new Error(`Invalid tokensToBuy value: ${tokensToBuy}`);
+      throw new Error(`Invalid tokens value: ${planDetails.tokens}`);
     }
-    const userRef = db.collection("users").doc(userId);
-    await db.runTransaction(async (transaction) => {
-      const userDoc = await transaction.get(userRef);
-      if (!userDoc.exists) {
-        transaction.set(userRef, {tokenBalance: tokens});
-      } else {
-        transaction.update(userRef, {
-          tokenBalance: admin.firestore.FieldValue.increment(tokens),
-        });
-      }
-    });
-    await userRef.collection("tokenTransactions").add({
-      tokensAdded: tokens,
-      pricePaid: parseInt(planPrice, 10) || 0,
-      razorpayPaymentId: paymentId,
-      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+    await userRef.update({
+      tokens: admin.firestore.FieldValue.increment(tokens),
     });
     console.log(`Successfully added ${tokens} tokens to user ${userId}`);
-  } else { // Handle plan purchase
-    // ... (rest of plan purchase logic remains the same)
-    let newPlan: any = {
-      type: planType,
-      plan: {
-        duration: planDuration,
-        price: parseInt(planPrice, 10),
-      },
+  } else { // Handle DT plan purchase
+    const newPlan = {
+      ...planDetails,
+      id: `plan_${Date.now()}`,
       purchaseTimestamp: admin.firestore.Timestamp.now().toMillis(),
       expiryTimestamp: admin.firestore.Timestamp.now().toMillis() +
-          (30 * 24 * 60 * 60 * 1000),
-      planId: planId || null,
+          (30 * 24 * 60 * 60 * 1000), // 30-day expiry
     };
-
-    if (planType === "call") {
-      const durationStr = planDuration as string;
-      const totalSeconds = durationStr.includes("घंटा") ?
-          parseInt(durationStr) * 3600 : parseInt(durationStr) * 60;
-      newPlan = {...newPlan, remainingSeconds: totalSeconds, totalSeconds};
-    } else if (planType === "chat") {
-      const totalMessages = parseInt(messages, 10);
-      newPlan = {
-        ...newPlan,
-        remainingMessages: totalMessages,
-        totalMessages,
-      };
-    }
-    await db.collection("users").doc(userId)
-      .collection("purchasedPlans").add(newPlan);
-    console.log(`Successfully created ${planType} plan for user ${userId}`);
+    await userRef.update({
+      activePlans: admin.firestore.FieldValue.arrayUnion(newPlan),
+    });
+    console.log(`Successfully added ${planDetails.name} plan for ${userId}`);
   }
 
   // Mark payment as processed
@@ -165,6 +130,7 @@ const processPurchase = async (paymentNotes: any, paymentId: string) => {
     notes: paymentNotes,
   });
 };
+
 
 // Zego Token Generation Endpoint
 // FIX: Explicitly typed req and res with express.* types for correct type inference.
@@ -177,66 +143,26 @@ app.post("/generateZegoToken", authenticate, async (req: express.Request, res: e
     return;
   }
 
-  try {
-    if (planId.startsWith("token_session_")) {
-       // Proceed for token sessions
-    } else {
-        const planRef = db
-          .collection("users")
-          .doc(userId)
-          .collection("purchasedPlans")
-          .doc(planId);
-        const planDoc = await planRef.get();
-        if (!planDoc.exists) {
-          res.status(404).send({error: "Plan not found."});
-          return;
-        }
-        const planData = planDoc.data();
-        const hasBalance = (planData?.remainingSeconds ?? 0) > 0 || (planData?.remainingMessages ?? 0) > 0;
-        if (!planData || !hasBalance) {
-          res.status(403).send({error: "No balance remaining."});
-          return;
-        }
-    }
+  // NOTE: Balance check is now done pre-session via deductUsage.
+  // This token generation assumes a balance check has already passed.
 
+  try {
     const appID = parseInt(functions.config().zego.app_id, 10);
     const serverSecret = functions.config().zego.server_secret;
-    const effectiveTimeInSeconds = 3600;
+    const effectiveTimeInSeconds = 3600; // 1 hour validity for the token
     const payload = "";
+    const zegoUserId = firebaseUIDtoZegoUID(userId);
+    const channelId = planId; // Use planId as the unique channel/room ID
 
     const token = RtcTokenBuilder.buildTokenWithUid(
-      appID, serverSecret, planId,
-      firebaseUIDtoZegoUID(userId),
+      appID, serverSecret, channelId,
+      zegoUserId,
       RtcRole.PUBLISHER, effectiveTimeInSeconds, payload,
     );
     res.status(200).send({token});
   } catch (error) {
     console.error("Error generating Zego token:", error);
     res.status(500).send({error: "Could not generate session token."});
-  }
-});
-
-
-// FIX: Explicitly typed req and res with express.* types for correct type inference.
-app.post("/verifyPayment", authenticate, async (req: express.Request, res: express.Response) => {
-  const {razorpay_payment_id} = req.body;
-  if (!razorpay_payment_id) {
-    return res.status(400).send({error: "Payment ID is required."});
-  }
-
-  try {
-    const payment = await razorpayInstance.payments.fetch(razorpay_payment_id);
-
-    if (payment.status !== "captured") {
-      return res.status(400).send({error: "Payment not successful."});
-    }
-
-    await processPurchase(payment.notes, razorpay_payment_id);
-
-    return res.status(200).send({status: "success"});
-  } catch (error) {
-    console.error("Payment verification failed:", error);
-    return res.status(500).send({error: "Failed to verify payment."});
   }
 });
 
@@ -330,8 +256,46 @@ export const addEarning = functions
     }
   });
 
-// Callable function for dummy payments
-export const processDummyPayment = functions
+// NEW: Renamed from createRazorpayOrder to align with new service
+export const createPaymentOrder = functions
+  .region("us-central1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      throw new functions.https.HttpsError(
+        "unauthenticated",
+        "The function must be called while authenticated."
+      );
+    }
+    const {amount, planType, planDetails} = data;
+
+    const notes = {
+      userId: context.auth.uid,
+      planType: planType,
+      planDetails: planDetails, // e.g., { tokens: 50, price: 230 }
+    };
+
+    const options = {
+      amount: amount * 100, // Amount in paise
+      currency: "INR",
+      receipt: `receipt_user_${context.auth.uid}_${Date.now()}`,
+      notes: notes,
+    };
+
+    try {
+      const order = await razorpayInstance.orders.create(options);
+      return {success: true, order};
+    } catch (error) {
+      console.error("Razorpay order creation failed:", error);
+      throw new functions.https.HttpsError(
+        "internal",
+        "Failed to create payment order."
+      );
+    }
+  });
+
+
+// Callable function to verify payment signature
+export const verifyPayment = functions
   .region("us-central1")
   .https.onCall(async (data, context) => {
     if (!context.auth) {
@@ -341,35 +305,144 @@ export const processDummyPayment = functions
       );
     }
 
-    const userId = context.auth.uid;
-    const { purchaseType, planDetails } = data;
-
-    if (!purchaseType || !planDetails) {
-        throw new functions.https.HttpsError(
-            "invalid-argument",
-            "Missing purchase type or plan details."
-        );
+    const {razorpay_order_id, razorpay_payment_id, razorpay_signature} = data;
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Payment verification data is required."
+      );
     }
-    
-    // Create a dummy payment ID for idempotency check
-    const dummyPaymentId = `dummy_${userId}_${Date.now()}`;
 
-    const paymentNotes = {
-        userId: userId,
-        purchaseType: purchaseType,
-        ...planDetails,
-    };
-    
     try {
-        await processPurchase(paymentNotes, dummyPaymentId);
-        return { status: "success", message: "Dummy payment processed successfully." };
-    } catch (error) {
-        console.error("Error processing dummy payment:", error);
+      // Verify signature
+      const body = razorpay_order_id + "|" + razorpay_payment_id;
+      const expectedSignature = crypto
+        .createHmac("sha256", functions.config().razorpay.key_secret)
+        .update(body.toString())
+        .digest("hex");
+
+      if (expectedSignature !== razorpay_signature) {
         throw new functions.https.HttpsError(
-            "internal",
-            "An error occurred while processing the payment."
+          "permission-denied",
+          "Payment verification failed: Invalid signature."
         );
+      }
+
+      // Fetch payment from Razorpay to get notes and verify status
+      const payment = await razorpayInstance.payments.fetch(razorpay_payment_id);
+      if (payment.status !== "captured") {
+        throw new functions.https.HttpsError(
+          "failed-precondition",
+          "Payment not successful."
+        );
+      }
+
+      // Process the purchase (credits user account, idempotency check inside)
+      await processPurchase(payment.notes, razorpay_payment_id);
+
+      return {status: "success", message: "Payment verified and processed."};
+    } catch (error: any) {
+      console.error("Payment verification failed:", error);
+      if (error instanceof functions.https.HttpsError) {
+        throw error;
+      }
+      throw new functions.https.HttpsError(
+        "internal",
+        "Failed to verify payment."
+      );
     }
+  });
+  
+// NEW: Securely deducts balance for a call session after it ends.
+export const finalizeCallSession = functions
+  .region("us-central1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      throw new functions.https.HttpsError("unauthenticated", "Authentication required.");
+    }
+    const {consumedSeconds, associatedPlanId} = data;
+    if (typeof consumedSeconds !== "number" || consumedSeconds < 0 || !associatedPlanId) {
+      throw new functions.https.HttpsError("invalid-argument", "Invalid session data provided.");
+    }
+
+    const uid = context.auth.uid;
+    const userRef = db.collection("users").doc(uid);
+    const consumedMinutes = Math.ceil(consumedSeconds / 60);
+
+    if (consumedMinutes === 0) {
+      return {status: "success", message: "No time consumed."};
+    }
+
+    return db.runTransaction(async (transaction) => {
+      const userDoc = await transaction.get(userRef);
+      if (!userDoc.exists) {
+        throw new functions.https.HttpsError("not-found", "User not found.");
+      }
+      const userData = userDoc.data()!;
+      const activePlans = (userData.activePlans || []).filter((p: any) => p.expiryTimestamp > Date.now());
+
+      // Priority 1: Use DT Plan if it's the one associated with the session
+      const planIndex = activePlans.findIndex((p: any) => p.id === associatedPlanId && p.type === "call");
+      if (planIndex > -1) {
+        const plan = activePlans[planIndex];
+        const remainingMinutes = Math.floor((plan.minutes || 0));
+        if (remainingMinutes >= consumedMinutes) {
+          plan.minutes -= consumedMinutes;
+          transaction.update(userRef, {activePlans});
+          return {status: "success", message: `Deducted ${consumedMinutes} minutes from plan.`};
+        }
+      }
+
+      // Priority 2: Use tokens
+      const requiredTokens = consumedMinutes * 2;
+      if ((userData.tokens || 0) >= requiredTokens) {
+        transaction.update(userRef, {tokens: admin.firestore.FieldValue.increment(-requiredTokens)});
+        return {status: "success", message: `Deducted ${requiredTokens} tokens.`};
+      }
+
+      // If neither works, throw an error (should ideally not happen due to pre-checks)
+      throw new functions.https.HttpsError("failed-precondition", "Insufficient balance to finalize session.");
+    });
+  });
+
+// NEW: Securely deducts balance for chat messages.
+export const deductUsage = functions
+  .region("us-central1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      throw new functions.https.HttpsError("unauthenticated", "Authentication required.");
+    }
+
+    const {type, messages, associatedPlanId} = data;
+    const uid = context.auth.uid;
+    const userRef = db.collection("users").doc(uid);
+
+    return db.runTransaction(async (transaction) => {
+      const userDoc = await transaction.get(userRef);
+      if (!userDoc.exists) throw new functions.https.HttpsError("not-found", "User not found.");
+
+      const userData = userDoc.data()!;
+      const activePlans = (userData.activePlans || []).filter((p: any) => p.expiryTimestamp > Date.now());
+
+      if (type === "chat") {
+        // Priority 1: Use the associated DT chat plan
+        const planIndex = activePlans.findIndex((p: any) => p.id === associatedPlanId && p.type === "chat");
+        if (planIndex > -1) {
+          if ((activePlans[planIndex].messages || 0) >= messages) {
+            activePlans[planIndex].messages -= messages;
+            transaction.update(userRef, {activePlans});
+            return {status: "success", planId: activePlans[planIndex].id};
+          }
+        }
+        // Priority 2: Use tokens
+        const requiredTokens = messages * 0.5; // 1 token per 2 messages
+        if ((userData.tokens || 0) >= requiredTokens) {
+          transaction.update(userRef, {tokens: admin.firestore.FieldValue.increment(-requiredTokens)});
+          return {status: "success", planId: `token_session_${Date.now()}`};
+        }
+      }
+      throw new functions.https.HttpsError("failed-precondition", "Insufficient balance.");
+    });
   });
 
 

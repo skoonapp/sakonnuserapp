@@ -1,6 +1,15 @@
-
-
 export type ActiveView = 'home' | 'calls' | 'chats' | 'profile';
+
+export interface ActivePlan {
+  id: string;
+  type: 'call' | 'chat';
+  name: string;
+  minutes?: number;
+  messages?: number;
+  price: number;
+  purchaseTimestamp: number;
+  expiryTimestamp: number;
+}
 
 export interface User {
   uid: string;
@@ -10,7 +19,8 @@ export interface User {
   role?: 'admin' | 'listener';
   listenerId?: string;
   favoriteListeners?: number[];
-  tokenBalance?: number;
+  tokens?: number; // Replaces tokenBalance
+  activePlans?: ActivePlan[]; // Replaces purchasedPlans subcollection
 }
 
 export interface Listener {
@@ -28,7 +38,13 @@ export interface Plan {
   duration: string;
   price: number;
   tierName?: string;
+  // For the new DT plan structure
+  type?: 'call' | 'chat';
+  name?: string;
+  minutes?: number;
+  messages?: number;
 }
+
 
 export interface PurchasedPlan {
   id: string;
@@ -59,8 +75,8 @@ export interface ChatMessage {
 
 export interface BaseSession {
     listener: Listener;
-    plan: Plan;
-    sessionDurationSeconds: number;
+    plan: Plan; // This can be a simplified object now
+    sessionDurationSeconds: number; // Max duration, not tied to a specific plan
     associatedPlanId: string;
     isTokenSession: boolean;
 }

@@ -28,27 +28,27 @@ export const QUICK_REPLIES = [
 
 export const FIREBASE_API_URL = "https://us-central1-sakoonapp-9574c.cloudfunctions.net/api";
 
-// FIX: Added missing constants required by multiple components.
-
 export const RAZORPAY_KEY_ID = "rzp_test_gV1tLH2ZnCWti9"; // Replace with your actual Razorpay Test Key ID
 
+// NEW: Updated Plan structure for the new paymentService
 export const CALL_PLANS: Plan[] = [
-    { duration: '5 मिनट', price: 50, tierName: 'Bronze Pack' },
-    { duration: '10 मिनट', price: 100, tierName: 'Silver Pack' },
-    { duration: '15 मिनट', price: 145, tierName: 'Gold Pack' },
-    { duration: '30 मिनट', price: 270, tierName: 'Platinum Pack' },
-    { duration: '45 मिनट', price: 410, tierName: 'Diamond Pack' },
-    { duration: '60 मिनट', price: 540, tierName: 'Elite Pack' },
+    { type: "call", name: "Bronze Pack", duration: "5 मिनट", minutes: 5, price: 50, tierName: 'Bronze Pack' },
+    { type: "call", name: "Silver Pack", duration: "10 मिनट", minutes: 10, price: 100, tierName: 'Silver Pack' },
+    { type: "call", name: "Gold Pack", duration: "15 मिनट", minutes: 15, price: 145, tierName: 'Gold Pack' },
+    { type: "call", name: "Platinum Pack", duration: "30 मिनट", minutes: 30, price: 270, tierName: 'Platinum Pack' },
+    { type: "call", name: "Diamond Pack", duration: "45 मिनट", minutes: 45, price: 410, tierName: 'Diamond Pack' },
+    { type: "call", name: "Elite Pack", duration: "60 मिनट", minutes: 60, price: 540, tierName: 'Elite Pack' },
 ];
 
 export const CHAT_PLANS: Plan[] = [
-    { duration: '5 मिनट', price: 20 },
-    { duration: '10 मिनट', price: 36 },
-    { duration: '15 मिनट', price: 50 },
-    { duration: '30 मिनट', price: 90 },
-    { duration: '45 मिनट', price: 135 },
-    { duration: '60 मिनट', price: 170 },
+    { type: "chat", name: "Bronze Chat", duration: "5 मिनट", messages: 8, price: 20 },
+    { type: "chat", name: "Silver Chat", duration: "10 मिनट", messages: 15, price: 36 },
+    { type: "chat", name: "Gold Chat", duration: "15 मिनट", messages: 21, price: 50 },
+    { type: "chat", name: "Platinum Chat", duration: "30 मिनट", messages: 40, price: 90 },
+    { type: "chat", name: "Diamond Chat", duration: "45 मिनट", messages: 60, price: 135 },
+    { type: "chat", name: "Elite Chat", duration: "60 मिनट", messages: 75, price: 170 },
 ];
+
 
 export const FAQ_DATA: FaqItem[] = [
     {
@@ -90,7 +90,7 @@ export const FAQ_DATA: FaqItem[] = [
 export const TESTIMONIALS_DATA = [
     {
         name: 'प्रिया S.',
-        image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=128&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=128&auto=format&fit=crop&ixlib-rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         quote: 'जब मैं अकेला महसूस कर रही थी, तब SakoonApp ने मुझे एक दोस्त दिया जिससे मैं बात कर सकती थी। इसने वास्तव में मेरी मदद की।',
     },
     {

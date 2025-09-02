@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
-import type { Plan, User } from '../types';
-import { auth, functions } from '../utils/firebase';
+import React from 'react';
+import type { Plan } from '../types';
 
 interface PlanCardProps {
   tierName: string;
   callPlan: Plan;
   chatPlan: Plan;
   isPopular?: boolean;
-  currentUser: User;
+  onPurchase: (planData: Plan, type: 'call' | 'chat') => void;
+  loadingType: 'call' | 'chat' | null;
 }
-
 
 const PhoneIcon: React.FC<{className?: string}> = ({className}) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor">
@@ -50,53 +49,8 @@ const getTierStyles = (tierName: string): string => {
 };
 
 
-const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPopular = false, currentUser }) => {
-  const [loadingType, setLoadingType] = useState<'call' | 'chat' | null>(null);
+const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPopular = false, onPurchase, loadingType }) => {
   
-  const messageMapping: { [key: string]: number } = {
-    '5 मिनट': 8,
-    '10 मिनट': 15,
-    '15 मिनट': 21,
-    '30 मिनट': 40,
-    '45 मिनट': 60,
-    '1 घंटा': 75,
-    '60 मिनट': 75, // Ensures both "1 घंटा" and "60 मिनट" show 75 messages
-  };
-  const messages = messageMapping[chatPlan.duration] || 0;
-  
-  const handlePurchase = async (plan: Plan, type: 'call' | 'chat') => {
-    setLoadingType(type);
-
-    try {
-      const user = auth.currentUser;
-      if (!user) {
-        throw new Error("You must be logged in to make a purchase.");
-      }
-
-      const processDummyPayment = functions.httpsCallable("processDummyPayment");
-
-      const planDetails = {
-        planType: type,
-        planDuration: plan.duration,
-        planPrice: String(plan.price),
-        ...(type === 'chat' && { messages: String(messages) })
-      };
-      
-      await processDummyPayment({
-          purchaseType: 'plan',
-          planDetails: planDetails
-      });
-
-      alert(`आपका भुगतान सफल रहा! आपका ${plan.duration} का ${type === 'call' ? 'कॉल' : 'चैट'} प्लान जल्द ही आपके वॉलेट में दिखाई देगा।`);
-
-    } catch (error) {
-      console.error("Dummy payment failed:", error);
-      alert("भुगतान करने में कोई त्रुटि हुई। कृपया पुनः प्रयास करें।");
-    } finally {
-      setLoadingType(null);
-    }
-  };
-
   const popularContainerStyles = isPopular 
     ? 'bg-gradient-to-br from-cyan-50 to-blue-200 dark:from-cyan-900/50 dark:to-blue-900/50 border-cyan-400 dark:border-cyan-600 scale-105 shadow-2xl shadow-cyan-500/30' 
     : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-md';
@@ -132,7 +86,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPop
                 </div>
             </div>
             <button
-              onClick={() => handlePurchase(callPlan, 'call')}
+              onClick={() => onPurchase(callPlan, 'call')}
               disabled={loadingType !== null}
               className="w-full mt-auto bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
             >
@@ -149,13 +103,13 @@ const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPop
                 </div>
                  <div className="mb-2">
                     <p className="text-2xl">
-                        <span className="font-extrabold text-slate-900 dark:text-slate-100">{messages}</span>
+                        <span className="font-extrabold text-slate-900 dark:text-slate-100">{chatPlan.messages}</span>
                         <span className="font-semibold text-slate-600 dark:text-slate-400 ml-1.5">मैसेज</span>
                     </p>
                 </div>
             </div>
             <button
-              onClick={() => handlePurchase(chatPlan, 'chat')}
+              onClick={() => onPurchase(chatPlan, 'chat')}
               disabled={loadingType !== null}
               className="w-full mt-auto bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
             >

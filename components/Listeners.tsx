@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import PlanCard from './PlanCard';
 import { CALL_PLANS, CHAT_PLANS } from '../constants';
-import type { User } from '../types';
-import { auth, functions } from '../utils/firebase';
+import type { User, Plan as PlanType } from '../types';
+import { paymentService } from '../services/paymentService';
 
 
 interface PlansViewProps {
@@ -25,46 +25,29 @@ const TokenIcon: React.FC<{ className?: string }> = ({ className }) => (
 );
 // --- End Icons ---
 
+
 const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
-  const [loading, setLoading] = useState<number | null>(null); // Track loading by token amount
+  const [loading, setLoading] = useState<string | null>(null); // Track loading by a unique key
 
   const tokenOptions = [
-    { amount: 10, price: 50 },
-    { amount: 20, price: 95 },
-    { amount: 50, price: 230 },
-    { amount: 100, price: 450 },
-    { amount: 250, price: 1125 },
-    { amount: 500, price: 2250 },
+    { tokens: 10, price: 50 },
+    { tokens: 20, price: 95 },
+    { tokens: 50, price: 230 },
+    { tokens: 100, price: 450 },
+    { tokens: 250, price: 1125 },
+    { tokens: 500, price: 2250 },
   ];
 
-  const handleTokenPurchase = async (tokenOption: { amount: number; price: number }) => {
-    setLoading(tokenOption.amount);
-
-    try {
-        const user = auth.currentUser;
-        if (!user) {
-            throw new Error("You must be logged in to make a purchase.");
-        }
-
-        const processDummyPayment = functions.httpsCallable("processDummyPayment");
-        
-        const planDetails = {
-            tokensToBuy: String(tokenOption.amount),
-            planPrice: String(tokenOption.price),
-        };
-
-        await processDummyPayment({
-            purchaseType: 'tokens',
-            planDetails: planDetails,
-        });
-
-        alert(`आपका भुगतान सफल रहा! ${tokenOption.amount} टोकन जल्द ही आपके खाते में जोड़ दिए जाएंगे।`);
-    } catch (error) {
-        console.error("Dummy token purchase failed:", error);
-        alert("टोकन खरीदने में कोई त्रुटि हुई। कृपया पुनः प्रयास करें।");
-    } finally {
-        setLoading(null);
-    }
+  const handleTokenPurchase = async (tokens: number, price: number) => {
+    setLoading(`token_${tokens}`);
+    await paymentService.buyTokens(tokens, price);
+    setLoading(null);
+  };
+  
+  const handleDTPlanPurchase = async (planData: PlanType, type: 'call' | 'chat') => {
+      setLoading(`${type}_${planData.name}`);
+      await paymentService.buyDTPlan(planData);
+      setLoading(null);
   };
 
   const planPairs = CALL_PLANS.map((callPlan, index) => ({
@@ -89,20 +72,20 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
         
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
             {tokenOptions.map(option => (
-                <div key={option.amount} className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-between transition-all hover:shadow-lg hover:scale-105">
+                <div key={option.tokens} className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-between transition-all hover:shadow-lg hover:scale-105">
                     <div className="text-center">
                         <div className="flex items-center justify-center gap-2">
                             <TokenIcon className="w-6 h-6"/>
-                            <span className="text-2xl font-bold text-slate-800 dark:text-slate-200">{option.amount}</span>
+                            <span className="text-2xl font-bold text-slate-800 dark:text-slate-200">{option.tokens}</span>
                         </div>
                         <p className="text-slate-500 dark:text-slate-400 mb-4">टोकन</p>
                     </div>
                     <button 
-                        onClick={() => handleTokenPurchase(option)}
+                        onClick={() => handleTokenPurchase(option.tokens, option.price)}
                         disabled={loading !== null}
                         className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
                     >
-                        {loading === option.amount ? 'प्रोसेसिंग...' : `₹${option.price} Buy`}
+                        {loading === `token_${option.tokens}` ? 'प्रोसेसिंग...' : `₹${option.price} Buy`}
                     </button>
                 </div>
             ))}
@@ -128,7 +111,8 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
             callPlan={pair.callPlan}
             chatPlan={pair.chatPlan}
             isPopular={pair.isPopular}
-            currentUser={currentUser}
+            onPurchase={handleDTPlanPurchase}
+            loadingType={loading?.startsWith('call') ? 'call' : loading?.startsWith('chat') ? 'chat' : null}
           />
         ))}
       </div>

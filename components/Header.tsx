@@ -1,16 +1,12 @@
-
 import React from 'react';
 import type { User } from '../types';
+import { useWallet } from '../hooks/useWallet'; // To get the type
 
 interface HeaderProps {
   currentUser: User | null;
   isDarkMode: boolean;
   toggleDarkMode: () => void;
-  balances: {
-    tokenBalance: number;
-    callMinutes: number;
-    totalMessages: number;
-  };
+  wallet: ReturnType<typeof useWallet>;
 }
 
 // --- Icons ---
@@ -44,7 +40,19 @@ const ChatIcon: React.FC<{ className?: string }> = ({ className }) => (
 // --- End Icons ---
 
 
-const Header: React.FC<HeaderProps> = ({ currentUser, isDarkMode, toggleDarkMode, balances }) => {
+const Header: React.FC<HeaderProps> = ({ currentUser, isDarkMode, toggleDarkMode, wallet }) => {
+  const tokenBalance = wallet.tokens || 0;
+  const now = Date.now();
+  const validPlans = (wallet.activePlans || []).filter(p => p.expiryTimestamp > now);
+
+  const callMinutes = validPlans
+      .filter(p => p.type === 'call')
+      .reduce((sum, p) => sum + (p.minutes || 0), 0);
+
+  const totalMessages = validPlans
+      .filter(p => p.type === 'chat')
+      .reduce((sum, p) => sum + (p.messages || 0), 0);
+
   return (
     <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm shadow-sm sticky top-0 z-20">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
@@ -59,19 +67,19 @@ const Header: React.FC<HeaderProps> = ({ currentUser, isDarkMode, toggleDarkMode
         <div className="flex items-center gap-2">
             {currentUser && (
               <div className="flex items-center space-x-2 md:space-x-3 bg-slate-100 dark:bg-slate-800 px-2 py-1.5 rounded-full">
-                  <div className="flex items-center space-x-1" title={`${balances.tokenBalance} टोकन`}>
+                  <div className="flex items-center space-x-1" title={`${tokenBalance} टोकन`}>
                       <CustomTokenIcon className="w-5 h-5"/>
-                      <span className="font-bold text-sm text-slate-700 dark:text-slate-200">{balances.tokenBalance}</span>
+                      <span className="font-bold text-sm text-slate-700 dark:text-slate-200">{tokenBalance}</span>
                   </div>
                   <div className="w-px h-4 bg-slate-300 dark:bg-slate-600"></div>
-                  <div className="flex items-center space-x-1" title={`${balances.callMinutes} मिनट कॉल`}>
+                  <div className="flex items-center space-x-1" title={`${callMinutes} मिनट कॉल`}>
                       <CallIcon className="w-5 h-5 text-green-500"/>
-                      <span className="font-bold text-sm text-slate-700 dark:text-slate-200">{balances.callMinutes}</span>
+                      <span className="font-bold text-sm text-slate-700 dark:text-slate-200">{callMinutes}</span>
                   </div>
                   <div className="w-px h-4 bg-slate-300 dark:bg-slate-600"></div>
-                  <div className="flex items-center space-x-1" title={`${balances.totalMessages} मैसेज`}>
+                  <div className="flex items-center space-x-1" title={`${totalMessages} मैसेज`}>
                       <ChatIcon className="w-5 h-5 text-cyan-500"/>
-                      <span className="font-bold text-sm text-slate-700 dark:text-slate-200">{balances.totalMessages}</span>
+                      <span className="font-bold text-sm text-slate-700 dark:text-slate-200">{totalMessages}</span>
                   </div>
               </div>
             )}

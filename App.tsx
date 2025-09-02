@@ -1,11 +1,8 @@
-
-
-
 import React, { useState, useEffect, useCallback } from 'react';
-import type { User, Listener, PurchasedPlan, CallSession, ChatSession, ActiveView } from './types';
-import { auth, db } from './utils/firebase';
-import firebase from 'firebase/compat/app';
+import type { User, Listener, ActivePlan, CallSession, ChatSession, ActiveView } from './types';
+import { auth, db, functions } from './utils/firebase';
 import { handleCallEnd, handleChat } from './utils/earnings';
+import { useWallet } from './hooks/useWallet';
 
 // Import Components
 import SplashScreen from './components/SplashScreen';
@@ -45,6 +42,7 @@ const App: React.FC = () => {
     // Auth State
     const [user, setUser] = useState<User | null>(null);
     const [loadingAuth, setLoadingAuth] = useState(true);
+    const wallet = useWallet(); // NEW: Real-time wallet hook
 
     // Navigation State
     const [activeView, setActiveView] = useState<ActiveView>('home');
@@ -54,13 +52,8 @@ const App: React.FC = () => {
     const [showAICompanion, setShowAICompanion] = useState(false);
     const [showPolicy, setShowPolicy] = useState<'terms' | 'privacy' | 'cancellation' | null>(null);
     const [showRechargeModal, setShowRechargeModal] = useState(false);
-
-    // Data State
-    const [balances, setBalances] = useState({ tokenBalance: 0, callMinutes: 0, totalMessages: 0 });
-    const [purchasedPlans, setPurchasedPlans] = useState<PurchasedPlan[]>([]);
     
     // Session State
-    const [selectedPlan, setSelectedPlan] = useState<PurchasedPlan | null>(null);
     const [activeCallSession, setActiveCallSession] = useState<CallSession | null>(null);
     const [activeChatSession, setActiveChatSession] = useState<ChatSession | null>(null);
 
@@ -158,7 +151,8 @@ const App: React.FC = () => {
                             email: firebaseUser.email,
                             mobile: firebaseUser.phoneNumber || '',
                             favoriteListeners: [],
-                            tokenBalance: 0,
+                            tokens: 0,
+                            activePlans: [],
                         };
                         userDocRef.set(newUser, { merge: true });
                         setUser(newUser);
@@ -166,14 +160,9 @@ const App: React.FC = () => {
                     setLoadingAuth(false);
                 });
 
-                const unsubscribePlans = userDocRef.collection('purchasedPlans').onSnapshot(snapshot => {
-                    const plans = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as PurchasedPlan));
-                    setPurchasedPlans(plans);
-                });
 
                 return () => {
                     unsubscribeUser();
-                    unsubscribePlans();
                 };
             } else {
                 setUser(null);
@@ -183,27 +172,6 @@ const App: React.FC = () => {
         return () => unsubscribe();
     }, []);
 
-    // Calculate Balances
-    useEffect(() => {
-        if (user) {
-            const now = Date.now();
-            const validPlans = purchasedPlans.filter(p => p.expiryTimestamp > now);
-
-            const totalMinutes = validPlans
-                .filter(p => p.type === 'call' && p.remainingSeconds)
-                .reduce((sum, p) => sum + (p.remainingSeconds || 0), 0) / 60;
-
-            const totalMessages = validPlans
-                .filter(p => p.type === 'chat' && p.remainingMessages)
-                .reduce((sum, p) => sum + (p.remainingMessages || 0), 0);
-            
-            setBalances({
-                tokenBalance: user.tokenBalance || 0,
-                callMinutes: Math.floor(totalMinutes),
-                totalMessages: totalMessages,
-            });
-        }
-    }, [user, purchasedPlans]);
 
     // Handlers
     const handleLogout = useCallback(() => {
@@ -212,81 +180,67 @@ const App: React.FC = () => {
     
     const handleStartSession = useCallback((type: 'call' | 'chat', listener: Listener) => {
         const now = Date.now();
-        
+        const activePlans = (wallet.activePlans || []).filter(p => p.expiryTimestamp > now);
+
         // Priority 1: Find an active DT plan
-        const activePlans = purchasedPlans
-            .filter(p => 
-                p.type === type && 
-                p.expiryTimestamp > now && 
-                ((type === 'call' && (p.remainingSeconds || 0) > 10) || // At least 10s left
-                 (type === 'chat' && (p.remainingMessages || 0) > 0))
-            )
-            .sort((a, b) => a.purchaseTimestamp - b.purchaseTimestamp);
+        const dtPlan = activePlans.find(p => 
+            p.type === type && 
+            ((type === 'call' && (p.minutes || 0) > 0) || 
+             (type === 'chat' && (p.messages || 0) > 0))
+        );
 
-        let planToUse: PurchasedPlan | null = null;
+        let sessionPlan: ActivePlan | null = null;
+        let isTokenSession = false;
 
-        if (activePlans.length > 0) {
-            planToUse = activePlans[0];
+        if (dtPlan) {
+            sessionPlan = dtPlan;
         } else {
-            // Priority 2: Check for tokens if no DT plan is available
-            const canUseTokens = (type === 'call' && balances.tokenBalance >= 2) || (type === 'chat' && balances.tokenBalance >= 1);
+            // Priority 2: Check for tokens
+            const canUseTokens = (type === 'call' && (wallet.tokens || 0) >= 2) || (type === 'chat' && (wallet.tokens || 0) >= 0.5);
             if (canUseTokens) {
-                planToUse = {
-                    id: `token_session_${now}`,
-                    type: type,
-                    plan: { duration: 'टोकन', price: 0 },
-                    purchaseTimestamp: now,
-                    expiryTimestamp: now + 24 * 3600 * 1000, // 24h validity
-                    ...(type === 'call' && { remainingSeconds: 3600, totalSeconds: 3600 }), // 1hr max
-                    ...(type === 'chat' && { remainingMessages: 9999, totalMessages: 9999 }), // Uncapped, balance checked per msg
-                    isTokenSession: true,
-                };
+                isTokenSession = true;
             }
         }
 
-        if (planToUse) {
-            const sessionDurationSeconds = (p: PurchasedPlan) => {
-                if (p.isTokenSession) return 3600; // 1 hour max for token sessions
-                if (p.type === 'call') return p.remainingSeconds || 0;
-                return 3 * 3600; // 3 hours max for chat sessions, balance is per message
-            };
-
-            if (type === 'call') {
+        if (sessionPlan || isTokenSession) {
+             const associatedPlanId = sessionPlan ? sessionPlan.id : `token_session_${now}`;
+             if (type === 'call') {
                 setActiveCallSession({
                     type: 'call',
                     listener: listener,
-                    plan: planToUse.plan,
-                    sessionDurationSeconds: sessionDurationSeconds(planToUse),
-                    associatedPlanId: planToUse.id,
-                    isTokenSession: !!planToUse.isTokenSession,
+                    plan: { duration: sessionPlan?.name || 'टोकन', price: sessionPlan?.price || 0 },
+                    sessionDurationSeconds: 3600, // Max duration 1hr
+                    associatedPlanId: associatedPlanId,
+                    isTokenSession: isTokenSession,
                 });
-            } else {
+            } else { // chat
                 setActiveChatSession({
                     type: 'chat',
                     listener: listener,
-                    plan: planToUse.plan,
-                    sessionDurationSeconds: sessionDurationSeconds(planToUse),
-                    associatedPlanId: planToUse.id,
-                    isTokenSession: !!planToUse.isTokenSession,
+                    plan: { duration: sessionPlan?.name || 'टोकन', price: sessionPlan?.price || 0 },
+                    sessionDurationSeconds: 3 * 3600, // Max duration 3hr
+                    associatedPlanId: associatedPlanId,
+                    isTokenSession: isTokenSession,
                 });
             }
-            setSelectedPlan(planToUse);
         } else {
-            // No valid plan or tokens, show recharge modal
+            // No valid plan or tokens
             setShowRechargeModal(true);
         }
-    }, [purchasedPlans, balances.tokenBalance]);
+    }, [wallet]);
     
     const handleCallSessionEnd = useCallback(async (success: boolean, consumedSeconds: number) => {
-        if (selectedPlan && user && activeCallSession) {
-            if (success && consumedSeconds > 0) {
-                 if (!selectedPlan.isTokenSession) {
-                    const planRef = db.collection('users').doc(user.uid).collection('purchasedPlans').doc(selectedPlan.id);
-                    await planRef.update({
-                        remainingSeconds: firebase.firestore.FieldValue.increment(-consumedSeconds)
-                    });
+        if (user && activeCallSession) {
+            if (success && consumedSeconds > 5) { // Only deduct if call lasted more than 5 seconds
+                 try {
+                    const finalizeCall = functions.httpsCallable('finalizeCallSession');
+                    await finalizeCall({ consumedSeconds, associatedPlanId: activeCallSession.associatedPlanId });
+                } catch (error) {
+                    console.error("Failed to finalize call session on backend:", error);
+                    // Optionally show an error to the user
                 }
-                
+
+                // Record earnings for the listener regardless of deduction success
                 await handleCallEnd(
                     activeCallSession.listener.id.toString(),
                     user.uid,
@@ -295,13 +249,12 @@ const App: React.FC = () => {
             }
         }
         setActiveCallSession(null);
-        setSelectedPlan(null);
-    }, [selectedPlan, user, activeCallSession]);
+    }, [user, activeCallSession]);
 
     const handleChatSessionEnd = useCallback(async (success: boolean, consumedMessages: number) => {
         if (user && activeChatSession) {
              if (success && consumedMessages > 0) {
-                // Plan/token consumption is handled per-message in ChatUI
+                // Balance deduction is handled per-message in ChatUI
                 await handleChat(
                     activeChatSession.listener.id.toString(),
                     user.uid,
@@ -310,7 +263,6 @@ const App: React.FC = () => {
             }
         }
         setActiveChatSession(null);
-        setSelectedPlan(null);
     }, [user, activeChatSession]);
     
     const renderActiveView = () => {
@@ -334,7 +286,7 @@ const App: React.FC = () => {
         }
     };
     
-    if (loadingAuth) {
+    if (loadingAuth || wallet.loading) {
         return <SplashScreen />;
     }
 
@@ -352,7 +304,7 @@ const App: React.FC = () => {
     
     return (
         <div className="w-full max-w-md mx-auto bg-slate-100 dark:bg-slate-900 flex flex-col min-h-screen shadow-2xl transition-colors duration-300">
-            <Header currentUser={user} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} balances={balances} />
+            <Header currentUser={user} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} wallet={wallet} />
             <main className="flex-grow pb-20">
                 {renderActiveView()}
             </main>
@@ -385,7 +337,7 @@ const App: React.FC = () => {
                 </div>
             )}
             <AICompanionButton onClick={() => setShowAICompanion(true)} />
-            {showAICompanion && <AICompanion user={user} onClose={() => setShowAICompanion(false)} onNavigateToServices={() => { setActiveView('home'); setShowAICompanion(false); }} />}
+            {showAICompanion && <AICompanion user={user} onClose={() => setShowAICompanion(false)} onNavigateToServices={() => { setActiveView('calls'); setShowAICompanion(false); }} />}
             
             {showRechargeModal && (
                 <RechargeModal
