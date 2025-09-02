@@ -1,7 +1,7 @@
 import * as functions from "firebase-functions/v1";
 import * as admin from "firebase-admin";
 // FIX: Use standard ES module import for Express and explicitly import types to resolve conflicts.
-import express, {Request, Response, NextFunction} from "express";
+import express, {Request, Response} from "express";
 import cors from "cors";
 import {RtcTokenBuilder, RtcRole} from "zego-express-engine";
 import Razorpay from "razorpay";
@@ -14,15 +14,6 @@ const razorpayInstance = new Razorpay({
   key_id: functions.config().razorpay.key_id,
   key_secret: functions.config().razorpay.key_secret,
 });
-
-// Declaration merging to add 'user' to Express Request
-declare global {
-  namespace Express {
-    interface Request {
-      user?: admin.auth.DecodedIdToken;
-    }
-  }
-}
 
 /**
  * Creates a stable 32-bit unsigned integer from a string UID.
@@ -46,31 +37,6 @@ const firebaseUIDtoZegoUID = (uid: string): number => {
 const app = express();
 app.use(cors({origin: true}));
 app.use(express.json());
-
-// Middleware to check Firebase Auth token
-const authenticate = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  if (
-    !req.headers.authorization ||
-    !req.headers.authorization.startsWith("Bearer ")
-  ) {
-    res.status(403).send("Unauthorized");
-    return;
-  }
-  const idToken = req.headers.authorization.split("Bearer ")[1];
-  try {
-    const decodedIdToken = await admin.auth().verifyIdToken(idToken);
-    req.user = decodedIdToken;
-    next();
-    return;
-  } catch (e) {
-    res.status(403).send("Unauthorized");
-    return;
-  }
-};
 
 /**
  * Processes a purchase by updating the user's balance in Firestore.
@@ -130,40 +96,6 @@ const processPurchase = async (paymentNotes: any, paymentId: string) => {
 };
 
 
-// Zego Token Generation Endpoint
-app.post("/generateZegoToken", authenticate, async (req: Request, res: Response) => {
-  const userId = req.user!.uid;
-  const {planId} = req.body;
-
-  if (!planId) {
-    res.status(400).send({error: "Plan ID is required."});
-    return;
-  }
-
-  // NOTE: Balance check is now done pre-session via deductUsage.
-  // This token generation assumes a balance check has already passed.
-
-  try {
-    const appID = parseInt(functions.config().zego.app_id, 10);
-    const serverSecret = functions.config().zego.server_secret;
-    const effectiveTimeInSeconds = 3600; // 1 hour validity for the token
-    const payload = "";
-    const zegoUserId = firebaseUIDtoZegoUID(userId);
-    const channelId = planId; // Use planId as the unique channel/room ID
-
-    const token = RtcTokenBuilder.buildTokenWithUid(
-      appID, serverSecret, channelId,
-      zegoUserId,
-      RtcRole.PUBLISHER, effectiveTimeInSeconds, payload,
-    );
-    res.status(200).send({token});
-  } catch (error) {
-    console.error("Error generating Zego token:", error);
-    res.status(500).send({error: "Could not generate session token."});
-  }
-});
-
-
 // Razorpay Webhook Endpoint
 app.post("/razorpayWebhook", async (req: Request, res: Response) => {
   const secret = functions.config().razorpay.webhook_secret;
@@ -193,6 +125,50 @@ app.post("/razorpayWebhook", async (req: Request, res: Response) => {
 
 
 export const api = functions.region("us-central1").https.onRequest(app);
+
+// REFACTOR: New callable function for Zego token generation
+export const generateZegoToken = functions
+  .region("us-central1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      throw new functions.https.HttpsError(
+        "unauthenticated",
+        "The function must be called while authenticated."
+      );
+    }
+    const userId = context.auth.uid;
+    const {planId} = data;
+
+    if (!planId) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Plan ID is required."
+      );
+    }
+
+    try {
+      const appID = parseInt(functions.config().zego.app_id, 10);
+      const serverSecret = functions.config().zego.server_secret;
+      const effectiveTimeInSeconds = 3600; // 1 hour validity
+      const payload = "";
+      const zegoUserId = firebaseUIDtoZegoUID(userId);
+      const channelId = planId; // Use planId as the unique channel/room ID
+
+      const token = RtcTokenBuilder.buildTokenWithUid(
+        appID, serverSecret, channelId,
+        zegoUserId,
+        RtcRole.PUBLISHER, effectiveTimeInSeconds, payload
+      );
+      return {token}; // Return data directly
+    } catch (error) {
+      console.error("Error generating Zego token:", error);
+      throw new functions.https.HttpsError(
+        "internal",
+        "Could not generate session token."
+      );
+    }
+  });
+
 
 export const addEarning = functions
   .region("us-central1")
