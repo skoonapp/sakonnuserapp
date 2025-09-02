@@ -28,7 +28,7 @@ export const QUICK_REPLIES = [
 
 export const FIREBASE_API_URL = "https://us-central1-sakoonapp-9574c.cloudfunctions.net/api";
 
-export const RAZORPAY_KEY_ID = "rzp_test_gV1tLH2ZnCWti9"; // Replace with your actual Razorpay Test Key ID
+export const RAZORPAY_KEY_ID = "rzp_test_RCbZCp07AHjMLM"; // Replace with your actual Razorpay Test Key ID
 
 // NEW: Updated Plan structure for the new paymentService
 export const CALL_PLANS: Plan[] = [
