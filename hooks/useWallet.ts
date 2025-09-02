@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { auth, db } from "../utils/firebase";
-import type { ActivePlan } from "../types";
+import { db } from "../utils/firebase";
+import type { ActivePlan, User } from "../types";
 
 interface WalletState {
     tokens: number;
@@ -8,44 +8,45 @@ interface WalletState {
     loading: boolean;
 }
 
-export const useWallet = () => {
+export const useWallet = (user: User | null) => {
   const [wallet, setWallet] = useState<WalletState>({
     tokens: 0,
     activePlans: [],
-    loading: true
+    loading: true, // Start in loading state until we know if there is a user
   });
   
   useEffect(() => {
-    // FIX: Switched from modular `onAuthStateChanged(auth, ...)` to compat `auth.onAuthStateChanged(...)` to match the `auth` instance type from `utils/firebase`.
-    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
-      if (user) {
-        // FIX: Switched from modular `doc(db, ...)` and `onSnapshot(ref, ...)` to the compat SDK's chained method syntax.
-        const userDocRef = db.collection("users").doc(user.uid);
-        const unsubscribeDoc = userDocRef.onSnapshot((doc) => {
-          // FIX: In the compat SDK, `exists` is a boolean property, not a method like `exists()`.
-          if (doc.exists) {
-            const data = doc.data();
-            setWallet({
-              tokens: data?.tokens || 0,
-              activePlans: data?.activePlans || [],
-              loading: false
-            });
-          } else {
-             setWallet({ tokens: 0, activePlans: [], loading: false });
-          }
-        }, (error) => {
-            console.error("Error listening to wallet:", error);
-            setWallet({ tokens: 0, activePlans: [], loading: false });
+    // If there's no user, the wallet is empty and we're not loading.
+    if (!user) {
+      setWallet({ tokens: 0, activePlans: [], loading: false });
+      return;
+    }
+    
+    // Set loading to true when we start fetching for a new user, but keep old data
+    setWallet(prev => ({ ...prev, loading: true }));
+
+    const userDocRef = db.collection("users").doc(user.uid);
+    const unsubscribeDoc = userDocRef.onSnapshot((doc) => {
+      if (doc.exists) {
+        const data = doc.data();
+        setWallet({
+          tokens: data?.tokens || 0,
+          activePlans: data?.activePlans || [],
+          loading: false
         });
-        
-        return () => unsubscribeDoc();
       } else {
-        setWallet({ tokens: 0, activePlans: [], loading: false });
+         // This case should be handled by user creation logic in App.tsx, but as a fallback:
+         setWallet({ tokens: 0, activePlans: [], loading: false });
       }
+    }, (error) => {
+        console.error("Error listening to wallet:", error);
+        setWallet({ tokens: 0, activePlans: [], loading: false });
     });
     
-    return () => unsubscribeAuth();
-  }, []);
+    // Cleanup function for the effect
+    return () => unsubscribeDoc();
+
+  }, [user]); // Dependency array ensures this runs when the user state changes.
   
   return wallet;
 };

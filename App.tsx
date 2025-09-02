@@ -44,9 +44,8 @@ const CloseIcon: React.FC<{ className?: string }> = ({ className }) => (
 const App: React.FC = () => {
     // Auth State
     const [user, setUser] = useState<User | null>(null);
-    const [loadingAuth, setLoadingAuth] = useState(true);
-    const [isInitializing, setIsInitializing] = useState(true); // FIX: State to track initial auth check
-    const wallet = useWallet();
+    const [isInitializing, setIsInitializing] = useState(true); // State to track initial auth check
+    const wallet = useWallet(user); // Pass user to the refactored hook
 
     // Navigation State
     const [activeView, setActiveView] = useState<ActiveView>('home');
@@ -138,13 +137,17 @@ const App: React.FC = () => {
         });
     };
 
-    // Auth and Data Listener Effect
+    // FIX: Refactored Auth and Data Listener Effect for reliability
     useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged(firebaseUser => {
+        let unsubscribeUser: () => void = () => {};
+
+        const unsubscribeAuth = auth.onAuthStateChanged(firebaseUser => {
+            unsubscribeUser(); // Clean up previous Firestore listener if it exists
+
             if (firebaseUser) {
                 const userDocRef = db.collection('users').doc(firebaseUser.uid);
                 
-                const unsubscribeUser = userDocRef.onSnapshot(doc => {
+                unsubscribeUser = userDocRef.onSnapshot(doc => {
                     if (doc.exists) {
                         setUser(doc.data() as User);
                     } else {
@@ -161,21 +164,25 @@ const App: React.FC = () => {
                         userDocRef.set(newUser, { merge: true });
                         setUser(newUser);
                     }
-                    setLoadingAuth(false);
+                    setIsInitializing(false); // Initialization is complete once we have user data
+                }, error => {
+                    console.error("Error fetching user document:", error);
+                    setUser(null);
+                    setIsInitializing(false);
                 });
 
-
-                return () => {
-                    unsubscribeUser();
-                };
             } else {
+                // User is signed out
                 setUser(null);
-                setLoadingAuth(false);
+                setIsInitializing(false);
             }
-            // FIX: Mark initialization as complete after the first auth check.
-            setIsInitializing(false);
         });
-        return () => unsubscribe();
+
+        // Cleanup for the component unmount
+        return () => {
+            unsubscribeAuth();
+            unsubscribeUser();
+        };
     }, []);
 
 
@@ -302,8 +309,8 @@ const App: React.FC = () => {
         }
     };
     
-    // FIX: Updated loading check to include `isInitializing`.
-    if (isInitializing || loadingAuth || wallet.loading) {
+    // FIX: Updated loading check to be more robust.
+    if (isInitializing || wallet.loading) {
         return <SplashScreen />;
     }
 
