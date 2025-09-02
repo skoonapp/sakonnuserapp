@@ -7,7 +7,7 @@ interface PlanCardProps {
   chatPlan: Plan;
   isPopular?: boolean;
   onPurchase: (planData: Plan, type: 'call' | 'chat') => void;
-  loadingType: 'call' | 'chat' | null;
+  loadingPlan: string | null;
 }
 
 const PhoneIcon: React.FC<{className?: string}> = ({className}) => (
@@ -49,13 +49,17 @@ const getTierStyles = (tierName: string): string => {
 };
 
 
-const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPopular = false, onPurchase, loadingType }) => {
+const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPopular = false, onPurchase, loadingPlan }) => {
   
   const popularContainerStyles = isPopular 
     ? 'bg-gradient-to-br from-cyan-50 to-blue-200 dark:from-cyan-900/50 dark:to-blue-900/50 border-cyan-400 dark:border-cyan-600 scale-105 shadow-2xl shadow-cyan-500/30' 
     : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-md';
 
   const tierStyles = getTierStyles(tierName);
+  
+  const callPlanKey = `call_${callPlan.name}`;
+  const chatPlanKey = `chat_${chatPlan.name}`;
+  const isAnyPlanLoading = loadingPlan !== null;
 
   return (
     <div className={`relative ${popularContainerStyles} rounded-2xl p-4 flex flex-col text-center items-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-2`}>
@@ -87,10 +91,10 @@ const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPop
             </div>
             <button
               onClick={() => onPurchase(callPlan, 'call')}
-              disabled={loadingType !== null}
+              disabled={isAnyPlanLoading}
               className="w-full mt-auto bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
             >
-              {loadingType === 'call' ? 'प्रोसेसिंग...' : `₹${callPlan.price} खरीदें`}
+              {loadingPlan === callPlanKey ? 'प्रोसेसिंग...' : `₹${callPlan.price} खरीदें`}
             </button>
         </div>
 
@@ -110,10 +114,10 @@ const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPop
             </div>
             <button
               onClick={() => onPurchase(chatPlan, 'chat')}
-              disabled={loadingType !== null}
+              disabled={isAnyPlanLoading}
               className="w-full mt-auto bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
             >
-              {loadingType === 'chat' ? 'प्रोसेसिंग...' : `₹${chatPlan.price} खरीदें`}
+              {loadingPlan === chatPlanKey ? 'प्रोसेसिंग...' : `₹${chatPlan.price} खरीदें`}
             </button>
         </div>
       </div>

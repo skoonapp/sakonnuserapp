@@ -27,7 +27,9 @@ const TokenIcon: React.FC<{ className?: string }> = ({ className }) => (
 
 
 const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
-  const [loading, setLoading] = useState<string | null>(null); // Track loading by a unique key
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+
 
   const tokenOptions = [
     { tokens: 10, price: 50 },
@@ -39,15 +41,43 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
   ];
 
   const handleTokenPurchase = async (tokens: number, price: number) => {
-    setLoading(`token_${tokens}`);
-    await paymentService.buyTokens(tokens, price);
-    setLoading(null);
+    const planKey = `token_${tokens}`;
+    setLoadingPlan(planKey);
+    setFeedback(null);
+    try {
+      const result: any = await paymentService.buyTokens(tokens, price);
+      if (result?.success) {
+        setFeedback({ type: 'success', message: `Payment Successful! ${result.description} added.` });
+        setTimeout(() => setFeedback(null), 4000);
+      }
+    } catch (error: any) {
+        if (error.code !== 'user-closed-modal') {
+             setFeedback({ type: 'error', message: 'Payment failed. Please try again.' });
+             setTimeout(() => setFeedback(null), 4000);
+        }
+    } finally {
+        setLoadingPlan(null);
+    }
   };
   
   const handleDTPlanPurchase = async (planData: PlanType, type: 'call' | 'chat') => {
-      setLoading(`${type}_${planData.name}`);
-      await paymentService.buyDTPlan(planData);
-      setLoading(null);
+      const planKey = `${type}_${planData.name}`;
+      setLoadingPlan(planKey);
+      setFeedback(null);
+      try {
+        const result: any = await paymentService.buyDTPlan(planData);
+         if (result?.success) {
+            setFeedback({ type: 'success', message: `Payment Successful! ${result.description} activated.` });
+            setTimeout(() => setFeedback(null), 4000);
+        }
+    } catch (error: any) {
+        if (error.code !== 'user-closed-modal') {
+             setFeedback({ type: 'error', message: 'Payment failed. Please try again.' });
+             setTimeout(() => setFeedback(null), 4000);
+        }
+    } finally {
+        setLoadingPlan(null);
+    }
   };
 
   const planPairs = CALL_PLANS.map((callPlan, index) => ({
@@ -60,6 +90,12 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
   return (
     <div className="container mx-auto px-4 py-6">
       
+      {feedback && (
+        <div className={`p-4 mb-4 rounded-lg text-center font-semibold animate-fade-in-down ${feedback.type === 'success' ? 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300'}`}>
+            {feedback.message}
+        </div>
+      )}
+
       {/* Token Purchase Section */}
       <section className="mb-8">
         <div className="text-center mb-6">
@@ -82,10 +118,10 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
                     </div>
                     <button 
                         onClick={() => handleTokenPurchase(option.tokens, option.price)}
-                        disabled={loading !== null}
+                        disabled={loadingPlan !== null}
                         className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
                     >
-                        {loading === `token_${option.tokens}` ? 'प्रोसेसिंग...' : `₹${option.price} Buy`}
+                        {loadingPlan === `token_${option.tokens}` ? 'प्रोसेसिंग...' : `₹${option.price} Buy`}
                     </button>
                 </div>
             ))}
@@ -112,7 +148,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
             chatPlan={pair.chatPlan}
             isPopular={pair.isPopular}
             onPurchase={handleDTPlanPurchase}
-            loadingType={loading?.startsWith('call') ? 'call' : loading?.startsWith('chat') ? 'chat' : null}
+            loadingPlan={loadingPlan}
           />
         ))}
       </div>

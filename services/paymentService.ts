@@ -15,8 +15,7 @@ class PaymentService {
   // 🟢 Buy Token Plan
   async buyTokens(tokens: number, price: number) {
     if (!auth.currentUser) {
-      alert("Please login first!");
-      return;
+      throw new Error("Please login first!");
     }
     
     try {
@@ -33,15 +32,15 @@ class PaymentService {
       }
     } catch (error) {
       console.error("Payment error:", error);
-      alert("Payment failed! Try again.");
+      // Re-throw the error to be handled by the UI component
+      throw error;
     }
   }
   
   // 🟢 Buy DT Plan
   async buyDTPlan(planData: Plan) {
     if (!auth.currentUser) {
-      alert("Please login first!");
-      return;
+      throw new Error("Please login first!");
     }
     
     try {
@@ -62,7 +61,8 @@ class PaymentService {
       }
     } catch (error) {
       console.error("Payment error:", error);
-      alert("Payment failed! Try again.");
+      // Re-throw the error to be handled by the UI component
+      throw error;
     }
   }
   
@@ -84,11 +84,12 @@ class PaymentService {
                         razorpay_order_id: response.razorpay_order_id,
                         razorpay_signature: response.razorpay_signature,
                     });
-                    alert(`✅ Payment Success! ${description} added to your wallet.`);
-                    resolve({success: true});
+                    // The UI will now handle success feedback.
+                    // We resolve with the description so the UI can show a specific message.
+                    resolve({ success: true, description });
                 } catch (verifyError) {
                     console.error("Payment verification failed:", verifyError);
-                    alert("Payment verification failed. If money was deducted, it will be refunded in 5-7 business days.");
+                    // The UI will handle error feedback.
                     reject(verifyError);
                 }
             },
