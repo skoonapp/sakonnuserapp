@@ -270,6 +270,16 @@ const App: React.FC = () => {
         }
         setActiveChatSession(null);
     }, [user, activeChatSession]);
+
+    // PERF: Memoize callback functions for AI Companion to prevent re-initialization.
+    const handleCloseAICompanion = useCallback(() => {
+        setShowAICompanion(false);
+    }, []);
+
+    const handleNavigateToServices = useCallback(() => {
+        setActiveView('calls');
+        setShowAICompanion(false);
+    }, []);
     
     const renderActiveView = () => {
         if (!user) return null;
@@ -348,7 +358,7 @@ const App: React.FC = () => {
             <AICompanionButton onClick={() => setShowAICompanion(true)} />
             
             <Suspense fallback={null}>
-                {showAICompanion && <AICompanion user={user} onClose={() => setShowAICompanion(false)} onNavigateToServices={() => { setActiveView('calls'); setShowAICompanion(false); }} />}
+                {showAICompanion && <AICompanion user={user} onClose={handleCloseAICompanion} onNavigateToServices={handleNavigateToServices} />}
                 
                 {showPolicy === 'terms' && <TermsAndConditions onClose={() => setShowPolicy(null)} />}
                 {showPolicy === 'privacy' && <PrivacyPolicy onClose={() => setShowPolicy(null)} />}
