@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import ListenerCard from './ListenerCard';
 import { db } from '../utils/firebase';
 import firebase from 'firebase/compat/app';
 import type { Listener, User } from '../types';
 import ViewLoader from './ViewLoader';
+import { useListeners } from '../hooks/useListeners';
 
 interface CallsViewProps {
   onStartSession: (type: 'call' | 'chat', listener: Listener) => void;
@@ -11,61 +12,8 @@ interface CallsViewProps {
 }
 
 const CallsView: React.FC<CallsViewProps> = ({ onStartSession, currentUser }) => {
-  const [listeners, setListeners] = useState<Listener[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [lastVisible, setLastVisible] = useState<firebase.firestore.QueryDocumentSnapshot<firebase.firestore.DocumentData> | null>(null);
-  const [hasMore, setHasMore] = useState(true);
   const favorites = currentUser.favoriteListeners || [];
-  const PAGE_SIZE = 10;
-
-  const fetchListeners = useCallback(async (loadMore = false) => {
-      if (!hasMore && loadMore) return;
-      
-      setLoading(!loadMore);
-      setLoadingMore(loadMore);
-
-      try {
-        let query = db.collection('listeners')
-          .orderBy('online', 'desc')
-          .orderBy('rating', 'desc')
-          .limit(PAGE_SIZE);
-
-        if (loadMore && lastVisible) {
-          query = query.startAfter(lastVisible);
-        }
-
-        const documentSnapshots = await query.get();
-        const newListeners = documentSnapshots.docs.map(doc => doc.data() as Listener);
-
-        setLastVisible(documentSnapshots.docs[documentSnapshots.docs.length - 1]);
-        setHasMore(newListeners.length === PAGE_SIZE);
-
-        const allListeners = loadMore ? [...listeners, ...newListeners] : newListeners;
-        
-        // Custom sort to bring favorites to the top
-        allListeners.sort((a, b) => {
-            const aIsFav = favorites.includes(a.id);
-            const bIsFav = favorites.includes(b.id);
-            if (aIsFav !== bIsFav) return aIsFav ? -1 : 1;
-            if (a.online !== b.online) return a.online ? -1 : 1;
-            return b.rating - a.rating;
-        });
-
-        setListeners(allListeners);
-      } catch (error) {
-        console.error("Error fetching listeners:", error);
-      } finally {
-        setLoading(false);
-        setLoadingMore(false);
-      }
-  }, [favorites, hasMore, lastVisible, listeners]);
-
-
-  useEffect(() => {
-    // Initial fetch
-    fetchListeners();
-  }, [currentUser.favoriteListeners]); // Refetch if favorites change
+  const { listeners, loading, loadingMore, hasMore, loadMoreListeners } = useListeners(favorites);
 
   const handleToggleFavorite = async (listenerId: number) => {
     if (!currentUser) return;
@@ -82,11 +30,7 @@ const CallsView: React.FC<CallsViewProps> = ({ onStartSession, currentUser }) =>
           favoriteListeners: firebase.firestore.FieldValue.arrayUnion(listenerId)
         });
       }
-      // Note: A real-time listener on the user doc would automatically refetch and re-render.
-      // For now, we manually update the state to reflect the change immediately.
-      const updatedListeners = listeners.map(l => l); // Create new array to trigger re-render
-      setListeners(updatedListeners);
-
+      // The useListeners hook will automatically refetch when the favorites prop changes.
     } catch (error) {
       console.error("Failed to update favorites:", error);
       alert("Error updating favorites. Please try again.");
@@ -95,6 +39,15 @@ const CallsView: React.FC<CallsViewProps> = ({ onStartSession, currentUser }) =>
 
   if (loading) {
     return <ViewLoader />;
+  }
+
+  if (listeners.length === 0 && !loading) {
+        return (
+            <div className="text-center py-20 px-4">
+                <p className="text-lg font-semibold text-slate-600 dark:text-slate-400">अभी कोई Listener उपलब्ध नहीं है।</p>
+                <p className="text-slate-500 dark:text-slate-500 mt-2">जब कोई Listener ऑनलाइन आएगा, तो वह यहाँ दिखाई देगा।</p>
+            </div>
+        );
   }
 
   return (
@@ -114,7 +67,7 @@ const CallsView: React.FC<CallsViewProps> = ({ onStartSession, currentUser }) =>
       {hasMore && (
         <div className="text-center mt-6">
             <button
-                onClick={() => fetchListeners(true)}
+                onClick={loadMoreListeners}
                 disabled={loadingMore}
                 className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-6 rounded-lg transition-colors disabled:bg-slate-400"
             >
