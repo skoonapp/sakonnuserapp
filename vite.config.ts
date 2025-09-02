@@ -1,10 +1,12 @@
 
+
 import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ mode }) => {
-    const env = loadEnv(mode, process.cwd(), '');
+    // FIX: Replaced process.cwd() with '.' to avoid TypeScript type error.
+    const env = loadEnv(mode, '.', '');
     return {
       plugins: [
         VitePWA({
@@ -23,19 +25,19 @@ export default defineConfig(({ mode }) => {
               {
                 src: 'icon.svg',
                 sizes: '192x192',
-                type: 'image/png',
+                type: 'image/svg+xml',
                 purpose: 'any',
               },
               {
                 src: 'icon.svg',
                 sizes: '512x512',
-                type: 'image/png',
+                type: 'image/svg+xml',
                 purpose: 'any',
               },
               {
                 src: 'icon.svg',
                 sizes: '512x512',
-                type: 'image/png',
+                type: 'image/svg+xml',
                 purpose: 'maskable',
               },
             ],
@@ -52,13 +54,9 @@ export default defineConfig(({ mode }) => {
       },
       resolve: {
         alias: {
-          '@': path.resolve(process.cwd(), '.'),
+          // FIX: Replaced process.cwd() with '.' to resolve from the project root.
+          '@': path.resolve('.'),
         }
       },
-      build: {
-        rollupOptions: {
-          external: ['@google/genai']
-        }
-      }
     };
 });
