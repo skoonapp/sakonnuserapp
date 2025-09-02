@@ -20,7 +20,7 @@ const MoonIcon: React.FC<{ className?: string }> = ({ className }) => (
         <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
     </svg>
 );
-const CustomTokenIcon: React.FC<{className?: string}> = ({className}) => (
+const CustomMTIcon: React.FC<{className?: string}> = ({className}) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
         <circle cx="12" cy="12" r="12" className="fill-indigo-600 dark:fill-indigo-500" />
         <path d="M10.5 8.5 v7 L14 15.5" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round" />
@@ -67,8 +67,8 @@ const Header: React.FC<HeaderProps> = ({ currentUser, isDarkMode, toggleDarkMode
         <div className="flex items-center gap-2">
             {currentUser && (
               <div className="flex items-center space-x-2 md:space-x-3 bg-slate-100 dark:bg-slate-900 px-2 py-1.5 rounded-full">
-                  <div className="flex items-center space-x-1" title={`${tokenBalance} टोकन`}>
-                      <CustomTokenIcon className="w-5 h-5"/>
+                  <div className="flex items-center space-x-1" title={`${tokenBalance} MT`}>
+                      <CustomMTIcon className="w-5 h-5"/>
                       <span className="font-bold text-sm text-slate-700 dark:text-slate-100">{tokenBalance}</span>
                   </div>
                   <div className="w-px h-4 bg-slate-300 dark:bg-slate-700"></div>

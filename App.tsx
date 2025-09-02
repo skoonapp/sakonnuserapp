@@ -203,12 +203,12 @@ const App: React.FC = () => {
         }
 
         if (sessionPlan || isTokenSession) {
-             const associatedPlanId = sessionPlan ? sessionPlan.id : `token_session_${now}`;
+             const associatedPlanId = sessionPlan ? sessionPlan.id : `mt_session_${now}`;
              if (type === 'call') {
                 setActiveCallSession({
                     type: 'call',
                     listener: listener,
-                    plan: { duration: sessionPlan?.name || 'टोकन', price: sessionPlan?.price || 0 },
+                    plan: { duration: sessionPlan?.name || 'MT', price: sessionPlan?.price || 0 },
                     sessionDurationSeconds: 3600, // Max duration 1hr
                     associatedPlanId: associatedPlanId,
                     isTokenSession: isTokenSession,
@@ -217,7 +217,7 @@ const App: React.FC = () => {
                 setActiveChatSession({
                     type: 'chat',
                     listener: listener,
-                    plan: { duration: sessionPlan?.name || 'टोकन', price: sessionPlan?.price || 0 },
+                    plan: { duration: sessionPlan?.name || 'MT', price: sessionPlan?.price || 0 },
                     sessionDurationSeconds: 3 * 3600, // Max duration 3hr
                     associatedPlanId: associatedPlanId,
                     isTokenSession: isTokenSession,

@@ -273,7 +273,7 @@ const CallUI: React.FC<CallUIProps> = ({ session, user, onLeave }) => {
             
             <h1 className="text-4xl font-bold tracking-tight">{listener.name}</h1>
             <p className="text-lg text-slate-400 mt-1 bg-black/20 px-3 py-1 rounded-full">
-                {session.isTokenSession ? 'Token Session' : `${session.plan.duration} Plan`}
+                {session.isTokenSession ? 'MT Session' : `${session.plan.duration} Plan`}
             </p>
             <p className={`text-xl text-slate-300 mt-4 transition-all duration-300 font-mono p-2 rounded-lg ${isTimerAlert ? 'bg-red-500/80 animate-pulse' : ''}`}>
                 {status === 'connected' ? formatTime(remainingSeconds) : getStatusText()}

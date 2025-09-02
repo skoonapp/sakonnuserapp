@@ -41,7 +41,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
   ];
 
   const handleTokenPurchase = async (tokens: number, price: number) => {
-    const planKey = `token_${tokens}`;
+    const planKey = `mt_${tokens}`;
     setLoadingPlan(planKey);
     setFeedback(null);
     try {
@@ -101,9 +101,9 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
         <div className="text-center mb-6">
             <h3 className="text-3xl font-bold text-slate-800 dark:text-slate-100 flex items-center justify-center gap-3">
                 <WalletIcon className="w-8 h-8 text-indigo-500"/>
-                <span>Token Plans</span>
+                <span>MT Plans</span>
             </h3>
-            <p className="text-slate-600 dark:text-slate-400 mt-2">टोकन खरीदें और अपनी सुविधानुसार कॉल या चैट के लिए उपयोग करें।</p>
+            <p className="text-slate-600 dark:text-slate-400 mt-2">MT खरीदें और अपनी सुविधानुसार कॉल या चैट के लिए उपयोग करें।</p>
         </div>
         
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
@@ -114,22 +114,22 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
                             <TokenIcon className="w-6 h-6"/>
                             <span className="text-2xl font-bold text-slate-800 dark:text-slate-100">{option.tokens}</span>
                         </div>
-                        <p className="text-slate-500 dark:text-slate-400 mb-4">टोकन</p>
+                        <p className="text-slate-500 dark:text-slate-400 mb-4">MT</p>
                     </div>
                     <button 
                         onClick={() => handleTokenPurchase(option.tokens, option.price)}
                         disabled={loadingPlan !== null}
                         className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
                     >
-                        {loadingPlan === `token_${option.tokens}` ? 'प्रोसेसिंग...' : `₹${option.price} Buy`}
+                        {loadingPlan === `mt_${option.tokens}` ? 'प्रोसेसिंग...' : `₹${option.price} Buy`}
                     </button>
                 </div>
             ))}
         </div>
 
         <div className="text-center mt-6 bg-slate-100 dark:bg-slate-900/50 p-4 rounded-lg max-w-md mx-auto border border-slate-200 dark:border-slate-800">
-            <p className="font-semibold text-slate-700 dark:text-slate-200">📞 कॉल = 2 टोकन/मिनट</p>
-            <p className="font-semibold text-slate-700 dark:text-slate-200 mt-1">💬 चैट = 1 टोकन/2 मैसेज</p>
+            <p className="font-semibold text-slate-700 dark:text-slate-200">📞 कॉल = 2 MT/मिनट</p>
+            <p className="font-semibold text-slate-700 dark:text-slate-200 mt-1">💬 चैट = 1 MT/2 मैसेज</p>
         </div>
       </section>
 

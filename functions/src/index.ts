@@ -53,7 +53,7 @@ app.use(express.json());
 const authenticate = async (
   req: express.Request,
   res: express.Response,
-  next: express.NextFunction,
+  next: express.NextFunction
 ) => {
   if (
     !req.headers.authorization ||
@@ -100,7 +100,7 @@ const processPurchase = async (paymentNotes: any, paymentId: string) => {
 
   const userRef = db.collection("users").doc(userId);
 
-  if (planType === "token") {
+  if (planType === "mt") {
     const tokens = parseInt(planDetails.tokens, 10);
     if (isNaN(tokens) || tokens <= 0) {
       throw new Error(`Invalid tokens value: ${planDetails.tokens}`);
@@ -108,7 +108,7 @@ const processPurchase = async (paymentNotes: any, paymentId: string) => {
     await userRef.update({
       tokens: admin.firestore.FieldValue.increment(tokens),
     });
-    console.log(`Successfully added ${tokens} tokens to user ${userId}`);
+    console.log(`Successfully added ${tokens} MT to user ${userId}`);
   } else { // Handle DT plan purchase
     const newPlan = {
       ...planDetails,
@@ -397,7 +397,7 @@ export const finalizeCallSession = functions
       const requiredTokens = consumedMinutes * 2;
       if ((userData.tokens || 0) >= requiredTokens) {
         transaction.update(userRef, {tokens: admin.firestore.FieldValue.increment(-requiredTokens)});
-        return {status: "success", message: `Deducted ${requiredTokens} tokens.`};
+        return {status: "success", message: `Deducted ${requiredTokens} MT.`};
       }
 
       // If neither works, throw an error (should ideally not happen due to pre-checks)
@@ -438,7 +438,7 @@ export const deductUsage = functions
         const requiredTokens = messages * 0.5; // 1 token per 2 messages
         if ((userData.tokens || 0) >= requiredTokens) {
           transaction.update(userRef, {tokens: admin.firestore.FieldValue.increment(-requiredTokens)});
-          return {status: "success", planId: `token_session_${Date.now()}`};
+          return {status: "success", planId: `mt_session_${Date.now()}`};
         }
       }
       throw new functions.https.HttpsError("failed-precondition", "Insufficient balance.");

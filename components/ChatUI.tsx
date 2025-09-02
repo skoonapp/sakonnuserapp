@@ -204,7 +204,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
         const result: any = await deductUsage({ type: 'chat', messages: 1, associatedPlanId: associatedPlanIdRef.current });
         
         // If deduction was from tokens, the associatedPlanId might change for subsequent deductions
-        if (result.data.planId && result.data.planId.startsWith('token_session')) {
+        if (result.data.planId && result.data.planId.startsWith('mt_session')) {
             associatedPlanIdRef.current = result.data.planId;
         }
 

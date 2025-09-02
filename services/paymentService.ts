@@ -23,12 +23,12 @@ class PaymentService {
       
       const result: any = await createOrder({
         amount: price,
-        planType: "token",
+        planType: "mt",
         planDetails: { tokens, price }
       });
       
       if (result.data.success) {
-        return this.openRazorpay(result.data.order, price, `${tokens} Tokens`);
+        return this.openRazorpay(result.data.order, price, `${tokens} MT`);
       }
     } catch (error) {
       console.error("Payment error:", error);
