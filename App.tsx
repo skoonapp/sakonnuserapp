@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import type { User, Listener, ActivePlan, CallSession, ChatSession, ActiveView } from './types';
 import { auth, db, functions } from './utils/firebase';
 import { handleCallEnd, handleChat } from './utils/earnings';
@@ -9,18 +9,21 @@ import SplashScreen from './components/SplashScreen';
 import LoginScreen from './components/LoginScreen';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import PlansView from './components/Listeners'; // This is the home/plans view
-import CallsView from './components/Services';
-import ChatsView from './components/LiveFeedback'; // This is the chats view
-import ProfileView from './components/About';
 import AICompanionButton from './components/AICompanionButton';
-import AICompanion from './components/AICompanion';
 import CallUI from './components/CallUI';
 import ChatUI from './components/ChatUI';
-import TermsAndConditions from './components/TermsAndConditions';
-import PrivacyPolicy from './components/PrivacyPolicy';
-import CancellationRefundPolicy from './components/CancellationRefundPolicy';
 import RechargeModal from './components/RechargeModal';
+import ViewLoader from './components/ViewLoader';
+
+// --- Lazy Load Views and Modals for Code Splitting ---
+const PlansView = lazy(() => import('./components/Listeners')); // This is the home/plans view
+const CallsView = lazy(() => import('./components/Services'));
+const ChatsView = lazy(() => import('./components/LiveFeedback')); // This is the chats view
+const ProfileView = lazy(() => import('./components/About'));
+const AICompanion = lazy(() => import('./components/AICompanion'));
+const TermsAndConditions = lazy(() => import('./components/TermsAndConditions'));
+const PrivacyPolicy = lazy(() => import('./components/PrivacyPolicy'));
+const CancellationRefundPolicy = lazy(() => import('./components/CancellationRefundPolicy'));
 
 
 // --- Icons for Install Banner ---
@@ -42,7 +45,8 @@ const App: React.FC = () => {
     // Auth State
     const [user, setUser] = useState<User | null>(null);
     const [loadingAuth, setLoadingAuth] = useState(true);
-    const wallet = useWallet(); // NEW: Real-time wallet hook
+    const [isInitializing, setIsInitializing] = useState(true); // FIX: State to track initial auth check
+    const wallet = useWallet();
 
     // Navigation State
     const [activeView, setActiveView] = useState<ActiveView>('home');
@@ -168,6 +172,8 @@ const App: React.FC = () => {
                 setUser(null);
                 setLoadingAuth(false);
             }
+            // FIX: Mark initialization as complete after the first auth check.
+            setIsInitializing(false);
         });
         return () => unsubscribe();
     }, []);
@@ -286,7 +292,8 @@ const App: React.FC = () => {
         }
     };
     
-    if (loadingAuth || wallet.loading) {
+    // FIX: Updated loading check to include `isInitializing`.
+    if (isInitializing || loadingAuth || wallet.loading) {
         return <SplashScreen />;
     }
 
@@ -306,7 +313,9 @@ const App: React.FC = () => {
         <div className="w-full max-w-md mx-auto bg-slate-100 dark:bg-slate-950 flex flex-col min-h-screen shadow-2xl transition-colors duration-300">
             <Header currentUser={user} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} wallet={wallet} />
             <main className="flex-grow pb-20">
-                {renderActiveView()}
+                <Suspense fallback={<ViewLoader />}>
+                    {renderActiveView()}
+                </Suspense>
             </main>
             <Footer activeView={activeView} setActiveView={setActiveView} />
             
@@ -337,8 +346,15 @@ const App: React.FC = () => {
                 </div>
             )}
             <AICompanionButton onClick={() => setShowAICompanion(true)} />
-            {showAICompanion && <AICompanion user={user} onClose={() => setShowAICompanion(false)} onNavigateToServices={() => { setActiveView('calls'); setShowAICompanion(false); }} />}
             
+            <Suspense fallback={null}>
+                {showAICompanion && <AICompanion user={user} onClose={() => setShowAICompanion(false)} onNavigateToServices={() => { setActiveView('calls'); setShowAICompanion(false); }} />}
+                
+                {showPolicy === 'terms' && <TermsAndConditions onClose={() => setShowPolicy(null)} />}
+                {showPolicy === 'privacy' && <PrivacyPolicy onClose={() => setShowPolicy(null)} />}
+                {showPolicy === 'cancellation' && <CancellationRefundPolicy onClose={() => setShowPolicy(null)} />}
+            </Suspense>
+
             {showRechargeModal && (
                 <RechargeModal
                     onClose={() => setShowRechargeModal(false)}
@@ -348,10 +364,6 @@ const App: React.FC = () => {
                     }}
                 />
             )}
-
-            {showPolicy === 'terms' && <TermsAndConditions onClose={() => setShowPolicy(null)} />}
-            {showPolicy === 'privacy' && <PrivacyPolicy onClose={() => setShowPolicy(null)} />}
-            {showPolicy === 'cancellation' && <CancellationRefundPolicy onClose={() => setShowPolicy(null)} />}
         </div>
     );
 };
