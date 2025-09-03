@@ -47,7 +47,8 @@ export const useListeners = (favoriteListenerIds: number[] = []) => {
 
             setListeners(prevListeners => {
                 const combinedListeners = loadMore ? [...prevListeners, ...newListeners] : newListeners;
-                const uniqueListeners = Array.from(new Map(combinedListeners.map(l => [l.id, l])).values());
+                // FIX: Explicitly type uniqueListeners as Listener[] to help TypeScript inference.
+                const uniqueListeners: Listener[] = Array.from(new Map(combinedListeners.map(l => [l.id, l])).values());
 
                 uniqueListeners.sort((a, b) => {
                     const aIsFav = favoriteListenerIds.includes(a.id);

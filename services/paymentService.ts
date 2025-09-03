@@ -1,11 +1,10 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { auth } from "../utils/firebase";
-import { RAZORPAY_KEY_ID } from "../constants";
 import type { Plan } from '../types';
 
 declare global {
   interface Window {
-    Razorpay: any;
+    Cashfree: any;
   }
 }
 
@@ -19,7 +18,7 @@ class PaymentService {
     }
     
     try {
-      const createOrder = httpsCallable(this.functions, "createPaymentOrder");
+      const createOrder = httpsCallable(this.functions, "createCashfreeOrder");
       
       const result: any = await createOrder({
         amount: price,
@@ -28,7 +27,9 @@ class PaymentService {
       });
       
       if (result.data.success) {
-        return this.openRazorpay(result.data.order, price, `${tokens} MT`);
+        return result.data.orderToken; // Return token for the modal
+      } else {
+        throw new Error(result.data.message || 'Failed to create order.');
       }
     } catch (error) {
       console.error("Payment error:", error);
@@ -44,7 +45,7 @@ class PaymentService {
     }
     
     try {
-      const createOrder = httpsCallable(this.functions, "createPaymentOrder");
+      const createOrder = httpsCallable(this.functions, "createCashfreeOrder");
       
       const result: any = await createOrder({
         amount: planData.price,
@@ -53,62 +54,15 @@ class PaymentService {
       });
       
       if (result.data.success) {
-        return this.openRazorpay(
-          result.data.order, 
-          planData.price, 
-          planData.name || "DT Plan"
-        );
+        return result.data.orderToken; // Return token for the modal
+      } else {
+         throw new Error(result.data.message || 'Failed to create order.');
       }
     } catch (error) {
       console.error("Payment error:", error);
       // Re-throw the error to be handled by the UI component
       throw error;
     }
-  }
-  
-  // 🟢 Open Razorpay
-  private openRazorpay(order: any, amount: number, description: string) {
-    return new Promise((resolve, reject) => {
-        const options = {
-            key: RAZORPAY_KEY_ID,
-            amount: order.amount,
-            currency: "INR",
-            name: "SakoonApp",
-            description: description,
-            order_id: order.id,
-            handler: async (response: any) => {
-                try {
-                    const verifyPayment = httpsCallable(this.functions, "verifyPayment");
-                    await verifyPayment({
-                        razorpay_payment_id: response.razorpay_payment_id,
-                        razorpay_order_id: response.razorpay_order_id,
-                        razorpay_signature: response.razorpay_signature,
-                    });
-                    // The UI will now handle success feedback.
-                    // We resolve with the description so the UI can show a specific message.
-                    resolve({ success: true, description });
-                } catch (verifyError) {
-                    console.error("Payment verification failed:", verifyError);
-                    // The UI will handle error feedback.
-                    reject(verifyError);
-                }
-            },
-            prefill: {
-                name: auth.currentUser?.displayName || "User",
-                email: auth.currentUser?.email || "user@example.com",
-            },
-            theme: { color: "#0891B2" },
-            modal: {
-                ondismiss: () => {
-                    // This can be considered a failed payment by the user
-                    reject({ code: 'user-closed-modal', message: 'Payment modal was closed.' });
-                }
-            }
-        };
-        
-        const razorpay = new window.Razorpay(options);
-        razorpay.open();
-    });
   }
 }
 

@@ -4,16 +4,19 @@ import * as admin from "firebase-admin";
 import express, {Request, Response} from "express";
 import cors from "cors";
 import {RtcTokenBuilder, RtcRole} from "zego-express-engine";
-import Razorpay from "razorpay";
+import {Cashfree} from "cashfree-pg";
 import * as crypto from "crypto";
 
 admin.initializeApp();
 const db = admin.firestore();
 
-const razorpayInstance = new Razorpay({
-  key_id: functions.config().razorpay.key_id,
-  key_secret: functions.config().razorpay.key_secret,
-});
+// Initialize Cashfree
+Cashfree.XClientId = functions.config().cashfree.client_id;
+Cashfree.XClientSecret = functions.config().cashfree.client_secret;
+Cashfree.XEnvironment = functions.config().cashfree.env === "PROD" ?
+  Cashfree.Environment.PRODUCTION :
+  Cashfree.Environment.SANDBOX;
+
 
 /**
  * Creates a stable 32-bit unsigned integer from a string UID.
@@ -36,13 +39,15 @@ const firebaseUIDtoZegoUID = (uid: string): number => {
 
 const app = express();
 app.use(cors({origin: true}));
-app.use(express.json());
+// Note: We are not using express.json() globally here because the Cashfree webhook
+// needs the raw body for signature verification. We'll use it specifically on other routes if needed.
+
 
 /**
  * Processes a purchase by updating the user's balance in Firestore.
  * This now updates the new schema with 'tokens' and 'activePlans' array.
- * @param {any} paymentNotes - The notes object from the Razorpay payment.
- * @param {string} paymentId - The unique Razorpay payment ID.
+ * @param {any} paymentNotes - The notes object from the payment.
+ * @param {string} paymentId - The unique payment ID.
  */
 const processPurchase = async (paymentNotes: any, paymentId: string) => {
   const {
@@ -65,17 +70,23 @@ const processPurchase = async (paymentNotes: any, paymentId: string) => {
   const userRef = db.collection("users").doc(userId);
 
   if (planType === "mt") {
-    const tokens = parseInt(planDetails.tokens, 10);
+    // planDetails might be a string if it comes from webhook tags
+    const details = typeof planDetails === "string" ?
+      JSON.parse(planDetails) : planDetails;
+    const tokens = parseInt(details.tokens, 10);
+
     if (isNaN(tokens) || tokens <= 0) {
-      throw new Error(`Invalid tokens value: ${planDetails.tokens}`);
+      throw new Error(`Invalid tokens value: ${details.tokens}`);
     }
     await userRef.update({
       tokens: admin.firestore.FieldValue.increment(tokens),
     });
     console.log(`Successfully added ${tokens} MT to user ${userId}`);
   } else { // Handle DT plan purchase
+    const details = typeof planDetails === "string" ?
+      JSON.parse(planDetails) : planDetails;
     const newPlan = {
-      ...planDetails,
+      ...details,
       id: `plan_${Date.now()}`,
       purchaseTimestamp: admin.firestore.Timestamp.now().toMillis(),
       expiryTimestamp: admin.firestore.Timestamp.now().toMillis() +
@@ -84,7 +95,7 @@ const processPurchase = async (paymentNotes: any, paymentId: string) => {
     await userRef.update({
       activePlans: admin.firestore.FieldValue.arrayUnion(newPlan),
     });
-    console.log(`Successfully added ${planDetails.name} plan for ${userId}`);
+    console.log(`Successfully added ${details.name} plan for ${userId}`);
   }
 
   // Mark payment as processed
@@ -96,34 +107,50 @@ const processPurchase = async (paymentNotes: any, paymentId: string) => {
 };
 
 
-// Razorpay Webhook Endpoint
-// @google/genai-api-fix: Bypassing problematic Express type definitions by using 'any'.
-// This resolves incorrect compile-time errors about missing properties on req and res.
-app.post("/razorpayWebhook", async (req: any, res: any) => {
-  const secret = functions.config().razorpay.webhook_secret;
-  const signature = req.headers["x-razorpay-signature"] as string;
+// Cashfree Webhook Endpoint
+app.post("/cashfreeWebhook", express.raw({type: "application/json"}),
+  async (req: Request, res: Response) => {
+    try {
+      const signature = req.headers["x-webhook-signature"] as string;
+      const timestamp = req.headers["x-webhook-timestamp"] as string;
+      const payload = req.body;
 
-  try {
-    const shasum = crypto.createHmac("sha256", secret);
-    shasum.update(JSON.stringify(req.body));
-    const digest = shasum.digest("hex");
+      if (!signature || !timestamp) {
+        return res.status(400).send("Webhook signature/timestamp is missing.");
+      }
 
-    if (digest !== signature) {
-      res.status(400).send("Invalid signature");
-      return;
+      const secret = functions.config().cashfree.webhook_secret;
+      const dataToVerify = timestamp + payload.toString();
+      const expectedSignature = crypto
+        .createHmac("sha256", secret)
+        .update(dataToVerify)
+        .digest("base64");
+
+      if (signature !== expectedSignature) {
+        console.warn("Webhook signature mismatch.");
+        return res.status(400).send("Invalid signature");
+      }
+
+      const event = JSON.parse(payload.toString());
+      // Check for successful payment event
+      if (event.type === "PAYMENT_SUCCESS_WEBHOOK" &&
+        event.data.order.order_status === "PAID") {
+        const orderTags = event.data.order.order_tags;
+        const paymentId = event.data.payment.cf_payment_id;
+
+        if (orderTags && orderTags.userId && paymentId) {
+          // Pass the tags directly as they contain our plan info
+          await processPurchase(orderTags, paymentId.toString());
+        } else {
+          console.error("Missing required data in webhook payload", event.data);
+        }
+      }
+      res.status(200).send({status: "success"});
+    } catch (err) {
+      console.error("Webhook processing error:", err);
+      res.status(500).send("Internal Server Error");
     }
-
-    const event = req.body.event;
-    if (event === "payment.captured") {
-      const payment = req.body.payload.payment.entity;
-      await processPurchase(payment.notes, payment.id);
-    }
-    res.status(200).send({status: "success"});
-  } catch (err) {
-    console.error("Webhook processing error:", err);
-    res.status(500).send("Internal Server Error");
-  }
-});
+  });
 
 
 export const api = functions.region("us-central1").https.onRequest(app);
@@ -229,8 +256,8 @@ export const addEarning = functions
     }
   });
 
-// NEW: Renamed from createRazorpayOrder to align with new service
-export const createPaymentOrder = functions
+// NEW: Replaced Razorpay with Cashfree for order creation
+export const createCashfreeOrder = functions
   .region("us-central1")
   .https.onCall(async (data, context) => {
     if (!context.auth) {
@@ -240,88 +267,41 @@ export const createPaymentOrder = functions
       );
     }
     const {amount, planType, planDetails} = data;
+    const user = await admin.auth().getUser(context.auth.uid);
 
-    const notes = {
-      userId: context.auth.uid,
-      planType: planType,
-      planDetails: planDetails, // e.g., { tokens: 50, price: 230 }
-    };
-
-    const options = {
-      amount: amount * 100, // Amount in paise
-      currency: "INR",
-      receipt: `receipt_user_${context.auth.uid}_${Date.now()}`,
-      notes: notes,
+    const orderRequest = {
+      order_id: `order_${Date.now()}`,
+      order_amount: amount,
+      order_currency: "INR",
+      customer_details: {
+        customer_id: context.auth.uid,
+        customer_email: user.email || "user@example.com",
+        customer_phone: user.phoneNumber?.replace("+91", "") || "9999999999",
+        customer_name: user.displayName || "Sakoon User",
+      },
+      order_meta: {
+        // notify_url is set globally in cashfree config or can be here
+        // return_url: "https://yourapp.com/return?order_id={order_id}"
+      },
+      order_tags: {
+        userId: context.auth.uid,
+        planType: planType,
+        // Stringify details to store in tags
+        planDetails: JSON.stringify(planDetails),
+      },
     };
 
     try {
-      const order = await razorpayInstance.orders.create(options);
-      return {success: true, order};
-    } catch (error) {
-      console.error("Razorpay order creation failed:", error);
+      const response = await Cashfree.PG.Orders.create(orderRequest);
+      return {
+        success: true,
+        orderToken: response.data.payment_session_id,
+      };
+    } catch (error: any) {
+      console.error("Cashfree order creation failed:", error.response.data);
       throw new functions.https.HttpsError(
         "internal",
         "Failed to create payment order."
-      );
-    }
-  });
-
-
-// Callable function to verify payment signature
-export const verifyPayment = functions
-  .region("us-central1")
-  .https.onCall(async (data, context) => {
-    if (!context.auth) {
-      throw new functions.https.HttpsError(
-        "unauthenticated",
-        "The function must be called while authenticated."
-      );
-    }
-
-    const {razorpay_order_id, razorpay_payment_id, razorpay_signature} = data;
-    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
-      throw new functions.https.HttpsError(
-        "invalid-argument",
-        "Payment verification data is required."
-      );
-    }
-
-    try {
-      // Verify signature
-      const body = razorpay_order_id + "|" + razorpay_payment_id;
-      const expectedSignature = crypto
-        .createHmac("sha256", functions.config().razorpay.key_secret)
-        .update(body.toString())
-        .digest("hex");
-
-      if (expectedSignature !== razorpay_signature) {
-        throw new functions.https.HttpsError(
-          "permission-denied",
-          "Payment verification failed: Invalid signature."
-        );
-      }
-
-      // Fetch payment from Razorpay to get notes and verify status
-      const payment = await razorpayInstance.payments.fetch(razorpay_payment_id);
-      if (payment.status !== "captured") {
-        throw new functions.https.HttpsError(
-          "failed-precondition",
-          "Payment not successful."
-        );
-      }
-
-      // Process the purchase (credits user account, idempotency check inside)
-      await processPurchase(payment.notes, razorpay_payment_id);
-
-      return {status: "success", message: "Payment verified and processed."};
-    } catch (error: any) {
-      console.error("Payment verification failed:", error);
-      if (error instanceof functions.https.HttpsError) {
-        throw error;
-      }
-      throw new functions.https.HttpsError(
-        "internal",
-        "Failed to verify payment."
       );
     }
   });

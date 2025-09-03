@@ -26,8 +26,6 @@ export const QUICK_REPLIES = [
     "Is there anything else I can help you with?",
 ];
 
-export const RAZORPAY_KEY_ID = "rzp_test_RCbZCp07AHjMLM"; // Replace with your actual Razorpay Test Key ID
-
 // NEW: Updated Plan structure for the new paymentService
 export const CALL_PLANS: Plan[] = [
     { type: "call", name: "Bronze Pack", duration: "5 मिनट", minutes: 5, price: 50, tierName: 'Bronze Pack' },
@@ -66,7 +64,7 @@ export const FAQ_DATA: FaqItem[] = [
     },
     {
         question: 'मैं एक प्लान कैसे खरीदूं?',
-        answer: 'आप "होम" टैब पर जाकर कॉलिंग/चैट प्लान या MT प्लान खरीद सकते हैं। भुगतान सुरक्षित रूप से Razorpay के माध्यम से किया जाता है।',
+        answer: 'आप "होम" टैब पर जाकर कॉलिंग/चैट प्लान या MT प्लान खरीद सकते हैं। भुगतान सुरक्षित रूप से किया जाता है।',
         isPositive: true,
     },
     {
