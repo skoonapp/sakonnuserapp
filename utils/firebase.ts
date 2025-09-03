@@ -23,10 +23,10 @@ if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
 
-// Set authentication persistence to 'local' to keep the user signed in.
-// This ensures that the user's session is persisted across browser sessions
-// until they explicitly sign out.
-firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+// FIX: Set authentication persistence to 'session' to support sandboxed environments.
+// 'local' persistence can fail in iframes or web containers where localStorage is restricted.
+// 'session' uses sessionStorage, which is generally more permissive.
+firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
   .catch((error) => {
     // Handle errors here.
     console.error("Auth persistence error:", error.code, error.message);
