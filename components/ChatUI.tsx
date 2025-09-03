@@ -117,6 +117,10 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
         zp = window.ZegoUIKitPrebuilt.create(kitToken);
         zpInstanceRef.current = zp;
 
+        if (session.isFreeTrial) {
+            addSystemMessage(`This is a Free Trial session. You can send short messages (up to 75 characters) to the Listener.`);
+        }
+
         zp.on('IMRecvCustomCommand', ({ fromUser, command }: { fromUser: { userID: string }, command: string }) => {
             if (fromUser.userID === String(session.listener.id)) {
                 const cmdData = JSON.parse(command);
@@ -180,7 +184,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
       if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
       if (zpInstanceRef.current) { zpInstanceRef.current.destroy(); }
     };
-  }, [session.associatedPlanId, session.listener.id, session.listener.name, addSystemMessage, handleLeave]);
+  }, [session.associatedPlanId, session.listener.id, session.listener.name, addSystemMessage, handleLeave, session.isFreeTrial]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -199,11 +203,38 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
     };
     setMessages(prev => [...prev, localMessage]);
     
+    if (session.isFreeTrial) {
+        if (textToSend.length > 75) {
+            addSystemMessage("Free trial messages must be 75 characters or less.");
+            setMessages(prev => prev.filter(m => m.id !== localMessageId));
+            setInputValue(textToSend);
+            return;
+        }
+
+        try {
+            const useFreeMessage = functions.httpsCallable("useFreeMessage");
+            await useFreeMessage();
+            await zpInstanceRef.current.sendRoomMessage(textToSend);
+            setMessages(prev => prev.map(m => m.id === localMessageId ? { ...m, status: 'sent' } : m));
+            setSentMessagesCount(prev => prev + 1);
+            setTimeout(() => setMessages(prev => prev.map(m => m.id === localMessageId ? { ...m, status: 'delivered' } : m)), 1000);
+            setTimeout(() => setMessages(prev => prev.map(m => m.id === localMessageId ? { ...m, status: 'read' } : m)), 2500);
+        } catch (error: any) {
+            console.error('Failed to use free message:', error);
+            setMessages(prev => prev.map(m => m.id === localMessageId ? { ...m, status: 'failed' } : m));
+            addSystemMessage(error.message || 'Failed to send free message.');
+            if (error.code === 'functions/failed-precondition') {
+                addSystemMessage('You have used all your free messages. Please purchase a plan to continue chatting.');
+                setTimeout(() => handleLeave(true), 3000);
+            }
+        }
+        return;
+    }
+
     try {
         const deductUsage = functions.httpsCallable("deductUsage");
         const result: any = await deductUsage({ type: 'chat', messages: 1, associatedPlanId: associatedPlanIdRef.current });
         
-        // If deduction was from tokens, the associatedPlanId might change for subsequent deductions
         if (result.data.planId && result.data.planId.startsWith('mt_session')) {
             associatedPlanIdRef.current = result.data.planId;
         }
@@ -213,7 +244,6 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
         setMessages(prev => prev.map(m => m.id === localMessageId ? {...m, status: 'sent'} : m));
         setSentMessagesCount(prev => prev + 1);
         
-        // Simulate 'delivered' and 'read' for demo purposes
         setTimeout(() => setMessages(prev => prev.map(m => m.id === localMessageId ? {...m, status: 'delivered'} : m)), 1000);
         setTimeout(() => setMessages(prev => prev.map(m => m.id === localMessageId ? {...m, status: 'read'} : m)), 2500);
 

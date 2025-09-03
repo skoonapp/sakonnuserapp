@@ -160,6 +160,7 @@ const App: React.FC = () => {
                             favoriteListeners: [],
                             tokens: 0,
                             activePlans: [],
+                            freeMessagesRemaining: 5,
                         };
                         userDocRef.set(newUser, { merge: true });
                         setUser(newUser);
@@ -192,6 +193,19 @@ const App: React.FC = () => {
     }, []);
     
     const handleStartSession = useCallback((type: 'call' | 'chat', listener: Listener) => {
+        if (type === 'chat' && user && (user.freeMessagesRemaining || 0) > 0) {
+            setActiveChatSession({
+                type: 'chat',
+                listener: listener,
+                plan: { duration: 'Free Trial', price: 0 },
+                sessionDurationSeconds: 3 * 3600,
+                associatedPlanId: `free_trial_${user.uid}`,
+                isTokenSession: false,
+                isFreeTrial: true,
+            });
+            return;
+        }
+        
         const now = Date.now();
         const activePlans = (wallet.activePlans || []).filter(p => p.expiryTimestamp > now);
 
@@ -240,7 +254,7 @@ const App: React.FC = () => {
             // No valid plan or tokens
             setShowRechargeModal(true);
         }
-    }, [wallet]);
+    }, [wallet, user]);
     
     const handleCallSessionEnd = useCallback(async (success: boolean, consumedSeconds: number) => {
         if (user && activeCallSession) {
@@ -266,7 +280,7 @@ const App: React.FC = () => {
 
     const handleChatSessionEnd = useCallback(async (success: boolean, consumedMessages: number) => {
         if (user && activeChatSession) {
-             if (success && consumedMessages > 0) {
+             if (success && consumedMessages > 0 && !activeChatSession.isFreeTrial) {
                 // Balance deduction is handled per-message in ChatUI
                 await handleChat(
                     activeChatSession.listener.id.toString(),

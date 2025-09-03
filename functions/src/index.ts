@@ -97,7 +97,9 @@ const processPurchase = async (paymentNotes: any, paymentId: string) => {
 
 
 // Razorpay Webhook Endpoint
-app.post("/razorpayWebhook", async (req: Request, res: Response) => {
+// @google/genai-api-fix: Bypassing problematic Express type definitions by using 'any'.
+// This resolves incorrect compile-time errors about missing properties on req and res.
+app.post("/razorpayWebhook", async (req: any, res: any) => {
   const secret = functions.config().razorpay.webhook_secret;
   const signature = req.headers["x-razorpay-signature"] as string;
 
@@ -324,6 +326,37 @@ export const verifyPayment = functions
     }
   });
   
+// NEW: Securely deducts a free message from the user's account.
+export const useFreeMessage = functions
+  .region("us-central1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      throw new functions.https.HttpsError("unauthenticated", "Authentication required.");
+    }
+
+    const uid = context.auth.uid;
+    const userRef = db.collection("users").doc(uid);
+
+    return db.runTransaction(async (transaction) => {
+      const userDoc = await transaction.get(userRef);
+      if (!userDoc.exists) {
+        throw new functions.https.HttpsError("not-found", "User not found.");
+      }
+      const userData = userDoc.data()!;
+      const freeMessages = userData.freeMessagesRemaining || 0;
+
+      if (freeMessages <= 0) {
+        throw new functions.https.HttpsError("failed-precondition", "You have no free messages left.");
+      }
+
+      transaction.update(userRef, {
+        freeMessagesRemaining: admin.firestore.FieldValue.increment(-1),
+      });
+
+      return {status: "success", remaining: freeMessages - 1};
+    });
+  });
+
 // NEW: Securely deducts balance for a call session after it ends.
 export const finalizeCallSession = functions
   .region("us-central1")

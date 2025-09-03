@@ -21,6 +21,7 @@ export interface User {
   favoriteListeners?: number[];
   tokens?: number; // Replaces tokenBalance
   activePlans?: ActivePlan[]; // Replaces purchasedPlans subcollection
+  freeMessagesRemaining?: number;
 }
 
 export interface Listener {
