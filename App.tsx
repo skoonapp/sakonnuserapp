@@ -141,6 +141,14 @@ const App: React.FC = () => {
     useEffect(() => {
         let unsubscribeUser: () => void = () => {};
 
+        // Handle redirect result from OAuth providers like Google.
+        // This runs once on app load and checks if the user is returning from a sign-in flow.
+        auth.getRedirectResult().catch((error) => {
+            console.error("Auth Redirect Error:", error.code, error.message);
+            // Store error to be displayed by the LoginScreen component.
+            sessionStorage.setItem('authError', 'Failed to sign in with Google. Please try again.');
+        });
+
         const unsubscribeAuth = auth.onAuthStateChanged(firebaseUser => {
             unsubscribeUser(); // Clean up previous Firestore listener if it exists
 
