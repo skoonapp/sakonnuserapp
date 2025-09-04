@@ -5,8 +5,8 @@ import * as admin from "firebase-admin";
 import express from "express";
 import cors from "cors";
 import {RtcTokenBuilder} from "zego-express-engine";
-// FIX: Changed to a default import for `cashfree-pg` to resolve the "no exported member" error.
-import cashfree from "cashfree-pg";
+// FIX: Changed to a named import for `cashfree-pg` to resolve SDK usage errors.
+import { cashfree } from "cashfree-pg";
 import * as crypto from "crypto";
 
 admin.initializeApp();
@@ -69,8 +69,8 @@ const processPurchase = async (paymentNotes: any, paymentId: string) => {
 const app = express();
 app.use(cors({origin: true}));
 
-// FIX: Explicitly typed 'req' and 'res' as `any` to resolve type conflicts between Express and Firebase middleware.
-app.post("/cashfreeWebhook", express.raw({type: "application/json"}), async (req: any, res: any) => {
+// FIX: Cast `express.raw` to `any` to resolve type conflicts between Express and Firebase middleware.
+app.post("/cashfreeWebhook", express.raw({type: "application/json"}) as any, async (req: any, res: any) => {
   try {
     const signature = req.headers["x-webhook-signature"] as string;
     const timestamp = req.headers["x-webhook-timestamp"] as string;

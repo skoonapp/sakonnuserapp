@@ -52,8 +52,8 @@ const getTierStyles = (tierName: string): string => {
 const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPopular = false, onPurchase, loadingPlan }) => {
   
   const popularContainerStyles = isPopular 
-    ? 'bg-gradient-to-br from-cyan-50 to-blue-200 dark:from-cyan-950/60 dark:to-blue-950/60 border-cyan-400 dark:border-cyan-500 scale-105 shadow-2xl shadow-cyan-500/30' 
-    : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-md';
+    ? 'bg-gradient-to-br from-cyan-50 to-blue-200 dark:from-cyan-950/60 dark:to-blue-950/60 scale-105' 
+    : 'bg-white dark:bg-slate-900';
 
   const tierStyles = getTierStyles(tierName);
   
@@ -62,9 +62,9 @@ const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPop
   const isAnyPlanLoading = loadingPlan !== null;
 
   return (
-    <div className={`relative ${popularContainerStyles} rounded-2xl p-4 flex flex-col text-center items-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-2`}>
+    <div className={`relative ${popularContainerStyles} p-4 flex flex-col text-center items-center hover:-translate-y-1 transition-all duration-300`}>
       {isPopular && (
-        <div className="absolute top-0 -translate-y-1/2 bg-gradient-to-r from-orange-400 to-amber-500 text-white text-sm font-bold px-5 py-1.5 rounded-full shadow-lg animate-pulse">
+        <div className="absolute top-0 -translate-y-1/2 bg-gradient-to-r from-orange-400 to-amber-500 text-white text-sm font-bold px-5 py-1.5 rounded-full shadow-lg animate-pulse z-10">
           सबसे लोकप्रिय
         </div>
       )}

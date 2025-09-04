@@ -333,7 +333,7 @@ const App: React.FC = () => {
             <Header currentUser={user} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} wallet={wallet} />
             
             <main
-                className="flex-grow overflow-hidden" // Main container hides overflow for swiping
+                className="flex-grow overflow-hidden pt-16 pb-16" // Main container hides overflow for swiping
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}

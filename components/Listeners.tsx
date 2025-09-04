@@ -151,7 +151,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
       </div>
 
       {/* Plan Cards Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-2 border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden divide-y-2 md:divide-y-0 md:divide-x-2 divide-slate-200 dark:divide-slate-800">
         {planPairs.map((pair) => (
           <PlanCard 
             key={pair.tierName}
@@ -166,7 +166,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
       </div>
 
       {/* Secure Payments Section */}
-      <section className="mt-10 text-center bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 max-w-3xl mx-auto">
+      <section className="mt-6 text-center bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 max-w-3xl mx-auto">
         <h3 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">सुरक्षित पेमेंट</h3>
         <div className="flex flex-col items-center gap-y-3 my-4">
           <div className="flex justify-center items-center gap-x-6 sm:gap-x-8">
