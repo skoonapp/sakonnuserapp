@@ -68,6 +68,19 @@ const App: React.FC = () => {
     const [deferredInstallPrompt, setDeferredInstallPrompt] = useState<any>(null);
     const [showInstallBanner, setShowInstallBanner] = useState(false);
 
+    // Effect to hide the initial static splash screen from index.html
+    useEffect(() => {
+        const splashElement = document.getElementById('static-splash-screen');
+        if (splashElement) {
+            // Fade out
+            splashElement.style.opacity = '0';
+            // Remove from DOM after transition
+            splashElement.addEventListener('transitionend', () => {
+                splashElement.remove();
+            });
+        }
+    }, []); // Run only once on component mount
+
     useEffect(() => {
         const handler = (e: Event) => {
             e.preventDefault();
