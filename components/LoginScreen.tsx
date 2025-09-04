@@ -154,14 +154,13 @@ const LoginScreen: React.FC = () => {
 
         return (
              <div className="w-full max-w-sm">
-                <div className="mb-8 w-full max-w-xs text-center bg-gradient-to-r from-cyan-400 to-purple-600 text-white rounded-2xl shadow-xl p-6 border-2 border-white/30 relative overflow-hidden animate-shimmer">
-                    <p className="font-bold text-xl">नए यूज़र्स को मिलते हैं</p>
-                    <p className="font-extrabold text-3xl tracking-wide mt-1">5 मुफ़्त मैसेज!</p>
-                </div>
-                
-                <div className="text-center mb-8">
-                    <h1 className="text-5xl md:text-6xl font-bold text-white animate-title-glow">SakoonApp</h1>
-                    <p className="mt-4 text-lg md:text-xl text-cyan-200">अकेलापन अब बीतेगा, सकून से जी पाएगा</p>
+                <div className="text-center mb-6">
+                    <div className="w-full max-w-xs mx-auto text-center bg-gradient-to-r from-cyan-400 to-purple-600 text-white rounded-2xl shadow-xl p-6 border-2 border-white/30 relative overflow-hidden animate-shimmer">
+                        <p className="font-bold text-xl">नए यूज़र्स को मिलते हैं</p>
+                        <p className="font-extrabold text-3xl tracking-wide mt-1">5 मुफ़्त मैसेज!</p>
+                    </div>
+                    <h1 className="text-5xl md:text-6xl font-bold text-white animate-title-glow mt-4">SakoonApp</h1>
+                    <p className="mt-2 text-lg md:text-xl text-cyan-200">अकेलापन अब बीतेगा, सकून से जी पाएगा</p>
                 </div>
 
                 <div className="w-full bg-slate-900/60 backdrop-blur-sm border border-white/20 p-6 md:p-8 rounded-2xl">
@@ -193,7 +192,7 @@ const LoginScreen: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+        <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-start pt-8 sm:pt-12 p-4 relative overflow-hidden">
             <div className="absolute inset-0 z-0">
                 <div 
                     className="absolute inset-0 bg-cover bg-no-repeat opacity-20 animate-ken-burns" 
