@@ -22,6 +22,7 @@ export interface User {
   tokens?: number; // Replaces tokenBalance
   activePlans?: ActivePlan[]; // Replaces purchasedPlans subcollection
   freeMessagesRemaining?: number;
+  hasSeenWelcome?: boolean;
 }
 
 export interface Listener {

@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { auth } from '../utils/firebase';
 import firebase from 'firebase/compat/app';
@@ -20,52 +21,24 @@ export const useAuthHandler = () => {
         }
     }, []);
 
-    /**
-     * A generic handler for any authentication promise to reduce boilerplate.
-     * Sets loading state and handles standardized error messages.
-     * @param authPromise The async function from Firebase auth to execute.
-     * @param errorMessages A map of Firebase error codes to user-friendly messages.
-     */
-    const handleAuthRequest = useCallback(async (authPromise: Promise<any>, errorMessages: { [key: string]: string }) => {
-        setLoading(true);
-        setError('');
-        try {
-            await authPromise;
-            // On success, the onAuthStateChanged listener in App.tsx will handle the redirect.
-        } catch (err: any) {
-            console.error("Auth Error:", err.code, err.message);
-            const message = errorMessages[err.code] || 'An unexpected error occurred. Please try again.';
-            setError(message);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
     const signInWithGoogle = useCallback(() => {
         setLoading(true);
         setError('');
         const provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithRedirect(provider).catch((err) => {
-            // This handles immediate errors before the redirect occurs
-            console.error("Auth Error (pre-redirect):", err.code, err.message);
-            setError('Could not start Google sign-in. Please try again.');
-            setLoading(false);
-        });
+        // FIX: Switched to signInWithPopup to avoid environment errors in sandboxed iframes.
+        auth.signInWithPopup(provider)
+            .catch((err) => {
+                console.error("Google Popup Auth Error:", err.code, err.message);
+                // Don't show an error if the user intentionally closes the popup.
+                if (err.code !== 'auth/popup-closed-by-user') {
+                    setError('Failed to sign in with Google. Please try again.');
+                }
+            })
+            .finally(() => {
+                 // The onAuthStateChanged listener handles success, so we just need to stop loading.
+                setLoading(false);
+            });
     }, []);
-
-    const handleEmailPasswordSubmit = useCallback((email, password, isSignUp) => {
-        const promise = isSignUp
-            ? auth.createUserWithEmailAndPassword(email, password)
-            : auth.signInWithEmailAndPassword(email, password);
-        
-        handleAuthRequest(promise, {
-            'auth/email-already-in-use': 'This email is already registered. Please log in.',
-            'auth/invalid-email': 'Please enter a valid email address.',
-            'auth/weak-password': 'Password should be at least 6 characters.',
-            'auth/user-not-found': 'No account found with this email. Please sign up.',
-            'auth/wrong-password': 'Incorrect password. Please try again.',
-        });
-    }, [handleAuthRequest]);
 
     const sendOtpToPhone = useCallback(async (phoneNumber: string) => {
         setLoading(true);
@@ -87,7 +60,7 @@ export const useAuthHandler = () => {
             return true; // Indicate success to the UI component
         } catch (err: any) {
              console.error("SMS sending error:", err);
-             const messages = {
+             const messages: { [key: string]: string } = {
                 'auth/too-many-requests': 'Too many attempts. Please try again later.',
                 'auth/invalid-phone-number': 'Invalid phone number. Please check again.'
              };
@@ -110,7 +83,7 @@ export const useAuthHandler = () => {
             return true;
         } catch (err: any) {
              console.error("OTP verification error:", err);
-             const messages = {
+             const messages: { [key: string]: string } = {
                 'auth/invalid-verification-code': 'Invalid OTP. Please check again.'
              };
              setError(messages[err.code] || 'OTP verification failed. Please try again.');
@@ -123,5 +96,5 @@ export const useAuthHandler = () => {
     // Clear error state manually
     const clearError = useCallback(() => setError(''), []);
 
-    return { loading, error, signInWithGoogle, handleEmailPasswordSubmit, sendOtpToPhone, verifyOtp, clearError };
+    return { loading, error, signInWithGoogle, sendOtpToPhone, verifyOtp, clearError };
 };
