@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GoogleGenAI, Chat } from "@google/genai";
-import type { User, ChatMessage, Plan } from '../types';
+import type { User, ChatMessage, Plan, ChatMessageSender } from '../types';
 import { CALL_PLANS, CHAT_PLANS } from '../constants';
 import MarkdownRenderer from './MarkdownRenderer';
 
@@ -24,12 +24,19 @@ const CloseIcon: React.FC<{ className?: string }> = ({ className }) => (
     </svg>
 );
 
-const ReadReceiptIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className={className} viewBox="0 0 16 16">
-    <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 1.854 7.146a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0l7-7zm-4.208 7-.896-.897.707-.707.543.543 6.646-6.647a.5.5 0 0 1 .708.708l-7 7a.5.5 0 0 1-.708 0z"/>
-    <path d="m5.354 7.146.896.897-.707.707-.897-.896a.5.5 0 1 1 .708-.708z"/>
-  </svg>
-);
+const ClockIcon: React.FC<{ className?: string }> = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 000-1.5h-3.25V5z" clipRule="evenodd" /></svg>;
+const DeliveredIcon: React.FC<{ className?: string }> = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M11.953 4.136a.75.75 0 01.143 1.052l-5 6.5a.75.75 0 01-1.127.075l-2.5-2.5a.75.75 0 111.06-1.06l1.894 1.893 4.48-5.824a.75.75 0 011.052-.143z" clipRule="evenodd" /><path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.052-.143z" clipRule="evenodd" /></svg>;
+const ErrorIcon: React.FC<{ className?: string }> = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" /></svg>;
+
+const MessageStatus: React.FC<{ status?: ChatMessage['status'] }> = ({ status }) => {
+    switch (status) {
+        case 'sending': return <ClockIcon className="w-4 h-4 text-slate-400" />;
+        case 'delivered': return <DeliveredIcon className="w-4 h-4 text-slate-400" />;
+        case 'read': return <DeliveredIcon className="w-4 h-4 text-blue-500" />;
+        case 'failed': return <ErrorIcon className="w-4 h-4 text-red-500" />;
+        default: return null;
+    }
+};
 
 const MicrophoneIcon: React.FC<{className?: string}> = ({className}) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
@@ -156,17 +163,17 @@ ${allPlansInfo}
         if (!inputValue.trim() || isLoading || !chatRef.current) return;
 
         const text = inputValue.trim();
+        const userMessageId = `user-${Date.now()}`;
         setInputValue('');
-        setTimeout(() => textareaRef.current?.focus(), 0);
-
-
-        setMessages(prev => [...prev, {
-            id: `user-${Date.now()}`,
+        
+        const userMessage: ChatMessage = {
+            id: userMessageId,
             text: text,
             sender: { uid: user.uid, name: user.name || 'You' },
             timestamp: Date.now(),
-            status: 'sent'
-        }]);
+            status: 'delivered' // Start with gray double-tick
+        };
+        setMessages(prev => [...prev, userMessage]);
 
         setIsLoading(true);
         setError(null);
@@ -183,23 +190,37 @@ ${allPlansInfo}
                  }
             }
             
-            setMessages(prev => [...prev, {
+            const aiMessage: ChatMessage = {
                 id: `ai-${Date.now()}`,
                 text: result.text,
                 sender: { uid: 'ai', name: 'सकून दोस्त' },
                 timestamp: Date.now(),
-            }]);
+            };
+
+            // Update user message to 'read' (blue tick) and add AI response
+            setMessages(prev => [
+                // FIX: Explicitly cast the updated message object to ChatMessage to prevent a TypeScript type inference issue
+                // where the 'status' property was being widened to 'string' instead of its specific literal type.
+                ...prev.map(msg => msg.id === userMessageId ? { ...msg, status: 'read' } as ChatMessage : msg),
+                aiMessage
+            ]);
 
         } catch (err: any) {
             console.error("Gemini API error:", err);
             setError("Sorry, I'm having trouble connecting right now. Please try again in a moment.");
+            // FIX: Explicitly cast the updated message object to ChatMessage to resolve the same type widening issue as above.
+            setMessages(prev => prev.map(msg => 
+                msg.id === userMessageId ? { ...msg, status: 'failed' } as ChatMessage : msg
+            ));
         } finally {
             setIsLoading(false);
+            // Re-focus input to keep keyboard open
+            textareaRef.current?.focus();
         }
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex flex-col bg-stone-100 dark:bg-slate-900 animate-fade-in-up transition-transform duration-300">
+        <div className="fixed inset-0 z-50 flex flex-col bg-stone-100 dark:bg-slate-900 animate-fade-in-up transition-transform duration-300 h-full">
             <header className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 shadow-sm flex-shrink-0 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10">
                 <div className="flex items-center gap-3">
                     <div className="bg-gradient-to-br from-cyan-500 to-teal-400 p-2 rounded-full">
@@ -227,12 +248,18 @@ ${allPlansInfo}
                                         <RobotIcon className="w-5 h-5 text-white" />
                                     </div>
                                 )}
-                                <div className={`max-w-xs md:max-w-md p-2.5 rounded-xl ${
+                                <div className={`max-w-xs md:max-w-md p-2.5 rounded-xl flex flex-col ${
                                     isAI ? 'bg-white dark:bg-slate-800 rounded-bl-none shadow-sm' : 
                                     'bg-[#dcf8c6] dark:bg-cyan-900 text-slate-800 dark:text-slate-100 rounded-tr-none'
                                 }`}>
                                     <div className="text-sm prose prose-sm dark:prose-invert max-w-none">
                                         <MarkdownRenderer text={msg.text} />
+                                    </div>
+                                    <div className="flex items-center self-end gap-1.5 mt-1 text-slate-500 dark:text-slate-400">
+                                        <span className="text-xs">
+                                            {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </span>
+                                        {isUser && <MessageStatus status={msg.status} />}
                                     </div>
                                 </div>
                             </div>

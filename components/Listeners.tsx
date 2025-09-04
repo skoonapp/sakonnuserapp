@@ -36,7 +36,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
 
   const tokenOptions = [
     { tokens: 10, price: 50 },
-    { tokens: 20, price: 95 },
+    { tokens: 20, price: 99 },
     { tokens: 50, price: 230 },
     { tokens: 100, price: 450 },
     { tokens: 250, price: 1125 },
