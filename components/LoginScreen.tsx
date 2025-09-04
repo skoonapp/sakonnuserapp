@@ -75,7 +75,7 @@ const LoginScreen: React.FC = () => {
                         </div>
                         {error && <p className="text-red-300 bg-red-900/50 p-3 rounded-lg text-center mb-4">{error}</p>}
                         <button type="submit" disabled={loading} className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3.5 rounded-xl transition-colors disabled:bg-cyan-800">
-                            {loading ? 'सत्यापित हो रहा है...' : 'सत्यापित करें'}
+                            {loading ? 'Verifying...' : 'Verify'}
                         </button>
                     </form>
                     <button onClick={() => { setStep('form'); clearError(); }} className="mt-4 text-cyan-200 hover:text-white">गलत नंबर? वापस जाएं</button>
