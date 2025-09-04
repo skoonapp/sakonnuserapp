@@ -291,7 +291,7 @@ const CallUI: React.FC<CallUIProps> = ({ session, user, onLeave }) => {
                 </div>
             </div>
             
-            <h1 className="text-4xl font-bold tracking-tight">{listener.name}</h1>
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">{listener.name}</h1>
             <p className="text-lg text-slate-400 mt-1 bg-black/20 px-3 py-1 rounded-full">
                 {session.isTokenSession ? 'MT Session' : `${session.plan.duration} Plan`}
             </p>

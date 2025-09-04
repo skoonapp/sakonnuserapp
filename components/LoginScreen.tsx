@@ -94,7 +94,7 @@ const LoginScreen: React.FC = () => {
         if (step === 'otp') {
             return (
                 <div className="w-full max-w-sm">
-                    <h2 className="text-2xl font-bold text-white mb-2">OTP दर्ज करें</h2>
+                    <h2 className="text-xl md:text-2xl font-bold text-white mb-2">OTP दर्ज करें</h2>
                     <p className="text-sm text-cyan-200 mb-8">+91 {phoneNumber} पर भेजा गया 6-अंकीय कोड दर्ज करें।</p>
                     <form onSubmit={onOtpSubmit} className="bg-slate-900/60 backdrop-blur-sm border border-white/20 p-6 md:p-8 rounded-2xl">
                         <div className="relative mb-4">

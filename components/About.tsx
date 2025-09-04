@@ -68,42 +68,46 @@ const ProfileView: React.FC<ProfileViewProps> = ({
 
         <div className="bg-white dark:bg-slate-900 rounded-xl shadow-md divide-y divide-slate-200 dark:border-slate-700">
             {/* About Section */}
-            <section id="about" className="p-6">
-              <div className="container mx-auto">
-                <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
-                  <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100 text-center sm:text-left">
-                    हमारे बारे में
-                  </h2>
-                </div>
-                <p className="text-base text-slate-600 dark:text-slate-400 max-w-3xl mx-auto text-center leading-relaxed">
-                  SakoonApp एक सुरक्षित और गोपनीय स्थान है जहाँ आप अपनी भावनाओं को साझा कर सकते हैं। हमारा लक्ष्य मानसिक स्वास्थ्य और भावनात्मक समर्थन को सभी के लिए सुलभ बनाना है।
-                </p>
-              </div>
-              <Testimonials />
-            </section>
+            <div className="p-6">
+                <section id="about">
+                  <div className="container mx-auto">
+                    <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+                      <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100 text-center sm:text-left">
+                        हमारे बारे में
+                      </h2>
+                    </div>
+                    <p className="text-base text-slate-600 dark:text-slate-400 max-w-3xl mx-auto text-center leading-relaxed">
+                      SakoonApp एक सुरक्षित और गोपनीय स्थान है जहाँ आप अपनी भावनाओं को साझा कर सकते हैं। हमारा लक्ष्य मानसिक स्वास्थ्य और भावनात्मक समर्थन को सभी के लिए सुलभ बनाना है।
+                    </p>
+                  </div>
+                  <Testimonials />
+                </section>
+            </div>
 
             {/* Install App Section */}
             {deferredPrompt && (
-              <section id="install-app" className="p-6 text-center">
-                <div className="container mx-auto">
-                  <h3 className="text-2xl font-bold text-slate-700 dark:text-slate-100 mb-4">एक क्लिक में इंस्टॉल करें</h3>
-                  <p className="text-slate-600 dark:text-slate-400 mb-6 max-w-md mx-auto">
-                    SakoonApp को अपनी होम स्क्रीन पर जोड़ें ताकि आप इसे आसानी से और तेज़ी से इस्तेमाल कर सकें।
-                  </p>
-                  <button 
-                    onClick={onInstallClick} 
-                    className="flex w-full max-w-xs mx-auto justify-center items-center gap-3 bg-cyan-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-cyan-700 transition-colors shadow-lg transform hover:scale-105"
-                  >
-                    <InstallIcon className="w-6 h-6"/>
-                    <span>ऐप इंस्टॉल करें</span>
-                  </button>
-                </div>
-              </section>
+              <div className="p-6">
+                  <section id="install-app" className="text-center">
+                    <div className="container mx-auto">
+                      <h3 className="text-xl md:text-2xl font-bold text-slate-700 dark:text-slate-100 mb-4">एक क्लिक में इंस्टॉल करें</h3>
+                      <p className="text-slate-600 dark:text-slate-400 mb-6 max-w-md mx-auto">
+                        SakoonApp को अपनी होम स्क्रीन पर जोड़ें ताकि आप इसे आसानी से और तेज़ी से इस्तेमाल कर सकें।
+                      </p>
+                      <button 
+                        onClick={onInstallClick} 
+                        className="flex w-full max-w-xs mx-auto justify-center items-center gap-3 bg-cyan-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-cyan-700 transition-colors shadow-lg transform hover:scale-105"
+                      >
+                        <InstallIcon className="w-6 h-6"/>
+                        <span>ऐप इंस्टॉल करें</span>
+                      </button>
+                    </div>
+                  </section>
+              </div>
             )}
             
-            <FAQ />
+            <div className="p-6"><FAQ /></div>
             
-            <Contact />
+            <div className="p-6"><Contact /></div>
             
             <div className="p-6 text-center">
               <div className="flex justify-center">

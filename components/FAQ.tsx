@@ -17,7 +17,7 @@ const FAQ: React.FC = () => {
   };
 
   return (
-    <section id="faq" className="p-6">
+    <div id="faq">
       <div className="container mx-auto">
         <div className="max-w-2xl mx-auto bg-slate-50 dark:bg-slate-900/50 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 overflow-hidden">
           <button
@@ -51,7 +51,7 @@ const FAQ: React.FC = () => {
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 

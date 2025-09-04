@@ -111,7 +111,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
             <div className="bg-cyan-100 dark:bg-cyan-900/50 text-cyan-800 dark:text-cyan-200 text-sm font-semibold px-4 py-2 rounded-full inline-block mb-4">
                 Note: सभी प्लान 30 दिनों के लिए मान्य होंगे।
             </div>
-            <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-100 flex items-center justify-center gap-3">
+            <h3 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100 flex items-center justify-center gap-3">
                 <WalletIcon className="w-8 h-8 text-indigo-500"/>
                 <span>MT Plans</span>
             </h3>

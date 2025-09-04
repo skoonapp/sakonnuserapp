@@ -49,19 +49,19 @@ const Contact: React.FC = () => {
 
   if (status === 'success') {
     return (
-      <section id="contact" className="p-6">
+      <div id="contact">
         <div className="container mx-auto text-center">
           <div className="max-w-xl mx-auto bg-teal-50 dark:bg-teal-500/10 border border-teal-200 dark:border-teal-500/30 p-8 rounded-lg shadow-md">
             <h2 className="text-3xl font-bold text-teal-700 dark:text-teal-300 mb-3">धन्यवाद!</h2>
             <p className="text-lg text-teal-600 dark:text-teal-400">आपका संदेश सफलतापूर्वक भेज दिया गया है। हम जल्द ही आपसे संपर्क करेंगे।</p>
           </div>
         </div>
-      </section>
+      </div>
     );
   }
 
   return (
-    <section id="contact" className="p-6">
+    <div id="contact">
       <div className="container mx-auto">
         <div className="max-w-xl mx-auto bg-slate-50 dark:bg-slate-900/50 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 overflow-hidden">
           <button
@@ -123,7 +123,7 @@ const Contact: React.FC = () => {
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 
