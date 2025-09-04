@@ -26,14 +26,15 @@ class PaymentService {
         planDetails: { tokens, price }
       });
       
-      if (result.data.success) {
-        return result.data.orderToken; // Return token for the modal
+      // FIX: Added more defensive checks to ensure a valid order token is received.
+      if (result.data && result.data.success && result.data.orderToken) {
+        return result.data.orderToken;
       } else {
-        throw new Error(result.data.message || 'Failed to create order.');
+        console.error("Invalid response from createCashfreeOrder for MT plan:", result.data);
+        throw new Error(result.data.message || 'Failed to create a valid payment order.');
       }
     } catch (error) {
       console.error("Payment error:", error);
-      // Re-throw the error to be handled by the UI component
       throw error;
     }
   }
@@ -53,14 +54,15 @@ class PaymentService {
         planDetails: planData
       });
       
-      if (result.data.success) {
-        return result.data.orderToken; // Return token for the modal
+      // FIX: Added more defensive checks to ensure a valid order token is received.
+      if (result.data && result.data.success && result.data.orderToken) {
+        return result.data.orderToken;
       } else {
-         throw new Error(result.data.message || 'Failed to create order.');
+         console.error("Invalid response from createCashfreeOrder for DT plan:", result.data);
+         throw new Error(result.data.message || 'Failed to create a valid payment order.');
       }
     } catch (error) {
       console.error("Payment error:", error);
-      // Re-throw the error to be handled by the UI component
       throw error;
     }
   }

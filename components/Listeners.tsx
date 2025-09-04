@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import PlanCard from './PlanCard';
 import { CALL_PLANS, CHAT_PLANS } from '../constants';
@@ -145,7 +146,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
         </div>
       </section>
 
-      <div className="text-center mt-12 mb-6">
+      <div className="text-center mt-8 mb-6">
         <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-100">DT Plans</h2>
         <p className="text-lg text-slate-600 dark:text-slate-400 mt-2">Direct Plans से फिक्स मिनट और मैसेज के लिए उपयोग करें।</p>
       </div>

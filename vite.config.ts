@@ -1,5 +1,6 @@
 
 
+
 import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -14,7 +15,7 @@ export default defineConfig(({ mode }) => {
           // Define the manifest here to let the plugin generate and manage it
           manifest: {
             name: "SakoonApp",
-            short_name: "Sakoon",
+            short_name: "SakoonApp",
             description: "Talk to trained listeners and find emotional support. A safe space for your feelings.",
             start_url: "/",
             scope: "/",
