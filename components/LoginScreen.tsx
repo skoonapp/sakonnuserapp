@@ -20,14 +20,6 @@ const GoogleIcon: React.FC = () => (
         <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.012 36.49 44 31.134 44 24c0-1.341-.138-2.65-.389-3.917z"></path>
     </svg>
 );
-const GiftIcon: React.FC<{className?: string}> = ({className}) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
-        <path d="M12.75 3.375a.75.75 0 00-1.5 0V4.5h1.5V3.375z" />
-        <path fillRule="evenodd" d="M6.303 4.876A2.25 2.25 0 018.625 4.5h6.75a2.25 2.25 0 012.322.376l.322.427.323.427a2.25 2.25 0 010 2.848l-.323.427-.322.427a2.25 2.25 0 01-2.322.377H8.625a2.25 2.25 0 01-2.322-.377l-.322-.427-.323-.427a2.25 2.25 0 010-2.848l.323-.427.322-.427zM8.625 6a.75.75 0 00-.774.125l-.323.427-.322.427a.75.75 0 000 .949l.322.427.323.427a.75.75 0 00.774.125h6.75a.75.75 0 00.774-.125l.323-.427.322-.427a.75.75 0 000-.949l-.322-.427-.323-.427a.75.75 0 00-.774-.125H8.625z" clipRule="evenodd" />
-        <path d="M12 9.75a.75.75 0 01.75.75v10.5a.75.75 0 01-1.5 0V10.5a.75.75 0 01.75-.75z" />
-        <path d="M4.125 12.375a2.25 2.25 0 012.25-2.25h11.25a2.25 2.25 0 012.25 2.25v8.25a2.25 2.25 0 01-2.25-2.25H6.375a2.25 2.25 0 01-2.25-2.25v-8.25zM6.375 13.5v7.5h11.25v-7.5H6.375z" />
-    </svg>
-);
 // --- End Icon Components ---
 
 
@@ -162,9 +154,9 @@ const LoginScreen: React.FC = () => {
 
         return (
              <div className="w-full max-w-sm">
-                <div className="mb-8 text-center text-cyan-200 text-sm p-4 animate-float">
-                    <GiftIcon className="w-8 h-8 mx-auto mb-2 text-yellow-300"/>
-                    <p>नए यूज़र्स को मिलते हैं <strong>5 मुफ़्त मैसेज</strong>!</p>
+                <div className="mb-8 w-full max-w-xs text-center bg-gradient-to-r from-cyan-400 to-purple-600 text-white rounded-2xl shadow-xl p-6 border-2 border-white/30 relative overflow-hidden animate-shimmer">
+                    <p className="font-bold text-xl">नए यूज़र्स को मिलते हैं</p>
+                    <p className="font-extrabold text-3xl tracking-wide mt-1">5 मुफ़्त मैसेज!</p>
                 </div>
                 
                 <div className="text-center mb-8">
@@ -210,7 +202,7 @@ const LoginScreen: React.FC = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent"></div>
             </div>
 
-            <div className="relative z-10 flex flex-col items-center justify-center w-full h-full">
+            <div className="relative z-10 flex flex-col items-center justify-center w-full">
                 {renderContent()}
             </div>
             
