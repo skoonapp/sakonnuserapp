@@ -1,12 +1,12 @@
 
 import * as functions from "firebase-functions/v1";
 import * as admin from "firebase-admin";
-// FIX: Added Request and Response types from express to resolve handler type errors.
-import express, { Request, Response } from "express";
+// FIX: Using `any` for req/res as there are deep type conflicts between express/firebase-functions.
+import express from "express";
 import cors from "cors";
 import {RtcTokenBuilder} from "zego-express-engine";
-// FIX: Imported the lowercase 'cashfree' instance from the modern SDK instead of the 'Cashfree' class.
-import { cashfree } from "cashfree-pg";
+// FIX: Changed to a default import for `cashfree-pg` to resolve the "no exported member" error.
+import cashfree from "cashfree-pg";
 import * as crypto from "crypto";
 
 admin.initializeApp();
@@ -69,8 +69,8 @@ const processPurchase = async (paymentNotes: any, paymentId: string) => {
 const app = express();
 app.use(cors({origin: true}));
 
-// FIX: Explicitly typed 'req' and 'res' to resolve type conflicts between Express and Firebase middleware.
-app.post("/cashfreeWebhook", express.raw({type: "application/json"}), async (req: Request, res: Response) => {
+// FIX: Explicitly typed 'req' and 'res' as `any` to resolve type conflicts between Express and Firebase middleware.
+app.post("/cashfreeWebhook", express.raw({type: "application/json"}), async (req: any, res: any) => {
   try {
     const signature = req.headers["x-webhook-signature"] as string;
     const timestamp = req.headers["x-webhook-timestamp"] as string;

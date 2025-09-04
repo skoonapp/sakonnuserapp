@@ -46,23 +46,27 @@ const App: React.FC = () => {
     const [isInitializing, setIsInitializing] = useState(true);
     const wallet = useWallet(user);
 
-    // Navigation State
-    const [activeView, setActiveView] = useState<ActiveView>('home');
-
-    // UI State
+    // --- PWA & Layout State ---
+    const [deferredInstallPrompt, setDeferredInstallPrompt] = useState<any>(null);
+    const [showInstallBanner, setShowInstallBanner] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(false);
+    
+    // --- UI State ---
     const [showAICompanion, setShowAICompanion] = useState(false);
     const [showPolicy, setShowPolicy] = useState<'terms' | 'privacy' | 'cancellation' | null>(null);
     const [showRechargeModal, setShowRechargeModal] = useState(false);
     const [showWelcomeModal, setShowWelcomeModal] = useState(false);
     
-    // Session State
+    // --- Session State ---
     const [activeCallSession, setActiveCallSession] = useState<CallSession | null>(null);
     const [activeChatSession, setActiveChatSession] = useState<ChatSession | null>(null);
-
-    // PWA Install Prompt
-    const [deferredInstallPrompt, setDeferredInstallPrompt] = useState<any>(null);
-    const [showInstallBanner, setShowInstallBanner] = useState(false);
+    
+    // --- WhatsApp-like Navigation State ---
+    const views: ActiveView[] = ['home', 'calls', 'chats', 'profile'];
+    const [activeIndex, setActiveIndex] = useState(0);
+    const [touchStartX, setTouchStartX] = useState(0);
+    const [touchEndX, setTouchEndX] = useState(0);
+    const swipeThreshold = 50; // Min pixels to trigger a swipe
 
     // --- Effects ---
 
@@ -74,7 +78,7 @@ const App: React.FC = () => {
             splashElement.addEventListener('transitionend', () => splashElement.remove());
         }
     }, []);
-
+    
     // PWA Install prompt listener
     useEffect(() => {
         const handler = (e: Event) => {
@@ -145,8 +149,67 @@ const App: React.FC = () => {
             unsubscribeUser();
         };
     }, []);
+    
+    // --- PWA Back Button Handling ---
+    useEffect(() => {
+        const handlePopState = (event: PopStateEvent) => {
+            // When user hits back button, always go to the home screen as per the prompt.
+            setActiveIndex(0);
+        };
+        // Set initial state.
+        window.history.replaceState({ activeIndex: 0 }, '');
+
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, []);
+
 
     // --- Handlers ---
+    
+    // Main navigation handler for clicks, swipes, and history
+    const navigateTo = useCallback((newIndex: number) => {
+        const currentIndex = activeIndex;
+        if (newIndex === currentIndex) return;
+
+        // Manage browser history for native back button behavior
+        if (currentIndex === 0 && newIndex > 0) {
+            // Moving from home to an inner view: PUSH a new state
+            window.history.pushState({ activeIndex: newIndex }, '');
+        } else if (currentIndex > 0 && newIndex > 0) {
+            // Moving between inner views: REPLACE the state to avoid long back-button chains
+            window.history.replaceState({ activeIndex: newIndex }, '');
+        } else if (currentIndex > 0 && newIndex === 0) {
+            // Moving from an inner view back to home (e.g., via footer button)
+            window.history.back(); // This triggers our popstate listener
+            return; // popstate listener will set active index
+        }
+        
+        setActiveIndex(newIndex);
+    }, [activeIndex]);
+
+    // Swipe Navigation Handlers
+    const handleTouchStart = (e: React.TouchEvent) => {
+        setTouchEndX(0); // Clear previous swipe
+        setTouchStartX(e.targetTouches[0].clientX);
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        setTouchEndX(e.targetTouches[0].clientX);
+    };
+
+    const handleTouchEnd = () => {
+        if (!touchStartX || !touchEndX) return;
+        const deltaX = touchStartX - touchEndX;
+
+        if (deltaX > swipeThreshold) { // Swiped left
+            navigateTo((activeIndex + 1) % views.length);
+        } else if (deltaX < -swipeThreshold) { // Swiped right
+            navigateTo((activeIndex - 1 + views.length) % views.length);
+        }
+        // Reset touch positions
+        setTouchStartX(0);
+        setTouchEndX(0);
+    };
     
     const handleInstallClick = useCallback(() => {
         if (deferredInstallPrompt) {
@@ -250,42 +313,43 @@ const App: React.FC = () => {
     if (activeCallSession) return <CallUI session={activeCallSession} user={user} onLeave={handleCallSessionEnd} />;
     if (activeChatSession) return <ChatUI session={activeChatSession} user={user} onLeave={handleChatSessionEnd} />;
     
-    const renderActiveView = () => {
-        switch (activeView) {
-            case 'home':
-                return <HomeView currentUser={user} />;
-            case 'calls':
-                return <CallsView onStartSession={handleStartSession} currentUser={user} />;
-            case 'chats':
-                return <ChatsView onStartSession={handleStartSession} currentUser={user} />;
-            case 'profile':
-                return (
-                    <ProfileView 
-                        currentUser={user}
-                        onShowTerms={() => setShowPolicy('terms')}
-                        onShowPrivacyPolicy={() => setShowPolicy('privacy')}
-                        onShowCancellationPolicy={() => setShowPolicy('cancellation')}
-                        deferredPrompt={deferredInstallPrompt}
-                        onInstallClick={handleInstallClick}
-                        onLogout={handleLogout}
-                    />
-                );
-            default:
-                return <HomeView currentUser={user} />;
-        }
-    };
+    const viewComponents = [
+        <HomeView currentUser={user} />,
+        <CallsView onStartSession={handleStartSession} currentUser={user} />,
+        <ChatsView onStartSession={handleStartSession} currentUser={user} />,
+        <ProfileView 
+            currentUser={user}
+            onShowTerms={() => setShowPolicy('terms')}
+            onShowPrivacyPolicy={() => setShowPolicy('privacy')}
+            onShowCancellationPolicy={() => setShowPolicy('cancellation')}
+            deferredPrompt={deferredInstallPrompt}
+            onInstallClick={handleInstallClick}
+            onLogout={handleLogout}
+        />
+    ];
 
     return (
         <div className="relative w-full max-w-md mx-auto bg-slate-100 dark:bg-slate-950 flex flex-col h-screen shadow-2xl transition-colors duration-300 overflow-hidden">
             <Header currentUser={user} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} wallet={wallet} />
             
-            <main className="flex-grow overflow-y-auto pt-16 pb-20">
+            <main
+                className="flex-grow overflow-hidden" // Main container hides overflow for swiping
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+            >
                 <Suspense fallback={<ViewLoader />}>
-                    {renderActiveView()}
+                     <div className="swipe-container" style={{ transform: `translateX(-${activeIndex * 100}%)` }}>
+                        {viewComponents.map((view, index) => (
+                           <div key={views[index]} className="swipe-view">
+                               {view}
+                           </div>
+                        ))}
+                     </div>
                 </Suspense>
             </main>
             
-            <Footer activeView={activeView} setActiveView={setActiveView} />
+            <Footer activeIndex={activeIndex} setActiveIndex={navigateTo} />
             
             {/* --- Modals and Overlays --- */}
             {showWelcomeModal && user && <WelcomeModal user={user} onClose={handleCloseWelcomeModal} />}
@@ -307,14 +371,14 @@ const App: React.FC = () => {
             <AICompanionButton onClick={() => setShowAICompanion(true)} />
             
             <Suspense fallback={null}>
-                {showAICompanion && <AICompanion user={user} onClose={() => setShowAICompanion(false)} onNavigateToServices={() => { setActiveView('calls'); setShowAICompanion(false); }} />}
+                {showAICompanion && <AICompanion user={user} onClose={() => setShowAICompanion(false)} onNavigateToServices={() => { navigateTo(1); setShowAICompanion(false); }} />}
                 {showPolicy === 'terms' && <TermsAndConditions onClose={() => setShowPolicy(null)} />}
                 {showPolicy === 'privacy' && <PrivacyPolicy onClose={() => setShowPolicy(null)} />}
                 {showPolicy === 'cancellation' && <CancellationRefundPolicy onClose={() => setShowPolicy(null)} />}
             </Suspense>
 
             {showRechargeModal && (
-                <RechargeModal onClose={() => setShowRechargeModal(false)} onNavigateHome={() => { setActiveView('home'); setShowRechargeModal(false); }} />
+                <RechargeModal onClose={() => setShowRechargeModal(false)} onNavigateHome={() => { navigateTo(0); setShowRechargeModal(false); }} />
             )}
         </div>
     );

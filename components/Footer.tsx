@@ -1,10 +1,8 @@
 import React from 'react';
-// FIX: Changed the import path for ActiveView from '../App' to the correct location '../types'.
-import type { ActiveView } from '../types';
 
 interface BottomNavBarProps {
-  activeView: ActiveView;
-  setActiveView: (view: ActiveView) => void;
+  activeIndex: number;
+  setActiveIndex: (index: number) => void;
 }
 
 // --- Icon Components ---
@@ -42,23 +40,23 @@ const NavItem: React.FC<{ icon: React.ReactNode; label: string; isActive: boolea
     );
 };
 
-const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeView, setActiveView }) => {
+const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeIndex, setActiveIndex }) => {
   const navItems = [
-    { id: 'home', label: 'Home', icon: HomeIcon },
-    { id: 'calls', label: 'Calls', icon: CallIcon },
-    { id: 'chats', label: 'Chats', icon: ChatIcon },
-    { id: 'profile', label: 'Profile', icon: ProfileIcon },
+    { index: 0, label: 'Home', icon: HomeIcon },
+    { index: 1, label: 'Calls', icon: CallIcon },
+    { index: 2, label: 'Chats', icon: ChatIcon },
+    { index: 3, label: 'Profile', icon: ProfileIcon },
   ];
 
   return (
     <footer className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-cyan-50 dark:from-slate-950 dark:to-cyan-950/40 backdrop-blur-sm border-t border-cyan-100 dark:border-cyan-900/50 z-40 flex justify-around">
       {navItems.map(item => (
         <NavItem
-          key={item.id}
+          key={item.index}
           label={item.label}
-          isActive={activeView === item.id}
-          onClick={() => setActiveView(item.id as ActiveView)}
-          icon={<item.icon active={activeView === item.id} />}
+          isActive={activeIndex === item.index}
+          onClick={() => setActiveIndex(item.index)}
+          icon={<item.icon active={activeIndex === item.index} />}
         />
       ))}
     </footer>

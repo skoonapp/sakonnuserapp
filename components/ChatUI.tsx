@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState, useCallback, Fragment } from 'react';
 import type { ChatSession, User, ChatMessage } from '../types';
 import { fetchZegoToken } from '../utils/zego.ts';
