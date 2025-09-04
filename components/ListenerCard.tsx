@@ -33,6 +33,12 @@ const HeartIcon: React.FC<{ className?: string, isFilled?: boolean }> = ({ class
     </svg>
 );
 
+const ClockIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}>
+      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 000-1.5h-3.25V5z" clipRule="evenodd" />
+    </svg>
+);
+
 const CallIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
         <path fillRule="evenodd" d="M1.5 4.5a3 3 0 013-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 01-.694 1.955l-1.293.97c-.135.101-.164.298-.083.465a7.48 7.48 0 003.429 3.429c.167.081.364.052.465-.083l.97-1.293a1.875 1.875 0 011.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 01-3 3h-2.25C6.542 22.5 1.5 17.458 1.5 9.75V4.5z" clipRule="evenodd" />
@@ -77,13 +83,17 @@ const ListenerCard: React.FC<ListenerCardProps> = ({ listener, onCallClick, onCh
                 )}
                 <span className={`absolute bottom-0 right-0 block h-4 w-4 rounded-full ${listener.online ? 'bg-green-400' : 'bg-slate-400'} border-2 border-white dark:border-slate-900 ring-1 ${listener.online ? 'ring-green-500' : 'ring-slate-500'}`}></span>
             </div>
-            <div className="flex-grow text-left">
+            <div className="flex-grow text-left min-w-0">
               <div className="flex items-center gap-1.5">
-                <h3 className="font-bold text-slate-800 dark:text-slate-100 text-lg">{listener.name}</h3>
-                <VerifiedIcon className="w-5 h-5 text-blue-500" />
+                <h3 className="font-bold text-slate-800 dark:text-slate-100 text-lg truncate">{listener.name}</h3>
+                <VerifiedIcon className="w-5 h-5 text-blue-500 shrink-0" />
               </div>
-              <div className="flex items-center text-sm text-slate-500 dark:text-slate-400 mt-1">
-                <span>{listener.rating}★ {listener.reviewsCount}</span>
+              <div className="flex items-center text-sm text-slate-500 dark:text-slate-400 mt-1 divide-x divide-slate-300 dark:divide-slate-700">
+                <span className="pr-2">{listener.rating}★ ({listener.reviewsCount})</span>
+                <div className="flex items-center gap-1 pl-2">
+                    <ClockIcon className="w-4 h-4"/>
+                    <span>~12 min avg call</span>
+                </div>
               </div>
             </div>
             <div className="flex gap-2 shrink-0">
@@ -145,10 +155,14 @@ const ListenerCard: React.FC<ListenerCardProps> = ({ listener, onCallClick, onCh
             <h3 className="font-bold text-slate-800 dark:text-slate-100 text-lg md:text-xl truncate">{listener.name}</h3>
             <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm mb-3">{`(${listener.gender}, ${listener.age} yrs)`}</p>
 
-            <div className="flex justify-center items-center text-xs md:text-sm text-center mb-4 text-slate-600 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg">
-                <div>
+            <div className="flex justify-center items-center text-xs md:text-sm text-center mb-4 text-slate-600 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg divide-x divide-slate-300 dark:divide-slate-700">
+                <div className="px-3">
                     <span className="font-bold text-slate-800 dark:text-slate-100">{listener.rating}★</span>
                     <span className="block text-slate-500 dark:text-slate-400 text-[10px] md:text-xs">{listener.reviewsCount}</span>
+                </div>
+                <div className="px-3">
+                    <span className="font-bold text-slate-800 dark:text-slate-100">~12 min</span>
+                    <span className="block text-slate-500 dark:text-slate-400 text-[10px] md:text-xs">Avg. Call</span>
                 </div>
             </div>
             

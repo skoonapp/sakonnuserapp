@@ -97,3 +97,13 @@ export interface FaqItem {
     answer: string;
     isPositive: boolean;
 }
+
+export interface SessionHistoryEntry {
+  id: string;
+  listenerName: string;
+  listenerImage: string;
+  type: 'call' | 'chat';
+  timestamp: number;
+  durationSeconds?: number;
+  messageCount?: number;
+}

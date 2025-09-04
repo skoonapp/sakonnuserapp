@@ -1,12 +1,14 @@
 
 
 
+
 import React from 'react';
 import type { User } from '../types';
 import FAQ from './FAQ';
 import Contact from './Contact';
 import Testimonials from './Testimonials';
 import ApplyAsListener from './ApplyAsListener';
+import SessionHistory from './SessionHistory';
 
 interface ProfileViewProps {
   currentUser: User;
@@ -67,6 +69,8 @@ const ProfileView: React.FC<ProfileViewProps> = ({
             </div>
           </div>
         </section>
+
+        <SessionHistory currentUser={currentUser} />
 
         {/* About Section */}
         <section id="about" className="mt-8 py-6 bg-white dark:bg-slate-900 rounded-xl shadow-md">
