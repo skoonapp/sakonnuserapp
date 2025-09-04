@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import type { User, Listener, ActivePlan, CallSession, ChatSession, ActiveView } from './types';
 import { auth, db, functions } from './utils/firebase';
@@ -387,9 +388,9 @@ const App: React.FC = () => {
     }
     
     return (
-        <div className="w-full max-w-md mx-auto bg-slate-100 dark:bg-slate-950 flex flex-col min-h-screen shadow-2xl transition-colors duration-300">
+        <div className="w-full max-w-md mx-auto bg-slate-100 dark:bg-slate-950 flex flex-col h-screen shadow-2xl transition-colors duration-300">
             <Header currentUser={user} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} wallet={wallet} />
-            <main className="flex-grow pb-20">
+            <main className="flex-grow pb-20 overflow-y-auto">
                 <Suspense fallback={<ViewLoader />}>
                     {renderActiveView()}
                 </Suspense>
