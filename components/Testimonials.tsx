@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { TESTIMONIALS_DATA } from '../constants';
 
@@ -29,8 +28,8 @@ const Testimonials: React.FC = () => {
 
   return (
     <div className="mt-8 md:mt-12 text-center">
-      <h3 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-2">यूज़र्स क्या कहते हैं</h3>
-      <p className="text-lg text-slate-600 dark:text-slate-400 mb-8 px-4">हमारे खुश यूज़र्स के कुछ अनुभव।</p>
+      <h3 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">यूज़र्स क्या कहते हैं</h3>
+      <p className="text-base text-slate-600 dark:text-slate-400 mb-8 px-4">हमारे खुश यूज़र्स के कुछ अनुभव।</p>
       
       <div className="relative max-w-2xl mx-auto">
         <div className="overflow-hidden">
@@ -47,7 +46,7 @@ const Testimonials: React.FC = () => {
                     className="w-20 h-20 rounded-full object-cover mb-4 shadow-md border-4 border-white dark:border-slate-700"
                     loading="lazy" decoding="async"
                   />
-                  <blockquote className="text-lg text-slate-600 dark:text-slate-400 italic leading-relaxed mb-4 max-w-lg">
+                  <blockquote className="text-base text-slate-600 dark:text-slate-400 italic leading-relaxed mb-4 max-w-lg">
                     "{testimonial.quote}"
                   </blockquote>
                   <cite className="font-semibold text-slate-800 dark:text-slate-100 not-italic">- {testimonial.name}</cite>

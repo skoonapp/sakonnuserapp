@@ -43,8 +43,9 @@ const ProfileView: React.FC<ProfileViewProps> = ({
 
   return (
     <div className="bg-slate-50 dark:bg-slate-950">
-      <div className="container mx-auto px-4 pt-2 pb-6">
-        <div className="border-b border-slate-200 dark:border-slate-700 mb-4"></div>
+      <div className="container mx-auto px-4 pt-2 pb-6 space-y-6">
+        <div className="border-b border-slate-200 dark:border-slate-700"></div>
+
         {/* Highlighted Apply as Listener Section */}
         <section id="apply" className="py-3 bg-gradient-to-br from-cyan-50 to-blue-100 dark:from-cyan-950/50 dark:to-blue-950/50 rounded-xl shadow-lg border-2 border-cyan-200 dark:border-cyan-600">
           <div className="container mx-auto px-6">
@@ -65,71 +66,72 @@ const ProfileView: React.FC<ProfileViewProps> = ({
           </div>
         </section>
 
-        {/* About Section */}
-        <section id="about" className="mt-6 py-6 bg-white dark:bg-slate-900 rounded-xl shadow-md">
-          <div className="container mx-auto px-6">
-            <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-100 text-center sm:text-left">
-                हमारे बारे में
-              </h2>
-            </div>
-            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-3xl mx-auto text-center leading-relaxed">
-              SakoonApp एक सुरक्षित और गोपनीय स्थान है जहाँ आप अपनी भावनाओं को साझा कर सकते हैं। हमारा लक्ष्य मानसिक स्वास्थ्य और भावनात्मक समर्थन को सभी के लिए सुलभ बनाना है।
-            </p>
-          </div>
-          <Testimonials />
-        </section>
+        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-md divide-y divide-slate-200 dark:border-slate-700">
+            {/* About Section */}
+            <section id="about" className="p-6">
+              <div className="container mx-auto">
+                <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+                  <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100 text-center sm:text-left">
+                    हमारे बारे में
+                  </h2>
+                </div>
+                <p className="text-base text-slate-600 dark:text-slate-400 max-w-3xl mx-auto text-center leading-relaxed">
+                  SakoonApp एक सुरक्षित और गोपनीय स्थान है जहाँ आप अपनी भावनाओं को साझा कर सकते हैं। हमारा लक्ष्य मानसिक स्वास्थ्य और भावनात्मक समर्थन को सभी के लिए सुलभ बनाना है।
+                </p>
+              </div>
+              <Testimonials />
+            </section>
 
-        {/* Install App Section */}
-        {deferredPrompt && (
-          <section id="install-app" className="mt-6 py-6 bg-white dark:bg-slate-900 rounded-xl shadow-md">
-            <div className="container mx-auto px-6 text-center">
-              <h3 className="text-2xl font-bold text-slate-700 dark:text-slate-100 mb-4">एक क्लिक में इंस्टॉल करें</h3>
-              <p className="text-slate-600 dark:text-slate-400 mb-6 max-w-md mx-auto">
-                SakoonApp को अपनी होम स्क्रीन पर जोड़ें ताकि आप इसे आसानी से और तेज़ी से इस्तेमाल कर सकें।
-              </p>
-              <button 
-                onClick={onInstallClick} 
-                className="flex w-full max-w-xs mx-auto justify-center items-center gap-3 bg-cyan-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-cyan-700 transition-colors shadow-lg transform hover:scale-105"
-              >
-                <InstallIcon className="w-6 h-6"/>
-                <span>ऐप इंस्टॉल करें</span>
-              </button>
-            </div>
-          </section>
-        )}
-        
-        <FAQ />
-        
-        <Contact />
-        
-        <div className="mt-6 text-center p-6 bg-white dark:bg-slate-900 rounded-xl shadow-md">
-          <div className="flex justify-center">
-              <button
-                  onClick={onLogout}
-                  className="flex items-center gap-2 bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 font-bold py-2 px-4 rounded-lg hover:bg-red-200 dark:hover:bg-red-500/20 transition-colors"
-              >
-                  <LogoutIcon className="w-5 h-5" />
-                  <span>लॉगआउट</span>
-              </button>
-          </div>
-          
-          <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
-             <h3 className="text-xl font-bold text-slate-700 dark:text-slate-100 mb-4">App & Policies</h3>
-             <div className="flex flex-col sm:flex-row justify-center items-center flex-wrap gap-4">
-                <button onClick={onShowTerms} className="text-cyan-600 dark:text-cyan-300 font-semibold hover:underline">Terms & Conditions</button>
-                <button onClick={onShowPrivacyPolicy} className="text-cyan-600 dark:text-cyan-300 font-semibold hover:underline">Privacy Policy</button>
-                <button onClick={onShowCancellationPolicy} className="text-cyan-600 dark:text-cyan-300 font-semibold hover:underline">Cancellation/Refund Policy</button>
-            </div>
-          </div>
+            {/* Install App Section */}
+            {deferredPrompt && (
+              <section id="install-app" className="p-6 text-center">
+                <div className="container mx-auto">
+                  <h3 className="text-2xl font-bold text-slate-700 dark:text-slate-100 mb-4">एक क्लिक में इंस्टॉल करें</h3>
+                  <p className="text-slate-600 dark:text-slate-400 mb-6 max-w-md mx-auto">
+                    SakoonApp को अपनी होम स्क्रीन पर जोड़ें ताकि आप इसे आसानी से और तेज़ी से इस्तेमाल कर सकें।
+                  </p>
+                  <button 
+                    onClick={onInstallClick} 
+                    className="flex w-full max-w-xs mx-auto justify-center items-center gap-3 bg-cyan-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-cyan-700 transition-colors shadow-lg transform hover:scale-105"
+                  >
+                    <InstallIcon className="w-6 h-6"/>
+                    <span>ऐप इंस्टॉल करें</span>
+                  </button>
+                </div>
+              </section>
+            )}
+            
+            <FAQ />
+            
+            <Contact />
+            
+            <div className="p-6 text-center">
+              <div className="flex justify-center">
+                  <button
+                      onClick={onLogout}
+                      className="flex items-center gap-2 bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 font-bold py-2 px-4 rounded-lg hover:bg-red-200 dark:hover:bg-red-500/20 transition-colors"
+                  >
+                      <LogoutIcon className="w-5 h-5" />
+                      <span>लॉगआउट</span>
+                  </button>
+              </div>
+              
+              <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
+                 <h3 className="text-xl font-bold text-slate-700 dark:text-slate-100 mb-4">App & Policies</h3>
+                 <div className="flex flex-col sm:flex-row justify-center items-center flex-wrap gap-4">
+                    <button onClick={onShowTerms} className="text-cyan-600 dark:text-cyan-300 font-semibold hover:underline">Terms & Conditions</button>
+                    <button onClick={onShowPrivacyPolicy} className="text-cyan-600 dark:text-cyan-300 font-semibold hover:underline">Privacy Policy</button>
+                    <button onClick={onShowCancellationPolicy} className="text-cyan-600 dark:text-cyan-300 font-semibold hover:underline">Cancellation/Refund Policy</button>
+                </div>
+              </div>
 
-           <footer className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800">
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                © 2025 SakoonApp. All Rights Reserved.
-              </p>
-            </footer>
+               <footer className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    © 2025 SakoonApp. All Rights Reserved.
+                  </p>
+                </footer>
+            </div>
         </div>
-
       </div>
     </div>
   );

@@ -94,8 +94,8 @@ const LoginScreen: React.FC = () => {
         if (step === 'otp') {
             return (
                 <div className="w-full max-w-sm">
-                    <h2 className="text-3xl font-bold text-white mb-2">OTP दर्ज करें</h2>
-                    <p className="text-cyan-200 mb-8">+91 {phoneNumber} पर भेजा गया 6-अंकीय कोड दर्ज करें।</p>
+                    <h2 className="text-2xl font-bold text-white mb-2">OTP दर्ज करें</h2>
+                    <p className="text-sm text-cyan-200 mb-8">+91 {phoneNumber} पर भेजा गया 6-अंकीय कोड दर्ज करें।</p>
                     <form onSubmit={onOtpSubmit} className="bg-slate-900/60 backdrop-blur-sm border border-white/20 p-6 md:p-8 rounded-2xl">
                         <div className="relative mb-4">
                             <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
@@ -159,8 +159,8 @@ const LoginScreen: React.FC = () => {
                         <p className="font-bold text-xl">नए यूज़र्स को मिलते हैं</p>
                         <p className="font-extrabold text-3xl tracking-wide mt-1">5 मुफ़्त मैसेज!</p>
                     </div>
-                    <h1 className="text-5xl md:text-6xl font-bold text-white animate-title-glow mt-4">SakoonApp</h1>
-                    <p className="mt-2 text-lg md:text-xl text-cyan-200">अकेलापन अब बीतेगा, सकून से जी पाएगा</p>
+                    <h1 className="text-4xl md:text-5xl font-bold text-white animate-title-glow mt-4">SakoonApp</h1>
+                    <p className="mt-2 text-base md:text-lg text-cyan-200">अकेलापन अब बीतेगा, सकून से जी पाएगा</p>
                 </div>
 
                 <div className="w-full bg-slate-900/60 backdrop-blur-sm border border-white/20 p-6 md:p-8 rounded-2xl">

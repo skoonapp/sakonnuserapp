@@ -260,7 +260,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
       <header className="bg-white dark:bg-slate-900 shadow-md z-10 flex items-center p-3 gap-3 flex-shrink-0">
         <img src={listener.image} alt={listener.name} className="w-10 h-10 rounded-full object-cover" onError={() => setImageError(true)} />
         <div className="flex-grow">
-            <div className="flex items-center gap-1.5"><h1 className="font-bold text-slate-800 dark:text-slate-100">{listener.name}</h1><VerifiedIcon className="w-5 h-5 text-blue-500" /></div>
+            <div className="flex items-center gap-1.5"><h1 className="font-bold text-lg text-slate-800 dark:text-slate-100">{listener.name}</h1><VerifiedIcon className="w-5 h-5 text-blue-500" /></div>
             <p className={`text-xs font-semibold ${getStatusColor()}`}>{getStatusText()}</p>
         </div>
         <button onClick={() => handleLeave(true)} className="text-sm bg-red-100 text-red-700 font-semibold px-3 py-1.5 rounded-md hover:bg-red-200 transition-colors disabled:opacity-50 dark:bg-red-900/50 dark:text-red-300 dark:hover:bg-red-900" aria-label="End Chat" disabled={status === 'ended'}>End Chat</button>
