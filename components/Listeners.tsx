@@ -118,25 +118,27 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
             <p className="text-slate-600 dark:text-slate-400 mt-2">Money Token खरीदें और अपनी सुविधानुसार कॉल या चैट के लिए उपयोग करें।</p>
         </div>
         
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-3xl mx-auto pt-6">
-            {tokenOptions.map(option => (
-                <div key={option.tokens} className="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-between transition-all hover:shadow-lg hover:scale-105">
-                    <div className="text-center">
-                        <div className="flex items-center justify-center gap-2">
-                            <TokenIcon className="w-6 h-6"/>
-                            <span className="text-2xl font-bold text-slate-800 dark:text-slate-100">{option.tokens}</span>
+        <div className="max-w-3xl mx-auto pt-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 border-2 border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden divide-x-2 divide-y-2 divide-slate-200 dark:divide-slate-800">
+                {tokenOptions.map(option => (
+                    <div key={option.tokens} className="bg-white dark:bg-slate-900 p-4 flex flex-col items-center justify-between transition-all hover:shadow-lg hover:-translate-y-1">
+                        <div className="text-center">
+                            <div className="flex items-center justify-center gap-2">
+                                <TokenIcon className="w-6 h-6"/>
+                                <span className="text-2xl font-bold text-slate-800 dark:text-slate-100">{option.tokens}</span>
+                            </div>
+                            <p className="text-slate-500 dark:text-slate-400 mb-4">MT</p>
                         </div>
-                        <p className="text-slate-500 dark:text-slate-400 mb-4">MT</p>
+                        <button 
+                            onClick={() => handleTokenPurchase(option.tokens, option.price)}
+                            disabled={loadingPlan !== null}
+                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
+                        >
+                            {loadingPlan === `mt_${option.tokens}` ? 'प्रोसेसिंग...' : `₹${option.price} Buy`}
+                        </button>
                     </div>
-                    <button 
-                        onClick={() => handleTokenPurchase(option.tokens, option.price)}
-                        disabled={loadingPlan !== null}
-                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
-                    >
-                        {loadingPlan === `mt_${option.tokens}` ? 'प्रोसेसिंग...' : `₹${option.price} Buy`}
-                    </button>
-                </div>
-            ))}
+                ))}
+            </div>
         </div>
 
         <div className="text-center mt-6 bg-slate-100 dark:bg-slate-900/50 p-4 rounded-lg max-w-md mx-auto border border-slate-200 dark:border-slate-800">

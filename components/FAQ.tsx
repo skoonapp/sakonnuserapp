@@ -1,8 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FAQ_DATA } from '../constants';
 import FAQItem from './FAQItem';
 
 const FAQ: React.FC = () => {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  const handleToggle = (index: number) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
+
   return (
     <section id="faq" className="py-6 bg-slate-50 dark:bg-slate-950/50">
       <div className="container mx-auto px-6">
@@ -11,7 +17,12 @@ const FAQ: React.FC = () => {
         </div>
         <div className="max-w-2xl mx-auto space-y-2">
           {FAQ_DATA.map((item, index) => (
-            <FAQItem key={index} {...item} />
+            <FAQItem 
+              key={index} 
+              {...item}
+              isOpen={openIndex === index}
+              onToggle={() => handleToggle(index)}
+            />
           ))}
         </div>
       </div>

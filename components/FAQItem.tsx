@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import type { FaqItem } from '../types';
 
 // New Answer Renderer component to handle numbered lists and bold text
@@ -38,10 +38,12 @@ const AnswerRenderer: React.FC<{ text: string }> = ({ text }) => {
     );
 };
 
+interface FAQItemProps extends FaqItem {
+  isOpen: boolean;
+  onToggle: () => void;
+}
 
-const FAQItem: React.FC<FaqItem> = ({ question, answer, isPositive }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
+const FAQItem: React.FC<FAQItemProps> = ({ question, answer, isPositive, isOpen, onToggle }) => {
   // Icons are smaller now and use flex-shrink-0 to prevent resizing
   const CheckIcon = () => (
      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-500 flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -59,7 +61,7 @@ const FAQItem: React.FC<FaqItem> = ({ question, answer, isPositive }) => {
   return (
     <div className="bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={onToggle}
         className="w-full flex justify-between items-center text-left p-5 focus:outline-none"
       >
         <span className="text-lg font-medium text-slate-800 dark:text-slate-100">{question}</span>
