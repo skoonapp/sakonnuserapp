@@ -1,6 +1,5 @@
-
-import React, { useState, useEffect, useCallback, lazy, Suspense, useRef } from 'react';
-import type { User, Listener, ActivePlan, CallSession, ChatSession, ActiveView } from './types';
+import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
+import type { User, Listener, CallSession, ChatSession, ActiveView } from './types';
 import { auth, db, functions } from './utils/firebase';
 import { handleCallEnd, handleChat } from './utils/earnings';
 import { useWallet } from './hooks/useWallet';
@@ -47,13 +46,8 @@ const App: React.FC = () => {
     const [isInitializing, setIsInitializing] = useState(true);
     const wallet = useWallet(user);
 
-    // Navigation and Swipe State
-    const viewOrder: ActiveView[] = ['home', 'calls', 'chats', 'profile'];
-    const [activeIndex, setActiveIndex] = useState(0);
-    const [isSwiping, setIsSwiping] = useState(false);
-    const touchStartX = useRef(0);
-    const touchEndX = useRef(0);
-    const swipeContainerRef = useRef<HTMLDivElement>(null);
+    // Navigation State
+    const [activeView, setActiveView] = useState<ActiveView>('home');
 
     // UI State
     const [isDarkMode, setIsDarkMode] = useState(false);
@@ -152,32 +146,6 @@ const App: React.FC = () => {
         };
     }, []);
 
-    // History and Back Button management
-    useEffect(() => {
-        const handlePopState = (event: PopStateEvent) => {
-            if (event.state && typeof event.state.activeIndex === 'number') {
-                setActiveIndex(event.state.activeIndex);
-            } else {
-                // If state is null, it's the initial page load, go to home
-                setActiveIndex(0);
-            }
-        };
-
-        window.addEventListener('popstate', handlePopState);
-        // On initial load, replace state to ensure back button from home closes app
-        window.history.replaceState({ activeIndex: 0 }, '');
-
-        return () => {
-            window.removeEventListener('popstate', handlePopState);
-        };
-    }, []);
-
-    const navigate = (newIndex: number) => {
-        if (newIndex === activeIndex) return;
-        setActiveIndex(newIndex);
-        window.history.pushState({ activeIndex: newIndex }, '');
-    };
-
     // --- Handlers ---
     
     const handleInstallClick = useCallback(() => {
@@ -275,48 +243,6 @@ const App: React.FC = () => {
         setActiveChatSession(null);
     }, [user, activeChatSession]);
     
-    // Swipe Handlers
-    const handleTouchStart = (e: React.TouchEvent) => {
-        touchEndX.current = 0; // Reset
-        touchStartX.current = e.targetTouches[0].clientX;
-    };
-
-    const handleTouchMove = (e: React.TouchEvent) => {
-        touchEndX.current = e.targetTouches[0].clientX;
-        if (swipeContainerRef.current && !isSwiping) {
-            const diff = touchEndX.current - touchStartX.current;
-            // Immediate feedback without transition
-            swipeContainerRef.current.style.transition = 'none';
-            swipeContainerRef.current.style.transform = `translateX(calc(-${activeIndex * 100}% + ${diff}px))`;
-        }
-    };
-
-    const handleTouchEnd = () => {
-        if (!swipeContainerRef.current) return;
-
-        setIsSwiping(true);
-        swipeContainerRef.current.style.transition = 'transform 0.3s ease-in-out';
-        const diff = touchEndX.current - touchStartX.current;
-        
-        let newIndex = activeIndex;
-        // Swipe threshold: 30% of screen width or a minimum of 50px
-        const threshold = swipeContainerRef.current.clientWidth * 0.3;
-
-        if (touchEndX.current !== 0) { // Check if a move actually happened
-            if (diff > threshold && activeIndex > 0) {
-                newIndex = activeIndex - 1;
-            } else if (diff < -threshold && activeIndex < viewOrder.length - 1) {
-                newIndex = activeIndex + 1;
-            }
-        }
-        
-        navigate(newIndex);
-
-        setTimeout(() => {
-            setIsSwiping(false);
-        }, 300); // Transition duration
-    };
-
     // --- Render Logic ---
     
     if (isInitializing || wallet.loading) return <SplashScreen />;
@@ -324,51 +250,42 @@ const App: React.FC = () => {
     if (activeCallSession) return <CallUI session={activeCallSession} user={user} onLeave={handleCallSessionEnd} />;
     if (activeChatSession) return <ChatUI session={activeChatSession} user={user} onLeave={handleChatSessionEnd} />;
     
-    const activeView = viewOrder[activeIndex];
+    const renderActiveView = () => {
+        switch (activeView) {
+            case 'home':
+                return <HomeView currentUser={user} />;
+            case 'calls':
+                return <CallsView onStartSession={handleStartSession} currentUser={user} />;
+            case 'chats':
+                return <ChatsView onStartSession={handleStartSession} currentUser={user} />;
+            case 'profile':
+                return (
+                    <ProfileView 
+                        currentUser={user}
+                        onShowTerms={() => setShowPolicy('terms')}
+                        onShowPrivacyPolicy={() => setShowPolicy('privacy')}
+                        onShowCancellationPolicy={() => setShowPolicy('cancellation')}
+                        deferredPrompt={deferredInstallPrompt}
+                        onInstallClick={handleInstallClick}
+                        onLogout={handleLogout}
+                    />
+                );
+            default:
+                return <HomeView currentUser={user} />;
+        }
+    };
 
     return (
         <div className="relative w-full max-w-md mx-auto bg-slate-100 dark:bg-slate-950 flex flex-col h-screen shadow-2xl transition-colors duration-300 overflow-hidden">
             <Header currentUser={user} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} wallet={wallet} />
             
-            <main
-                className="flex-grow overflow-hidden" // Changed to overflow-hidden
-                onTouchStart={handleTouchStart}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
-            >
-                <div 
-                    ref={swipeContainerRef}
-                    className="h-full flex"
-                    style={{ 
-                        width: `${viewOrder.length * 100}%`,
-                        transform: `translateX(-${activeIndex * (100 / viewOrder.length)}%)`,
-                        transition: isSwiping ? 'transform 0.3s ease-in-out' : 'none',
-                    }}
-                >
-                    {viewOrder.map((view, index) => (
-                        <div key={view} className="w-full h-full flex-shrink-0 overflow-y-auto pt-16 pb-20">
-                            <Suspense fallback={<ViewLoader />}>
-                                {index === activeIndex && view === 'home' && <HomeView currentUser={user} />}
-                                {index === activeIndex && view === 'calls' && <CallsView onStartSession={handleStartSession} currentUser={user} />}
-                                {index === activeIndex && view === 'chats' && <ChatsView onStartSession={handleStartSession} currentUser={user} />}
-                                {index === activeIndex && view === 'profile' && (
-                                    <ProfileView 
-                                        currentUser={user}
-                                        onShowTerms={() => setShowPolicy('terms')}
-                                        onShowPrivacyPolicy={() => setShowPolicy('privacy')}
-                                        onShowCancellationPolicy={() => setShowPolicy('cancellation')}
-                                        deferredPrompt={deferredInstallPrompt}
-                                        onInstallClick={handleInstallClick}
-                                        onLogout={handleLogout}
-                                    />
-                                )}
-                            </Suspense>
-                        </div>
-                    ))}
-                </div>
+            <main className="flex-grow overflow-y-auto pt-16 pb-20">
+                <Suspense fallback={<ViewLoader />}>
+                    {renderActiveView()}
+                </Suspense>
             </main>
             
-            <Footer activeView={activeView} setActiveView={(view) => navigate(viewOrder.indexOf(view))} />
+            <Footer activeView={activeView} setActiveView={setActiveView} />
             
             {/* --- Modals and Overlays --- */}
             {showWelcomeModal && user && <WelcomeModal user={user} onClose={handleCloseWelcomeModal} />}
@@ -390,14 +307,14 @@ const App: React.FC = () => {
             <AICompanionButton onClick={() => setShowAICompanion(true)} />
             
             <Suspense fallback={null}>
-                {showAICompanion && <AICompanion user={user} onClose={() => setShowAICompanion(false)} onNavigateToServices={() => { navigate(viewOrder.indexOf('calls')); setShowAICompanion(false); }} />}
+                {showAICompanion && <AICompanion user={user} onClose={() => setShowAICompanion(false)} onNavigateToServices={() => { setActiveView('calls'); setShowAICompanion(false); }} />}
                 {showPolicy === 'terms' && <TermsAndConditions onClose={() => setShowPolicy(null)} />}
                 {showPolicy === 'privacy' && <PrivacyPolicy onClose={() => setShowPolicy(null)} />}
                 {showPolicy === 'cancellation' && <CancellationRefundPolicy onClose={() => setShowPolicy(null)} />}
             </Suspense>
 
             {showRechargeModal && (
-                <RechargeModal onClose={() => setShowRechargeModal(false)} onNavigateHome={() => { navigate(0); setShowRechargeModal(false); }} />
+                <RechargeModal onClose={() => setShowRechargeModal(false)} onNavigateHome={() => { setActiveView('home'); setShowRechargeModal(false); }} />
             )}
         </div>
     );
