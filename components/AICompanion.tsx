@@ -12,19 +12,13 @@ interface AICompanionProps {
 
 // --- Icons ---
 const SendIcon: React.FC<{className?: string}> = ({className}) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <svg xmlns="http://www.w.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
         <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
-    </svg>
-);
-const CloseIcon: React.FC<{ className?: string }> = ({ className }) => (
-    <svg className={className} stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-      <line x1="18" y1="6" x2="6" y2="18"></line>
-      <line x1="6" y1="6" x2="18" y2="18"></line>
     </svg>
 );
 const ClockIcon: React.FC<{ className?: string }> = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 000-1.5h-3.25V5z" clipRule="evenodd" /></svg>;
 const DeliveredIcon: React.FC<{ className?: string }> = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M11.953 4.136a.75.75 0 01.143 1.052l-5 6.5a.75.75 0 01-1.127.075l-2.5-2.5a.75.75 0 111.06-1.06l1.894 1.893 4.48-5.824a.75.75 0 011.052-.143z" clipRule="evenodd" /><path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.052-.143z" clipRule="evenodd" /></svg>;
-const ErrorIcon: React.FC<{ className?: string }> = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" /></svg>;
+const ErrorIcon: React.FC<{ className?: string }> = ({ className }) => <svg xmlns="http://www.w.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" /></svg>;
 const MessageStatus: React.FC<{ status?: ChatMessage['status'] }> = ({ status }) => {
     switch (status) {
         case 'sending': return <ClockIcon className="w-4 h-4 text-slate-400" />;
@@ -152,83 +146,91 @@ const AICompanion: React.FC<AICompanionProps> = ({ user, onClose, onNavigateToSe
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex flex-col bg-stone-100 dark:bg-slate-900 animate-fade-in-up transition-transform duration-300 h-full">
-            <header className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 shadow-sm flex-shrink-0 border-b border-slate-200 dark:border-slate-800">
-                <div className="flex items-center gap-3">
-                    <div className="bg-gradient-to-br from-cyan-500 to-teal-400 p-2 rounded-full">
-                        <RobotIcon className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                        <h2 className="font-bold text-lg text-slate-800 dark:text-slate-100">सकून AI दोस्त</h2>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">आपका सहायक गाइड</p>
-                    </div>
-                </div>
-                <button onClick={onClose} className="p-2 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors">
-                    <CloseIcon className="w-6 h-6" />
-                </button>
-            </header>
-    
-            <main className="flex-grow p-4 overflow-y-auto" style={{backgroundImage: `url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')`}}>
-                <div className="flex flex-col gap-2">
-                    {messages.map((msg) => {
-                        const isAI = msg.sender.uid === 'ai';
-                        const isUser = msg.sender.uid === user.uid;
-                        return (
-                            <div key={msg.id} className={`flex items-end gap-2 ${isUser ? 'flex-row-reverse' : ''}`}>
-                                {isAI && (
-                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-teal-400 flex items-center justify-center shrink-0 self-start">
-                                        <RobotIcon className="w-5 h-5 text-white" />
-                                    </div>
-                                )}
-                                <div className={`max-w-xs md:max-w-md p-2.5 rounded-xl flex flex-col ${isAI ? 'bg-white dark:bg-slate-800 rounded-bl-none shadow-sm' : 'bg-[#dcf8c6] dark:bg-cyan-900 text-slate-800 dark:text-slate-100 rounded-tr-none'}`}>
-                                    <div className="text-sm prose prose-sm dark:prose-invert max-w-none"><MarkdownRenderer text={msg.text} /></div>
-                                    <div className="flex items-center self-end gap-1.5 mt-1 text-slate-500 dark:text-slate-400">
-                                        <span className="text-xs">{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                        {isUser && <MessageStatus status={msg.status} />}
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-                    {isLoading && (
-                        <div className="flex items-end gap-2">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-teal-400 flex items-center justify-center shrink-0"><RobotIcon className="w-5 h-5 text-white" /></div>
-                            <div className="max-w-xs md:max-w-md p-3 rounded-2xl bg-white dark:bg-slate-800 rounded-bl-none shadow-sm">
-                                <div className="flex items-center gap-2">
-                                    <span className="h-2 w-2 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                                    <span className="h-2 w-2 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                                    <span className="h-2 w-2 bg-slate-400 rounded-full animate-bounce"></span>
-                                </div>
-                            </div>
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={onClose}>
+            <div
+                className="w-full max-w-lg h-full sm:h-[95%] sm:max-h-[700px] bg-stone-100 dark:bg-slate-950 rounded-t-2xl sm:rounded-2xl shadow-xl flex flex-col overflow-hidden animate-fade-in-up"
+                onClick={e => e.stopPropagation()}
+            >
+                <header className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 shadow-sm flex-shrink-0 border-b border-slate-200 dark:border-slate-800">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-gradient-to-br from-cyan-500 to-teal-400 p-2 rounded-full">
+                            <RobotIcon className="w-6 h-6 text-white" />
                         </div>
-                    )}
-                    {error && <p className="text-red-500 dark:text-red-400 bg-red-100 dark:bg-red-900/50 p-3 rounded-lg text-sm text-center">{error}</p>}
-                </div>
-                <div ref={messagesEndRef} />
-            </main>
-            
-            <footer className="p-2 bg-transparent flex-shrink-0">
-                <form onSubmit={handleSendMessage} className="flex items-end gap-2">
-                    <div className="flex-grow min-w-0 bg-white dark:bg-slate-900 rounded-2xl flex items-end px-3 py-1 shadow-sm">
-                        <textarea
-                            ref={textareaRef}
-                            rows={1}
-                            value={inputValue}
-                            onChange={(e) => setInputValue(e.target.value)}
-                            placeholder="सकून दोस्त से पूछें..."
-                            className="flex-grow bg-transparent p-2 focus:outline-none text-slate-900 dark:text-white resize-none max-h-28 overflow-y-auto"
-                            disabled={isLoading}
-                            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(e); } }}
-                        />
-                    </div>
-                    <button type="submit" disabled={isLoading || !inputValue.trim()} className="w-12 h-12 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full flex items-center justify-center transition-all transform hover:scale-110 shadow-md disabled:bg-slate-500 disabled:cursor-not-allowed disabled:scale-100 shrink-0" aria-label="Send message">
-                        <div className="relative w-6 h-6">
-                            <MicrophoneIcon className={`absolute inset-0 w-full h-full transition-all duration-300 ${inputValue.trim() ? 'opacity-0 scale-50' : 'opacity-100 scale-100'}`} />
-                            <SendIcon className={`absolute inset-0 w-full h-full transition-all duration-300 ${inputValue.trim() ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`} />
+                        <div>
+                            <h2 className="font-bold text-lg text-slate-800 dark:text-slate-100">सकून AI दोस्त</h2>
+                            <p className="text-sm text-slate-500 dark:text-slate-400">आपका सहायक गाइड</p>
                         </div>
+                    </div>
+                    <button 
+                        onClick={onClose} 
+                        className="text-sm border border-red-500 text-red-500 font-semibold px-4 py-1.5 rounded-lg hover:bg-red-500/10 transition-colors"
+                    >
+                        End chat
                     </button>
-                </form>
-            </footer>
+                </header>
+        
+                <main className="flex-grow p-4 overflow-y-auto" style={{backgroundImage: `url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')`}}>
+                    <div className="flex flex-col gap-2">
+                        {messages.map((msg) => {
+                            const isAI = msg.sender.uid === 'ai';
+                            const isUser = msg.sender.uid === user.uid;
+                            return (
+                                <div key={msg.id} className={`flex items-end gap-2 ${isUser ? 'flex-row-reverse' : ''}`}>
+                                    {isAI && (
+                                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-teal-400 flex items-center justify-center shrink-0 self-start">
+                                            <RobotIcon className="w-5 h-5 text-white" />
+                                        </div>
+                                    )}
+                                    <div className={`max-w-xs md:max-w-md p-2.5 rounded-xl flex flex-col ${isAI ? 'bg-white dark:bg-slate-800 rounded-bl-none shadow-sm' : 'bg-[#dcf8c6] dark:bg-cyan-900 text-slate-800 dark:text-slate-100 rounded-tr-none'}`}>
+                                        <div className="text-sm prose prose-sm dark:prose-invert max-w-none"><MarkdownRenderer text={msg.text} /></div>
+                                        <div className="flex items-center self-end gap-1.5 mt-1 text-slate-500 dark:text-slate-400">
+                                            <span className="text-xs">{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                            {isUser && <MessageStatus status={msg.status} />}
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                        {isLoading && (
+                            <div className="flex items-end gap-2">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-teal-400 flex items-center justify-center shrink-0"><RobotIcon className="w-5 h-5 text-white" /></div>
+                                <div className="max-w-xs md:max-w-md p-3 rounded-2xl bg-white dark:bg-slate-800 rounded-bl-none shadow-sm">
+                                    <div className="flex items-center gap-2">
+                                        <span className="h-2 w-2 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                                        <span className="h-2 w-2 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                                        <span className="h-2 w-2 bg-slate-400 rounded-full animate-bounce"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        {error && <p className="text-red-500 dark:text-red-400 bg-red-100 dark:bg-red-900/50 p-3 rounded-lg text-sm text-center">{error}</p>}
+                    </div>
+                    <div ref={messagesEndRef} />
+                </main>
+                
+                <footer className="p-2 bg-transparent flex-shrink-0">
+                    <form onSubmit={handleSendMessage} className="flex items-end gap-2">
+                        <div className="flex-grow min-w-0 bg-white dark:bg-slate-900 rounded-2xl flex items-end px-3 py-1 shadow-sm">
+                            <textarea
+                                ref={textareaRef}
+                                rows={1}
+                                value={inputValue}
+                                onChange={(e) => setInputValue(e.target.value)}
+                                placeholder="सकून दोस्त से पूछें..."
+                                className="flex-grow bg-transparent p-2 focus:outline-none text-slate-900 dark:text-white resize-none max-h-28 overflow-y-auto"
+                                disabled={isLoading}
+                                onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(e); } }}
+                            />
+                        </div>
+                        <button type="submit" disabled={isLoading || !inputValue.trim()} className="w-12 h-12 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full flex items-center justify-center transition-all transform hover:scale-110 shadow-md disabled:bg-slate-500 disabled:cursor-not-allowed disabled:scale-100 shrink-0" aria-label="Send message">
+                            <div className="relative w-6 h-6">
+                                <MicrophoneIcon className={`absolute inset-0 w-full h-full transition-all duration-300 ${inputValue.trim() ? 'opacity-0 scale-50' : 'opacity-100 scale-100'}`} />
+                                <SendIcon className={`absolute inset-0 w-full h-full transition-all duration-300 ${inputValue.trim() ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`} />
+                            </div>
+                        </button>
+                    </form>
+                </footer>
+            </div>
         </div>
     );
 };
