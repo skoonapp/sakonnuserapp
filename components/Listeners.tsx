@@ -3,6 +3,7 @@ import PlanCard from './PlanCard';
 import { CALL_PLANS, CHAT_PLANS } from '../constants';
 import type { User, Plan as PlanType } from '../types';
 import { paymentService } from '../services/paymentService';
+import CashfreeModal from './CashfreeModal';
 
 
 interface PlansViewProps {
@@ -29,6 +30,8 @@ const TokenIcon: React.FC<{ className?: string }> = ({ className }) => (
 const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+  const [orderToken, setOrderToken] = useState<string | null>(null);
+  const [paymentDescription, setPaymentDescription] = useState('');
 
 
   const tokenOptions = [
@@ -45,16 +48,12 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
     setLoadingPlan(planKey);
     setFeedback(null);
     try {
-      const result: any = await paymentService.buyTokens(tokens, price);
-      if (result?.success) {
-        setFeedback({ type: 'success', message: `Payment Successful! ${result.description} added.` });
-        setTimeout(() => setFeedback(null), 4000);
-      }
+      const token = await paymentService.buyTokens(tokens, price);
+      setPaymentDescription(`${tokens} MT`);
+      setOrderToken(token);
     } catch (error: any) {
-        if (error.code !== 'user-closed-modal') {
-             setFeedback({ type: 'error', message: 'Payment failed. Please try again.' });
-             setTimeout(() => setFeedback(null), 4000);
-        }
+       setFeedback({ type: 'error', message: error.message || 'Payment failed to initialize.' });
+       setTimeout(() => setFeedback(null), 4000);
     } finally {
         setLoadingPlan(null);
     }
@@ -65,19 +64,27 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
       setLoadingPlan(planKey);
       setFeedback(null);
       try {
-        const result: any = await paymentService.buyDTPlan(planData);
-         if (result?.success) {
-            setFeedback({ type: 'success', message: `Payment Successful! ${result.description} activated.` });
-            setTimeout(() => setFeedback(null), 4000);
-        }
+        const token = await paymentService.buyDTPlan(planData);
+        setPaymentDescription(planData.name || 'Plan');
+        setOrderToken(token);
     } catch (error: any) {
-        if (error.code !== 'user-closed-modal') {
-             setFeedback({ type: 'error', message: 'Payment failed. Please try again.' });
-             setTimeout(() => setFeedback(null), 4000);
-        }
+        setFeedback({ type: 'error', message: error.message || 'Payment failed to initialize.' });
+        setTimeout(() => setFeedback(null), 4000);
     } finally {
         setLoadingPlan(null);
     }
+  };
+
+  const handleModalClose = (status: 'success' | 'failure' | 'closed') => {
+    if (status === 'success') {
+        setFeedback({ type: 'success', message: `Payment for ${paymentDescription} is processing! Your balance will update shortly.` });
+    } else if (status === 'failure') {
+        setFeedback({ type: 'error', message: 'Payment failed. Please try again.' });
+    }
+    // For 'closed', we don't show any message.
+    setOrderToken(null);
+    setPaymentDescription('');
+    setTimeout(() => setFeedback(null), 5000);
   };
 
   const planPairs = CALL_PLANS.map((callPlan, index) => ({
@@ -90,6 +97,8 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
   return (
     <div className="container mx-auto px-4 py-6">
       
+      {orderToken && <CashfreeModal orderToken={orderToken} onClose={handleModalClose} />}
+
       {feedback && (
         <div className={`p-4 mb-4 rounded-lg text-center font-semibold animate-fade-in-down ${feedback.type === 'success' ? 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300'}`}>
             {feedback.message}
@@ -134,8 +143,11 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
       </section>
 
       <div className="text-center my-8">
+        <div className="bg-cyan-100 dark:bg-cyan-900/50 text-cyan-800 dark:text-cyan-200 text-sm font-semibold px-4 py-2 rounded-full inline-block mb-4">
+            Note: सभी प्लान 30 दिनों के लिए मान्य होंगे।
+        </div>
         <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-100">DT Plans</h2>
-        <p className="text-lg text-slate-600 dark:text-slate-400 mt-2">सभी प्लान 30 दिन के मान्य होंगे</p>
+        <p className="text-lg text-slate-600 dark:text-slate-400 mt-2">Direct Plans से फिक्स मिनट और मैसेज के लिए उपयोग करें।</p>
       </div>
 
       {/* Plan Cards Section */}

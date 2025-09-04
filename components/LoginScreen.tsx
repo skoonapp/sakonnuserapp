@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuthHandler } from '../hooks/useAuthHandler';
 
 // --- Icon Components ---
@@ -36,11 +36,40 @@ const LoginScreen: React.FC = () => {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [otp, setOtp] = useState('');
     
-    // All logic is now cleanly abstracted in the hook
+    // Resend OTP State
+    const [resendTimer, setResendTimer] = useState(60);
+    const [canResendOtp, setCanResendOtp] = useState(false);
+    const [resendAttempts, setResendAttempts] = useState(0);
+    
     const { loading, error, signInWithGoogle, sendOtpToPhone, verifyOtp, clearError } = useAuthHandler();
+    
+    // OTP Countdown Timer Effect
+    useEffect(() => {
+        let interval: number;
+        if (step === 'otp' && resendTimer > 0) {
+            setCanResendOtp(false);
+            interval = window.setInterval(() => {
+                setResendTimer(prev => prev - 1);
+            }, 1000);
+        } else if (step === 'otp' && resendTimer === 0) {
+            setCanResendOtp(true);
+        }
+
+        return () => {
+            if (interval) {
+                window.clearInterval(interval);
+            }
+        };
+    }, [step, resendTimer]);
+
 
     const onPhoneSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        // Reset resend state for a new submission attempt
+        setResendTimer(60);
+        setCanResendOtp(false);
+        setResendAttempts(0);
+
         const success = await sendOtpToPhone(phoneNumber);
         if (success) {
             setStep('otp');
@@ -50,7 +79,23 @@ const LoginScreen: React.FC = () => {
     const onOtpSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         await verifyOtp(otp);
-        // On success, the main App component's listener will handle the login
+    };
+
+    const handleResendOtp = async () => {
+        if (!canResendOtp || resendAttempts >= 2 || loading) return;
+
+        setCanResendOtp(false);
+        const success = await sendOtpToPhone(phoneNumber);
+
+        if (success) {
+            const newAttempts = resendAttempts + 1;
+            setResendAttempts(newAttempts);
+            // Set next timer duration: 180s for the second attempt
+            setResendTimer(newAttempts === 1 ? 180 : 0); 
+        } else {
+            // If sending fails, allow user to try again without waiting
+            setCanResendOtp(true);
+        }
     };
 
     const renderContent = () => {
@@ -77,6 +122,38 @@ const LoginScreen: React.FC = () => {
                         <button type="submit" disabled={loading} className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3.5 rounded-xl transition-colors disabled:bg-cyan-800">
                             {loading ? 'Verifying...' : 'Verify'}
                         </button>
+                        
+                        <div className="mt-6 text-center">
+                            {resendAttempts < 2 ? (
+                                canResendOtp ? (
+                                    <button
+                                        type="button"
+                                        onClick={handleResendOtp}
+                                        className="text-cyan-200 hover:text-white font-semibold disabled:text-slate-400 disabled:cursor-not-allowed"
+                                        disabled={loading}
+                                    >
+                                        Resend OTP
+                                    </button>
+                                ) : (
+                                    <p className="text-slate-400">
+                                        Resend OTP in {Math.floor(resendTimer / 60)}:{String(resendTimer % 60).padStart(2, '0')}
+                                    </p>
+                                )
+                            ) : (
+                                 <div className="text-center text-cyan-200 bg-slate-800/50 p-4 rounded-lg">
+                                    <p className="mb-3">OTP resend limit reached.</p>
+                                    <button
+                                        type="button"
+                                        onClick={signInWithGoogle}
+                                        disabled={loading}
+                                        className="w-full flex items-center justify-center gap-3 bg-white text-slate-800 font-bold py-2.5 rounded-lg transition-colors hover:bg-slate-200 disabled:bg-slate-300"
+                                    >
+                                        <GoogleIcon />
+                                        <span>Sign in with Google instead</span>
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </form>
                     <button onClick={() => { setStep('form'); clearError(); }} className="mt-4 text-cyan-200 hover:text-white">गलत नंबर? वापस जाएं</button>
                 </div>
