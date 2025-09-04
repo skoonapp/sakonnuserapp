@@ -119,7 +119,9 @@ app.post("/cashfreeWebhook", express.raw({type: "application/json"}),
 // FIX: Using express.Request and express.Response to ensure correct types are resolved.
 // FIX: Removed explicit types to allow express to infer them correctly and avoid conflicts.
 // FIX: Removed explicit Request and Response types from the handler to resolve type conflicts.
-  async (req, res) => {
+// FIX: Re-adding explicit types for the handler's request and response objects.
+// This resolves a TypeScript error where the handler was not matching the expected signature for app.post.
+  async (req: Request, res: Response) => {
     try {
       const signature = req.headers["x-webhook-signature"] as string;
       const timestamp = req.headers["x-webhook-timestamp"] as string;
