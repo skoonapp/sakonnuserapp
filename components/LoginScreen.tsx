@@ -162,6 +162,11 @@ const LoginScreen: React.FC = () => {
 
         return (
              <div className="w-full max-w-sm">
+                <div className="mb-8 text-center text-cyan-200 text-sm p-4 animate-float">
+                    <GiftIcon className="w-8 h-8 mx-auto mb-2 text-yellow-300"/>
+                    <p>नए यूज़र्स को मिलते हैं <strong>5 मुफ़्त मैसेज</strong>!</p>
+                </div>
+                
                 <div className="text-center mb-8">
                     <h1 className="text-5xl md:text-6xl font-bold text-white animate-title-glow">SakoonApp</h1>
                     <p className="mt-4 text-lg md:text-xl text-cyan-200">अकेलापन अब बीतेगा, सकून से जी पाएगा</p>
@@ -191,11 +196,6 @@ const LoginScreen: React.FC = () => {
                     </button>
                     {error && <p className="text-red-300 bg-red-900/50 p-3 rounded-lg text-center mt-4 text-sm">{error}</p>}
                 </div>
-
-                <div className="mt-8 text-center text-cyan-200 text-sm p-4 animate-float">
-                    <GiftIcon className="w-8 h-8 mx-auto mb-2 text-yellow-300"/>
-                    <p>नए यूज़र्स को मिलते हैं <strong>5 मुफ़्त मैसेज</strong>, 75 अक्षर तक प्रत्येक!</p>
-                </div>
             </div>
         );
     };
@@ -213,6 +213,11 @@ const LoginScreen: React.FC = () => {
             <div className="relative z-10 flex flex-col items-center justify-center w-full h-full">
                 {renderContent()}
             </div>
+            
+            <footer className="absolute bottom-4 left-0 right-0 text-center text-xs text-slate-500 z-10 px-4">
+                <p>SakoonApp by Metxfitt Pvt. Ltd. | © 2025 All Rights Reserved</p>
+                <p>Contact: support@sakoonapp.com | Follow us: @SakoonApp</p>
+            </footer>
         </div>
     );
 };
