@@ -388,9 +388,9 @@ const App: React.FC = () => {
     }
     
     return (
-        <div className="w-full max-w-md mx-auto bg-slate-100 dark:bg-slate-950 flex flex-col h-screen shadow-2xl transition-colors duration-300">
+        <div className="relative w-full max-w-md mx-auto bg-slate-100 dark:bg-slate-950 flex flex-col h-screen shadow-2xl transition-colors duration-300 overflow-hidden">
             <Header currentUser={user} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} wallet={wallet} />
-            <main className="flex-grow pb-20 overflow-y-auto">
+            <main className="flex-grow pt-16 pb-20 overflow-y-auto">
                 <Suspense fallback={<ViewLoader />}>
                     {renderActiveView()}
                 </Suspense>

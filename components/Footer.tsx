@@ -51,7 +51,7 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeView, setActiveView }
   ];
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-cyan-50 dark:from-slate-950 dark:to-cyan-950/40 backdrop-blur-sm border-t border-cyan-100 dark:border-cyan-900/50 z-40 flex justify-around">
+    <footer className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-cyan-50 dark:from-slate-950 dark:to-cyan-950/40 backdrop-blur-sm border-t border-cyan-100 dark:border-cyan-900/50 z-40 flex justify-around">
       {navItems.map(item => (
         <NavItem
           key={item.id}

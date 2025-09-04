@@ -1,7 +1,8 @@
 import * as functions from "firebase-functions/v1";
 import * as admin from "firebase-admin";
 // FIX: Use standard ES module import for Express to resolve type conflicts.
-import express from "express";
+// FIX: Added explicit 'Request' and 'Response' imports to resolve type errors in route handlers.
+import express, { Request, Response } from "express";
 import cors from "cors";
 import {RtcTokenBuilder, RtcRole} from "zego-express-engine";
 import {Cashfree} from "cashfree-pg";
@@ -16,10 +17,10 @@ const db = admin.firestore();
 Cashfree.setConfig({
     clientId: functions.config().cashfree.client_id,
     clientSecret: functions.config().cashfree.client_secret,
-    // @ts-ignore - Correcting Cashfree SDK usage, PG property is deprecated.
+    // FIX: Replaced deprecated 'Cashfree.Environment' enum with string values 'PRODUCTION'/'SANDBOX' for the v4 SDK.
     env: functions.config().cashfree.env === "PROD" ?
-        Cashfree.Environment.PRODUCTION :
-        Cashfree.Environment.SANDBOX,
+        "PRODUCTION" :
+        "SANDBOX",
 });
 
 
@@ -113,9 +114,11 @@ const processPurchase = async (paymentNotes: any, paymentId: string) => {
 
 
 // Cashfree Webhook Endpoint
+// FIX: Explicitly typed 'req' and 'res' to match Express types, resolving handler signature conflicts.
 app.post("/cashfreeWebhook", express.raw({type: "application/json"}),
 // FIX: Using express.Request and express.Response to ensure correct types are resolved.
 // FIX: Removed explicit types to allow express to infer them correctly and avoid conflicts.
+// FIX: Removed explicit Request and Response types from the handler to resolve type conflicts.
   async (req, res) => {
     try {
       const signature = req.headers["x-webhook-signature"] as string;
