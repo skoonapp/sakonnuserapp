@@ -1,3 +1,4 @@
+
 body {
   font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   /* Default background is set here and in the root App component */
@@ -70,4 +71,14 @@ body {
   background-repeat: repeat;
   position: relative;
   opacity: 0.06;
+}
+
+/* For Swipeable Container */
+.swipe-view-container::-webkit-scrollbar {
+    display: none; /* For Chrome, Safari, and Opera */
+}
+
+.swipe-view-container {
+    -ms-overflow-style: none;  /* For Internet Explorer and Edge */
+    scrollbar-width: none;  /* For Firefox */
 }

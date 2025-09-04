@@ -2,7 +2,7 @@ import * as functions from "firebase-functions/v1";
 import * as admin from "firebase-admin";
 // FIX: Use standard ES module import for Express to resolve type conflicts.
 // FIX: Added explicit 'Request' and 'Response' imports to resolve type errors in route handlers.
-import express, { Request, Response } from "express";
+import express from "express";
 import cors from "cors";
 import {RtcTokenBuilder, RtcRole} from "zego-express-engine";
 import {Cashfree} from "cashfree-pg";
@@ -121,7 +121,8 @@ app.post("/cashfreeWebhook", express.raw({type: "application/json"}),
 // FIX: Removed explicit Request and Response types from the handler to resolve type conflicts.
 // FIX: Re-adding explicit types for the handler's request and response objects.
 // This resolves a TypeScript error where the handler was not matching the expected signature for app.post.
-  async (req: Request, res: Response) => {
+// FIX: Removed explicit Request and Response types to allow for correct type inference from the Express middleware, resolving multiple type errors.
+  async (req, res) => {
     try {
       const signature = req.headers["x-webhook-signature"] as string;
       const timestamp = req.headers["x-webhook-timestamp"] as string;
