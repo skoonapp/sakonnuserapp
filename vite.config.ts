@@ -23,21 +23,21 @@ export default defineConfig(({ mode }) => {
             theme_color: "#0891B2",
             icons: [
               {
-                src: 'icon.svg',
+                src: 'https://listenerimages.netlify.app/images/listener8.webp',
                 sizes: '192x192',
-                type: 'image/svg+xml',
+                type: 'image/webp',
                 purpose: 'any',
               },
               {
-                src: 'icon.svg',
+                src: 'https://listenerimages.netlify.app/images/listener8.webp',
                 sizes: '512x512',
-                type: 'image/svg+xml',
+                type: 'image/webp',
                 purpose: 'any',
               },
               {
-                src: 'icon.svg',
+                src: 'https://listenerimages.netlify.app/images/listener8.webp',
                 sizes: '512x512',
-                type: 'image/svg+xml',
+                type: 'image/webp',
                 purpose: 'maskable',
               },
             ],

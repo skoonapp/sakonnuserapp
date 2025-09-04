@@ -92,7 +92,7 @@ const App: React.FC = () => {
         }
     }, [deferredInstallPrompt]);
 
-    const handleInstallClick = () => {
+    const handleInstallClick = useCallback(() => {
         if (deferredInstallPrompt) {
             deferredInstallPrompt.prompt();
             deferredInstallPrompt.userChoice.then((choiceResult: { outcome: 'accepted' | 'dismissed' }) => {
@@ -105,7 +105,7 @@ const App: React.FC = () => {
                 setShowInstallBanner(false);
             });
         }
-    };
+    }, [deferredInstallPrompt]);
 
     const handleInstallDismiss = () => {
         const expiry = new Date().getTime() + 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -215,9 +215,13 @@ const App: React.FC = () => {
                 console.error("Error updating welcome status:", error);
             } finally {
                  setShowWelcomeModal(false);
+                 // After welcome, suggest installing the app if possible
+                 if (deferredInstallPrompt) {
+                    handleInstallClick();
+                 }
             }
         }
-    }, [user]);
+    }, [user, deferredInstallPrompt, handleInstallClick]);
 
     const handleStartSession = useCallback((type: 'call' | 'chat', listener: Listener) => {
         if (type === 'chat' && user && (user.freeMessagesRemaining || 0) > 0) {
@@ -383,27 +387,28 @@ const App: React.FC = () => {
             )}
             {showInstallBanner && (
                 <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-md z-40 animate-fade-in-up">
-                  <div className="bg-gradient-to-r from-cyan-600 to-teal-500 rounded-xl shadow-2xl p-4 flex items-center gap-4 text-white relative">
-                    <div className="bg-white/20 p-3 rounded-full shrink-0">
-                      <InstallIcon className="w-6 h-6" />
-                    </div>
-                    <div className="flex-grow">
-                      <p className="font-bold">Install SakoonApp</p>
-                      <p className="text-sm opacity-90">Install from the Profile tab for the best experience.</p>
-                    </div>
                     <button
-                      onClick={() => {
-                        setActiveView('profile');
-                        handleInstallDismiss(); // Hide banner after navigating
-                      }}
-                      className="bg-white text-cyan-700 font-bold py-2 px-4 rounded-lg text-sm shrink-0 hover:bg-cyan-100 transition-colors"
+                        onClick={handleInstallClick}
+                        className="w-full text-left bg-gradient-to-r from-cyan-600 to-teal-500 rounded-xl shadow-2xl p-2.5 flex items-center gap-3 text-white relative transition-transform hover:scale-105"
                     >
-                      Go to Profile
+                        <div className="bg-white/20 p-2 rounded-full shrink-0">
+                            <InstallIcon className="w-5 h-5" />
+                        </div>
+                        <div className="flex-grow">
+                            <p className="font-bold text-sm">Install SakoonApp</p>
+                            <p className="text-xs opacity-90">Add to home screen for quick access.</p>
+                        </div>
+                        <span className="bg-white text-cyan-700 font-bold py-1.5 px-3 rounded-lg text-xs shrink-0">
+                            Install
+                        </span>
+                        <button
+                            onClick={(e) => { e.stopPropagation(); handleInstallDismiss(); }}
+                            className="absolute -top-2 -right-2 bg-slate-800/50 rounded-full p-1 hover:bg-slate-800/80 transition-colors"
+                            aria-label="Dismiss install banner"
+                        >
+                            <CloseIcon className="w-4 h-4 text-white" />
+                        </button>
                     </button>
-                    <button onClick={handleInstallDismiss} className="absolute -top-2 -right-2 bg-slate-800/50 rounded-full p-1 hover:bg-slate-800/80 transition-colors">
-                      <CloseIcon className="w-4 h-4 text-white" />
-                    </button>
-                  </div>
                 </div>
             )}
             <AICompanionButton onClick={() => setShowAICompanion(true)} />
