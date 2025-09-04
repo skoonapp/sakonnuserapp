@@ -106,8 +106,11 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
       )}
 
       {/* Token Purchase Section */}
-      <section className="mb-8">
+      <section>
         <div className="text-center mb-6">
+            <div className="bg-cyan-100 dark:bg-cyan-900/50 text-cyan-800 dark:text-cyan-200 text-sm font-semibold px-4 py-2 rounded-full inline-block mb-4">
+                Note: सभी प्लान 30 दिनों के लिए मान्य होंगे।
+            </div>
             <h3 className="text-3xl font-bold text-slate-800 dark:text-slate-100 flex items-center justify-center gap-3">
                 <WalletIcon className="w-8 h-8 text-indigo-500"/>
                 <span>MT Plans</span>
@@ -142,10 +145,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
         </div>
       </section>
 
-      <div className="text-center my-8">
-        <div className="bg-cyan-100 dark:bg-cyan-900/50 text-cyan-800 dark:text-cyan-200 text-sm font-semibold px-4 py-2 rounded-full inline-block mb-4">
-            Note: सभी प्लान 30 दिनों के लिए मान्य होंगे।
-        </div>
+      <div className="text-center mt-12 mb-6">
         <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-100">DT Plans</h2>
         <p className="text-lg text-slate-600 dark:text-slate-400 mt-2">Direct Plans से फिक्स मिनट और मैसेज के लिए उपयोग करें।</p>
       </div>

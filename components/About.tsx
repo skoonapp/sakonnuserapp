@@ -48,16 +48,16 @@ const ProfileView: React.FC<ProfileViewProps> = ({
       <div className="container mx-auto px-4 py-6">
 
         {/* Highlighted Apply as Listener Section */}
-        <section id="apply" className="mt-4 py-6 bg-gradient-to-br from-cyan-50 to-blue-100 dark:from-cyan-950/50 dark:to-blue-950/50 rounded-xl shadow-lg border-2 border-cyan-200 dark:border-cyan-600">
+        <section id="apply" className="mt-4 py-3 bg-gradient-to-br from-cyan-50 to-blue-100 dark:from-cyan-950/50 dark:to-blue-950/50 rounded-xl shadow-lg border-2 border-cyan-200 dark:border-cyan-600">
           <div className="container mx-auto px-6">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-100">
+            <div className="text-center mb-3">
+              <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
                 Listener बनें – दूसरों की मदद करें और घर बैठे कमाएँ!
               </h2>
-              <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mt-2">
+              <p className="text-sm text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mt-1">
                 क्या आप दूसरों की सुनना पसंद करते हैं? हमारे समुदाय में शामिल हों और एक सकारात्मक बदलाव लाएँ।
               </p>
-              <p className="mt-4 text-xl font-semibold text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-500/10 inline-block px-4 py-2 rounded-full border border-green-200 dark:border-green-500/30">
+              <p className="mt-3 text-base font-semibold text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-500/10 inline-block px-3 py-1.5 rounded-full border border-green-200 dark:border-green-500/30">
                 💰 10,000–15,000 रु. महीना घर बैठे कमाएँ।
               </p>
             </div>
@@ -67,20 +67,13 @@ const ProfileView: React.FC<ProfileViewProps> = ({
           </div>
         </section>
 
-        {/* About Section with Logout button */}
+        {/* About Section */}
         <section id="about" className="mt-8 py-6 bg-white dark:bg-slate-900 rounded-xl shadow-md">
           <div className="container mx-auto px-6">
             <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
               <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-100 text-center sm:text-left">
                 हमारे बारे में
               </h2>
-              <button
-                onClick={onLogout}
-                className="flex items-center gap-2 bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 font-bold py-2 px-4 rounded-lg hover:bg-red-200 dark:hover:bg-red-500/20 transition-colors"
-              >
-                <LogoutIcon className="w-5 h-5" />
-                <span>लॉगआउट</span>
-              </button>
             </div>
             <p className="text-lg text-slate-600 dark:text-slate-400 max-w-3xl mx-auto text-center leading-relaxed">
               SakoonApp एक सुरक्षित और गोपनीय स्थान है जहाँ आप अपनी भावनाओं को साझा कर सकते हैं। हमारा लक्ष्य मानसिक स्वास्थ्य और भावनात्मक समर्थन को सभी के लिए सुलभ बनाना है।
@@ -111,6 +104,17 @@ const ProfileView: React.FC<ProfileViewProps> = ({
         <FAQ />
         
         <Contact />
+        
+        {/* Logout Button */}
+        <div className="mt-4 flex justify-center">
+            <button
+                onClick={onLogout}
+                className="flex items-center gap-2 bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 font-bold py-2 px-4 rounded-lg hover:bg-red-200 dark:hover:bg-red-500/20 transition-colors"
+            >
+                <LogoutIcon className="w-5 h-5" />
+                <span>लॉगआउट</span>
+            </button>
+        </div>
         
         <div className="mt-6 text-center p-6 bg-white dark:bg-slate-900 rounded-xl shadow-md">
           <h3 className="text-2xl font-bold text-slate-700 dark:text-slate-100 mb-4">App & Policies</h3>
