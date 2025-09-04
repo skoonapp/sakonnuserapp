@@ -23,12 +23,13 @@ if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
 
-// FIX: Set authentication persistence to 'session' to support sandboxed environments.
-// 'local' persistence can fail in iframes or web containers where localStorage is restricted.
-// 'session' uses sessionStorage, which is generally more permissive.
-firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
+// FIX: Set authentication persistence to 'local' to ensure user remains logged in.
+// 'local' uses localStorage and persists across browser sessions/tabs, which is
+// the expected behavior for a PWA or web app that users "install".
+// This prevents the user from being logged out automatically after closing the app.
+firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
   .catch((error) => {
-    // Handle errors here.
+    // Handle errors here (e.g., if localStorage is disabled).
     console.error("Auth persistence error:", error.code, error.message);
   });
 

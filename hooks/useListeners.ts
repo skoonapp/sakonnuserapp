@@ -47,9 +47,9 @@ export const useListeners = (favoriteListenerIds: number[] = []) => {
 
             setListeners(prevListeners => {
                 const combinedListeners = loadMore ? [...prevListeners, ...newListeners] : newListeners;
-                // FIX: Explicitly typed uniqueListeners as Listener[] to fix type inference issues.
-                // The spread syntax or Array.from was incorrectly inferring the type as `unknown[]`.
-                const uniqueListeners: Listener[] = Array.from(new Map(combinedListeners.map(l => [l.id, l])).values());
+                // FIX: Explicitly provide generic types to `new Map` to ensure TypeScript correctly infers
+                // the type of `uniqueListeners` as Listener[], preventing a type error.
+                const uniqueListeners: Listener[] = Array.from(new Map<number, Listener>(combinedListeners.map(l => [l.id, l])).values());
 
                 uniqueListeners.sort((a, b) => {
                     const aIsFav = favoriteListenerIds.includes(a.id);

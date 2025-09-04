@@ -93,6 +93,26 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
     onLeave(isSuccess, sentMessagesCount);
   }, [onLeave, sentMessagesCount]);
 
+  // Effect for handling device back button press
+  useEffect(() => {
+    // Push a new state to the history stack when the chat UI opens.
+    // This allows us to "capture" the back button press.
+    window.history.pushState(null, '');
+
+    const handleBackButton = (event: PopStateEvent) => {
+        // When the user clicks the back button, popstate is triggered.
+        // We then call handleLeave to gracefully close the chat UI.
+        handleLeave(true);
+    };
+
+    window.addEventListener('popstate', handleBackButton);
+
+    return () => {
+        // Clean up the event listener when the component unmounts.
+        window.removeEventListener('popstate', handleBackButton);
+    };
+  }, [handleLeave]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };

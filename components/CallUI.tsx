@@ -104,6 +104,26 @@ const CallUI: React.FC<CallUIProps> = ({ session, user, onLeave }) => {
       }
     };
   }, [status, session.sessionDurationSeconds, endCall]);
+  
+  // Effect for handling device back button press
+  useEffect(() => {
+    // Push a new state to the history stack when the call UI opens.
+    // This allows us to "capture" the back button press.
+    window.history.pushState(null, '');
+
+    const handleBackButton = (event: PopStateEvent) => {
+        // When the user clicks the back button, we want to end the call gracefully.
+        endCall();
+    };
+
+    window.addEventListener('popstate', handleBackButton);
+
+    return () => {
+        // Clean up the event listener when the component unmounts.
+        window.removeEventListener('popstate', handleBackButton);
+    };
+  }, [endCall]);
+
 
   useEffect(() => {
     let isComponentMounted = true;
