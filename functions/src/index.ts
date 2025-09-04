@@ -1,7 +1,7 @@
 import * as functions from "firebase-functions/v1";
 import * as admin from "firebase-admin";
 // FIX: Use standard ES module import for Express and explicitly import types to resolve conflicts.
-import express, {Request, Response} from "express";
+import * as express from "express";
 import cors from "cors";
 import {RtcTokenBuilder, RtcRole} from "zego-express-engine";
 import {Cashfree} from "cashfree-pg";
@@ -109,7 +109,8 @@ const processPurchase = async (paymentNotes: any, paymentId: string) => {
 
 // Cashfree Webhook Endpoint
 app.post("/cashfreeWebhook", express.raw({type: "application/json"}),
-  async (req: Request, res: Response) => {
+// FIX: Using express.Request and express.Response to ensure correct types are resolved.
+  async (req: express.Request, res: express.Response) => {
     try {
       const signature = req.headers["x-webhook-signature"] as string;
       const timestamp = req.headers["x-webhook-timestamp"] as string;
