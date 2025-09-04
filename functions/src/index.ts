@@ -5,19 +5,19 @@ import * as admin from "firebase-admin";
 import express from "express";
 import cors from "cors";
 import {RtcTokenBuilder} from "zego-express-engine";
-// FIX: Changed to a named import for `cashfree-pg` to resolve SDK usage errors.
-import { cashfree } from "cashfree-pg";
+// FIX: Updated imports for cashfree-pg v4
+import { Cashfree, PGOrders } from "cashfree-pg";
 import * as crypto from "crypto";
 
 admin.initializeApp();
 const db = admin.firestore();
 
-// FIX: Correctly configure the Cashfree SDK using the 'cashfree' instance and modern properties.
-cashfree.setConfig({
-    clientId: functions.config().cashfree.client_id,
-    clientSecret: functions.config().cashfree.client_secret,
-    env: functions.config().cashfree.env === "PROD" ? "PROD" : "TEST",
-});
+// FIX: Correctly configure the Cashfree SDK using static properties for v4.
+Cashfree.XClientId = functions.config().cashfree.client_id;
+Cashfree.XClientSecret = functions.config().cashfree.client_secret;
+Cashfree.XEnvironment = functions.config().cashfree.env === "PROD" ?
+    Cashfree.Environment.PRODUCTION :
+    Cashfree.Environment.SANDBOX;
 
 const firebaseUIDtoZegoUID = (uid: string): number => {
   let hash = 0;
@@ -123,12 +123,14 @@ export const createCashfreeOrder = functions.https.onCall(async (data, context) 
     order_meta: {
       payment_notes: { userId, planType, planDetails: JSON.stringify(planDetails) },
     },
+    // FIX: Add order expiry for v3 compatibility
+    order_expiry_time: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
   };
 
   try {
-    // FIX: Updated the API call to match the modern Cashfree SDK.
-    const response = await cashfree.pg.orders.create(orderRequest);
-    return { success: true, orderToken: response.data.order_token };
+    // FIX: Updated the API call to match the modern Cashfree SDK v4 and return paymentSessionId.
+    const response = await PGOrders.createOrder(orderRequest);
+    return { success: true, paymentSessionId: response.data.payment_session_id };
   } catch (error: any) {
     console.error("Cashfree order creation failed:", error.response?.data || error.message);
     throw new functions.https.HttpsError("internal", "Failed to create payment order.");

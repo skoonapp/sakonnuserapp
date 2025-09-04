@@ -7,7 +7,7 @@ declare global {
 }
 
 interface CashfreeModalProps {
-  orderToken: string;
+  paymentSessionId: string;
   onClose: (status: 'success' | 'failure' | 'closed') => void;
 }
 
@@ -19,8 +19,7 @@ const CloseIcon: React.FC<{ className?: string }> = ({ className }) => (
 );
 
 
-const CashfreeModal: React.FC<CashfreeModalProps> = ({ orderToken, onClose }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+const CashfreeModal: React.FC<CashfreeModalProps> = ({ paymentSessionId, onClose }) => {
   const [isLoading, setIsLoading] = useState(true);
   const isClosedRef = useRef(false);
 
@@ -30,56 +29,40 @@ const CashfreeModal: React.FC<CashfreeModalProps> = ({ orderToken, onClose }) =>
       onClose('failure');
       return;
     }
-
-    if (!containerRef.current) return;
-
+    
     try {
-      const cashfree = new window.Cashfree(orderToken);
-      const dropinConfig = {
-        components: [
-            "order-details",
-            "card",
-            "upi",
-            "app",
-            "netbanking",
-        ],
-        // The 'onSuccess' and 'onFailure' are crucial for providing immediate feedback.
-        // The backend webhook remains the ultimate source of truth for crediting the user.
-        onSuccess: (data: any) => {
-            console.log('Cashfree success:', data);
+      // FIX: Use new Cashfree() constructor for v3 SDK
+      const cashfree = new window.Cashfree();
+      
+      // Mount the checkout component inside our modal
+      cashfree.checkout({
+        paymentSessionId: paymentSessionId,
+        // The mountTarget will render the payment form inside this element.
+        mountTarget: "#cashfree-payment-container",
+      }).then((result: any) => {
+         if (result.error) {
+            console.error("Cashfree Payment Error:", result.error);
+            if (!isClosedRef.current) {
+                isClosedRef.current = true;
+                onClose('failure');
+            }
+        }
+        if (result.paymentDetails) {
+            console.log("Cashfree Payment Success:", result.paymentDetails);
             if (!isClosedRef.current) {
                 isClosedRef.current = true;
                 onClose('success');
             }
-        },
-        onFailure: (data: any) => {
-            console.error('Cashfree failure:', data);
-             if (!isClosedRef.current) {
-                isClosedRef.current = true;
-                onClose('failure');
-            }
-        },
-        // Using style options to match the app's theme.
-        style: {
-            theme: document.documentElement.classList.contains('dark') ? "dark" : "light",
-            backgroundColor: document.documentElement.classList.contains('dark') ? "#0f172a" : "#f1f5f9",
-            color: document.documentElement.classList.contains('dark') ? "#f8fafc" : "#0f172a",
-            fontFamily: "Poppins, sans-serif",
-            fontSize: "14px",
-            errorColor: "#ef4444",
-            themeColor: "#0891B2",
         }
-      };
-      
-      // Render the payment UI inside our modal container.
-      cashfree.drop(containerRef.current, dropinConfig);
+      });
       setIsLoading(false);
 
     } catch (error) {
-        console.error("Error initializing Cashfree drop-in UI", error);
+        console.error("Error initializing Cashfree checkout UI", error);
         onClose('failure');
     }
-  }, [orderToken, onClose]);
+
+  }, [paymentSessionId, onClose]);
 
   const handleManualClose = () => {
     if (!isClosedRef.current) {
@@ -98,20 +81,19 @@ const CashfreeModal: React.FC<CashfreeModalProps> = ({ orderToken, onClose }) =>
             </button>
         </div>
         
-        {isLoading && (
-            <div className="h-96 flex items-center justify-center">
-                <div className="text-cyan-600 dark:text-cyan-400 flex flex-col items-center">
-                    <svg className="animate-spin h-8 w-8 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <p>Loading Secure Gateway...</p>
+        <div id="cashfree-payment-container" className="p-2" style={{minHeight: '24rem'}}>
+            {isLoading && (
+                <div className="h-96 flex items-center justify-center">
+                    <div className="text-cyan-600 dark:text-cyan-400 flex flex-col items-center">
+                        <svg className="animate-spin h-8 w-8 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <p>Loading Secure Gateway...</p>
+                    </div>
                 </div>
-            </div>
-        )}
-
-        <div ref={containerRef} className="p-2" style={{minHeight: isLoading ? 0 : '24rem'}}>
-            {/* Cashfree Drop-in UI will render here */}
+            )}
+            {/* Cashfree Checkout UI will render here */}
         </div>
       </div>
     </div>

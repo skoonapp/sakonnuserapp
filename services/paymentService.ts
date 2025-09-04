@@ -26,9 +26,9 @@ class PaymentService {
         planDetails: { tokens, price }
       });
       
-      // FIX: Added more defensive checks to ensure a valid order token is received.
-      if (result.data && result.data.success && result.data.orderToken) {
-        return result.data.orderToken;
+      // FIX: Updated to check for paymentSessionId for Cashfree v3.
+      if (result.data && result.data.success && result.data.paymentSessionId) {
+        return result.data.paymentSessionId;
       } else {
         console.error("Invalid response from createCashfreeOrder for MT plan:", result.data);
         throw new Error(result.data.message || 'Failed to create a valid payment order.');
@@ -54,9 +54,9 @@ class PaymentService {
         planDetails: planData
       });
       
-      // FIX: Added more defensive checks to ensure a valid order token is received.
-      if (result.data && result.data.success && result.data.orderToken) {
-        return result.data.orderToken;
+      // FIX: Updated to check for paymentSessionId for Cashfree v3.
+      if (result.data && result.data.success && result.data.paymentSessionId) {
+        return result.data.paymentSessionId;
       } else {
          console.error("Invalid response from createCashfreeOrder for DT plan:", result.data);
          throw new Error(result.data.message || 'Failed to create a valid payment order.');

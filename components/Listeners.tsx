@@ -30,7 +30,7 @@ const TokenIcon: React.FC<{ className?: string }> = ({ className }) => (
 const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
-  const [orderToken, setOrderToken] = useState<string | null>(null);
+  const [paymentSessionId, setPaymentSessionId] = useState<string | null>(null);
   const [paymentDescription, setPaymentDescription] = useState('');
 
 
@@ -48,9 +48,9 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
     setLoadingPlan(planKey);
     setFeedback(null);
     try {
-      const token = await paymentService.buyTokens(tokens, price);
+      const sessionId = await paymentService.buyTokens(tokens, price);
       setPaymentDescription(`${tokens} MT`);
-      setOrderToken(token);
+      setPaymentSessionId(sessionId);
     } catch (error: any) {
        setFeedback({ type: 'error', message: `Payment failed to start: ${error.message || 'Please check your connection and try again.'}` });
        setTimeout(() => setFeedback(null), 5000);
@@ -64,9 +64,9 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
       setLoadingPlan(planKey);
       setFeedback(null);
       try {
-        const token = await paymentService.buyDTPlan(planData);
+        const sessionId = await paymentService.buyDTPlan(planData);
         setPaymentDescription(planData.name || 'Plan');
-        setOrderToken(token);
+        setPaymentSessionId(sessionId);
     } catch (error: any) {
         setFeedback({ type: 'error', message: `Payment failed to start: ${error.message || 'Please check your connection and try again.'}` });
         setTimeout(() => setFeedback(null), 5000);
@@ -82,7 +82,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
         setFeedback({ type: 'error', message: 'Payment failed. Please try again.' });
     }
     // For 'closed', we don't show any message.
-    setOrderToken(null);
+    setPaymentSessionId(null);
     setPaymentDescription('');
     setTimeout(() => setFeedback(null), 5000);
   };
@@ -97,7 +97,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
   return (
     <div className="container mx-auto px-4 pt-2 pb-6">
       
-      {orderToken && <CashfreeModal orderToken={orderToken} onClose={handleModalClose} />}
+      {paymentSessionId && <CashfreeModal paymentSessionId={paymentSessionId} onClose={handleModalClose} />}
 
       {feedback && (
         <div className={`p-4 mb-4 rounded-lg text-center font-semibold animate-fade-in-down ${feedback.type === 'success' ? 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300'}`}>
