@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import PlanCard from './PlanCard';
 import { CALL_PLANS, CHAT_PLANS } from '../constants';
@@ -53,8 +52,8 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
       setPaymentDescription(`${tokens} MT`);
       setOrderToken(token);
     } catch (error: any) {
-       setFeedback({ type: 'error', message: error.message || 'Payment failed to initialize.' });
-       setTimeout(() => setFeedback(null), 4000);
+       setFeedback({ type: 'error', message: `Payment failed to start: ${error.message || 'Please check your connection and try again.'}` });
+       setTimeout(() => setFeedback(null), 5000);
     } finally {
         setLoadingPlan(null);
     }
@@ -69,8 +68,8 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
         setPaymentDescription(planData.name || 'Plan');
         setOrderToken(token);
     } catch (error: any) {
-        setFeedback({ type: 'error', message: error.message || 'Payment failed to initialize.' });
-        setTimeout(() => setFeedback(null), 4000);
+        setFeedback({ type: 'error', message: `Payment failed to start: ${error.message || 'Please check your connection and try again.'}` });
+        setTimeout(() => setFeedback(null), 5000);
     } finally {
         setLoadingPlan(null);
     }
@@ -96,7 +95,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
   }));
 
   return (
-    <div className="container mx-auto px-4 py-6">
+    <div className="container mx-auto px-4 pt-2 pb-6">
       
       {orderToken && <CashfreeModal orderToken={orderToken} onClose={handleModalClose} />}
 
@@ -108,7 +107,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
 
       {/* Token Purchase Section */}
       <section>
-        <div className="text-center mb-6">
+        <div className="text-center pb-4 border-b border-slate-200 dark:border-slate-700">
             <div className="bg-cyan-100 dark:bg-cyan-900/50 text-cyan-800 dark:text-cyan-200 text-sm font-semibold px-4 py-2 rounded-full inline-block mb-4">
                 Note: सभी प्लान 30 दिनों के लिए मान्य होंगे।
             </div>
@@ -119,7 +118,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
             <p className="text-slate-600 dark:text-slate-400 mt-2">Money Token खरीदें और अपनी सुविधानुसार कॉल या चैट के लिए उपयोग करें।</p>
         </div>
         
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-3xl mx-auto pt-6">
             {tokenOptions.map(option => (
                 <div key={option.tokens} className="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-between transition-all hover:shadow-lg hover:scale-105">
                     <div className="text-center">
@@ -167,7 +166,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser }) => {
       </div>
 
       {/* Secure Payments Section */}
-      <section className="mt-16 text-center bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 max-w-3xl mx-auto">
+      <section className="mt-10 text-center bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 max-w-3xl mx-auto">
         <h3 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">सुरक्षित पेमेंट</h3>
         <div className="flex flex-col items-center gap-y-3 my-4">
           <div className="flex justify-center items-center gap-x-6 sm:gap-x-8">

@@ -98,6 +98,7 @@ export interface FaqItem {
     isPositive: boolean;
 }
 
+// FIX: Define and export the SessionHistoryEntry type to resolve import errors.
 export interface SessionHistoryEntry {
   id: string;
   listenerName: string;

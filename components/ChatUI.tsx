@@ -193,6 +193,8 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
     const localMessageId = `local-${Date.now()}`;
     const textToSend = inputValue.trim();
     setInputValue('');
+    setTimeout(() => textareaRef.current?.focus(), 0);
+
 
     const localMessage: ChatMessage = {
         id: localMessageId,
@@ -283,7 +285,7 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
   return (
     <div className="fixed inset-0 bg-stone-100 dark:bg-slate-900 flex flex-col h-full" style={{backgroundImage: `url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')`}}>
       {/* Header */}
-      <header className="bg-white dark:bg-slate-900 shadow-md z-10 flex items-center p-3 gap-3">
+      <header className="bg-white dark:bg-slate-900 shadow-md z-10 flex items-center p-3 gap-3 sticky top-0">
         <img 
             src={listener.image} 
             alt={listener.name} 
@@ -369,10 +371,10 @@ const ChatUI: React.FC<ChatUIProps> = ({ session, user, onLeave }) => {
                     </div>
 
                     <button
-                        type={inputValue.trim() ? "submit" : "button"}
+                        type="submit"
                         className="w-12 h-12 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full flex items-center justify-center transition-all transform hover:scale-110 shadow-md disabled:bg-slate-500 disabled:cursor-not-allowed disabled:scale-100 shrink-0"
                         disabled={status !== 'connected' || !inputValue.trim()}
-                        aria-label={inputValue.trim() ? "Send Message" : "Voice Message"}
+                        aria-label="Send Message"
                     >
                         <div className="relative w-6 h-6">
                             <MicrophoneIcon className={`absolute inset-0 w-full h-full transition-all duration-300 ${inputValue.trim() ? 'opacity-0 scale-50' : 'opacity-100 scale-100'}`} />

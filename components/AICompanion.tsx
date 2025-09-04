@@ -157,6 +157,8 @@ ${allPlansInfo}
 
         const text = inputValue.trim();
         setInputValue('');
+        setTimeout(() => textareaRef.current?.focus(), 0);
+
 
         setMessages(prev => [...prev, {
             id: `user-${Date.now()}`,
@@ -197,8 +199,8 @@ ${allPlansInfo}
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex flex-col bg-slate-100 dark:bg-slate-950 animate-fade-in-up transition-transform duration-300">
-            <header className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 shadow-sm flex-shrink-0 border-b border-slate-200 dark:border-slate-800">
+        <div className="fixed inset-0 z-50 flex flex-col bg-stone-100 dark:bg-slate-900 animate-fade-in-up transition-transform duration-300">
+            <header className="flex items-center justify-between p-3 bg-white dark:bg-slate-900 shadow-sm flex-shrink-0 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10">
                 <div className="flex items-center gap-3">
                     <div className="bg-gradient-to-br from-cyan-500 to-teal-400 p-2 rounded-full">
                         <RobotIcon className="w-6 h-6 text-white" />
@@ -213,18 +215,22 @@ ${allPlansInfo}
                 </button>
             </header>
     
-            <main className="flex-grow p-4 overflow-y-auto">
-                <div className="flex flex-col gap-4">
+            <main className="flex-grow p-4 overflow-y-auto" style={{backgroundImage: `url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')`}}>
+                <div className="flex flex-col gap-2">
                     {messages.map((msg) => {
                         const isAI = msg.sender.uid === 'ai';
+                        const isUser = msg.sender.uid === user.uid;
                         return (
-                            <div key={msg.id} className={`flex items-end gap-2 ${!isAI ? 'flex-row-reverse' : ''}`}>
+                            <div key={msg.id} className={`flex items-end gap-2 ${isUser ? 'flex-row-reverse' : ''}`}>
                                 {isAI && (
-                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-teal-400 flex items-center justify-center shrink-0">
+                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-teal-400 flex items-center justify-center shrink-0 self-start">
                                         <RobotIcon className="w-5 h-5 text-white" />
                                     </div>
                                 )}
-                                <div className={`max-w-xs md:max-w-md p-3 rounded-2xl ${isAI ? 'bg-white dark:bg-slate-800 rounded-bl-none shadow-sm' : 'bg-cyan-500 text-white rounded-br-none'}`}>
+                                <div className={`max-w-xs md:max-w-md p-2.5 rounded-xl ${
+                                    isAI ? 'bg-white dark:bg-slate-800 rounded-bl-none shadow-sm' : 
+                                    'bg-[#dcf8c6] dark:bg-cyan-900 text-slate-800 dark:text-slate-100 rounded-tr-none'
+                                }`}>
                                     <div className="text-sm prose prose-sm dark:prose-invert max-w-none">
                                         <MarkdownRenderer text={msg.text} />
                                     </div>
@@ -251,9 +257,9 @@ ${allPlansInfo}
                 <div ref={messagesEndRef} />
             </main>
             
-            <footer className="p-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm flex-shrink-0 border-t border-slate-200 dark:border-slate-800">
+            <footer className="p-2 bg-transparent flex-shrink-0">
                 <form onSubmit={handleSendMessage} className="flex items-end gap-2">
-                    <div className="flex-grow min-w-0 bg-white dark:bg-slate-800 rounded-2xl flex items-end px-3 py-1 shadow-inner">
+                    <div className="flex-grow min-w-0 bg-white dark:bg-slate-900 rounded-2xl flex items-end px-3 py-1 shadow-sm">
                         <textarea
                             ref={textareaRef}
                             rows={1}
@@ -274,7 +280,7 @@ ${allPlansInfo}
                     <button
                         type="submit"
                         disabled={isLoading || !inputValue.trim()}
-                        className="w-12 h-12 bg-cyan-600 hover:bg-cyan-700 text-white rounded-full flex items-center justify-center transition-all transform hover:scale-110 shadow-md disabled:bg-slate-500 disabled:cursor-not-allowed disabled:scale-100 shrink-0"
+                        className="w-12 h-12 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full flex items-center justify-center transition-all transform hover:scale-110 shadow-md disabled:bg-slate-500 disabled:cursor-not-allowed disabled:scale-100 shrink-0"
                         aria-label="Send message"
                     >
                         <div className="relative w-6 h-6">

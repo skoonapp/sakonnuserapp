@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import type { User, Listener, ActivePlan, CallSession, ChatSession, ActiveView } from './types';
 import { auth, db, functions } from './utils/firebase';
@@ -304,16 +303,6 @@ const App: React.FC = () => {
     const handleCallSessionEnd = useCallback(async (success: boolean, consumedSeconds: number) => {
         if (user && activeCallSession) {
             if (success && consumedSeconds > 5) { // Only deduct if call lasted more than 5 seconds
-                // Save session to history
-                const historyEntry = {
-                    listenerName: activeCallSession.listener.name,
-                    listenerImage: LISTENER_IMAGES[activeCallSession.listener.id % LISTENER_IMAGES.length],
-                    type: 'call',
-                    timestamp: Date.now(),
-                    durationSeconds: consumedSeconds,
-                };
-                db.collection('users').doc(user.uid).collection('sessionHistory').add(historyEntry).catch(console.error);
-
                  try {
                     const finalizeCall = functions.httpsCallable('finalizeCallSession');
                     await finalizeCall({ consumedSeconds, associatedPlanId: activeCallSession.associatedPlanId });
@@ -336,16 +325,6 @@ const App: React.FC = () => {
     const handleChatSessionEnd = useCallback(async (success: boolean, consumedMessages: number) => {
         if (user && activeChatSession) {
              if (success && consumedMessages > 0) {
-                 // Save session to history
-                const historyEntry = {
-                    listenerName: activeChatSession.listener.name,
-                    listenerImage: LISTENER_IMAGES[activeChatSession.listener.id % LISTENER_IMAGES.length],
-                    type: 'chat',
-                    timestamp: Date.now(),
-                    messageCount: consumedMessages,
-                };
-                db.collection('users').doc(user.uid).collection('sessionHistory').add(historyEntry).catch(console.error);
-
                 // Record earnings only if it's not a free trial
                 if (!activeChatSession.isFreeTrial) {
                     await handleChat(
