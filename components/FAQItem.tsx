@@ -72,7 +72,7 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer, isPositive, isOpen,
         </span>
       </button>
       <div
-        className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? 'max-h-96' : 'max-h-0'}`}
+        className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? 'max-h-[1000px]' : 'max-h-0'}`}
       >
         <div className="p-5 pt-0 text-slate-600 dark:text-slate-400 flex items-start gap-3">
           {isPositive ? <CheckIcon /> : <CrossIcon />}
