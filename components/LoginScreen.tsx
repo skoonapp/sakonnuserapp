@@ -89,56 +89,83 @@ const LoginScreen: React.FC = () => {
             setCanResendOtp(true);
         }
     };
+    
+    const maskedPhoneNumber = phoneNumber.length > 3 ? `XXXXXXX${phoneNumber.slice(-3)}` : phoneNumber;
 
     const renderContent = () => {
         if (step === 'otp') {
             return (
-                <div className="w-full max-w-sm">
-                    <h2 className="text-xl md:text-2xl font-bold text-white mb-2">OTP दर्ज करें</h2>
-                    <p className="text-sm text-cyan-200 mb-8">+91 {phoneNumber} पर भेजा गया 6-अंकीय कोड दर्ज करें।</p>
+                <div className="w-full max-w-sm text-center">
+                    <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">OTP दर्ज करें</h2>
+                    
+                    <div className="bg-slate-800/50 border border-slate-700 p-4 rounded-xl mb-6 text-cyan-200 text-sm">
+                        हमने आपके नंबर +91 {maskedPhoneNumber} पर 6 अंकों का OTP भेजा है।
+                    </div>
+
                     <form onSubmit={onOtpSubmit} className="bg-slate-900/60 backdrop-blur-sm border border-white/20 p-6 md:p-8 rounded-2xl">
-                        <div className="relative mb-4">
-                            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
-                                <LockIcon className="w-5 h-5"/>
-                            </div>
+                        
+                        <div className="relative flex justify-center items-center mb-6">
+                            <label htmlFor="otp-input" className="sr-only">Enter OTP</label>
                             <input
+                                id="otp-input"
                                 type="tel"
                                 value={otp}
                                 onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
-                                placeholder="6-अंकीय OTP"
-                                className="w-full bg-slate-800/30 border border-white/20 text-white placeholder-cyan-300/50 text-lg rounded-xl tracking-[0.5em] text-center p-3.5 focus:ring-cyan-400 focus:border-cyan-400 focus:outline-none"
-                                required
+                                className="absolute w-full h-full opacity-0 z-10 tracking-[28px] md:tracking-[35px] indent-3 md:indent-4"
+                                maxLength={6}
+                                autoFocus
+                                autoComplete="one-time-code"
+                                inputMode="numeric"
                             />
+                            <div className="flex gap-2" aria-hidden="true" onClick={() => document.getElementById('otp-input')?.focus()}>
+                                {[...Array(6)].map((_, i) => (
+                                    <div key={i} className={`w-10 h-12 md:w-12 md:h-14 bg-slate-800/50 border-2 rounded-lg flex items-center justify-center transition-all duration-200 ${
+                                        otp.length === i ? 'border-cyan-400' : 'border-slate-700'
+                                    }`}>
+                                        <span className="text-white text-2xl font-bold">
+                                            {otp[i] ? '•' : ''}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
+
                         {error && <p className="text-red-300 bg-red-900/50 p-3 rounded-lg text-center mb-4">{error}</p>}
-                        <button type="submit" disabled={loading} className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3.5 rounded-xl transition-colors disabled:bg-cyan-800">
+                        
+                        <button type="submit" disabled={loading || otp.length < 6} className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3.5 rounded-xl transition-colors disabled:bg-cyan-800 disabled:opacity-70">
                             {loading ? 'Verifying...' : 'Verify'}
                         </button>
                         
-                        <div className="mt-6 text-center">
+                        <div className="mt-6 text-center text-sm text-slate-400">
                             {resendAttempts < 2 ? (
                                 canResendOtp ? (
-                                    <button
-                                        type="button"
-                                        onClick={handleResendOtp}
-                                        className="text-cyan-200 hover:text-white font-semibold disabled:text-slate-400 disabled:cursor-not-allowed"
-                                        disabled={loading}
-                                    >
-                                        Resend OTP
-                                    </button>
+                                    <span>
+                                        OTP नहीं आया?{' '}
+                                        <button
+                                            type="button"
+                                            onClick={handleResendOtp}
+                                            className="font-semibold text-cyan-300 hover:text-white disabled:text-slate-500 underline"
+                                            disabled={loading}
+                                        >
+                                            Resend OTP
+                                        </button>
+                                    </span>
                                 ) : (
-                                    <p className="text-slate-400">
-                                        Resend OTP in {Math.floor(resendTimer / 60)}:{String(resendTimer % 60).padStart(2, '0')}
-                                    </p>
+                                    <span>
+                                        OTP नहीं आया? Resend in{' '}
+                                        <span className="font-semibold text-white">
+                                            {Math.floor(resendTimer / 60)}:{String(resendTimer % 60).padStart(2, '0')}
+                                        </span>
+                                    </span>
                                 )
                             ) : (
-                                 <div className="text-center text-cyan-200 bg-slate-800/50 p-4 rounded-lg">
+                                <div className="text-center text-cyan-200 bg-slate-800/50 p-4 rounded-lg text-sm">
                                     <p className="mb-3">OTP resend limit reached.</p>
                                     <button
                                         type="button"
                                         onClick={signInWithGoogle}
                                         disabled={loading}
-                                        className="w-full flex items-center justify-center gap-3 bg-white text-slate-800 font-bold py-2.5 rounded-lg transition-colors hover:bg-slate-200 disabled:bg-slate-300"
+                                        className="w-full flex items-center justify-center gap-3 bg-white text-slate-800 font-bold py-2 rounded-lg transition-colors hover:bg-slate-200 disabled:bg-slate-300 text-sm"
                                     >
                                         <GoogleIcon />
                                         <span>Sign in with Google instead</span>
@@ -147,7 +174,7 @@ const LoginScreen: React.FC = () => {
                             )}
                         </div>
                     </form>
-                    <button onClick={() => { setStep('form'); clearError(); }} className="mt-4 text-cyan-200 hover:text-white">गलत नंबर? वापस जाएं</button>
+                    <button onClick={() => { setStep('form'); clearError(); setOtp(''); }} className="mt-6 text-cyan-200 hover:text-white text-sm">गलत नंबर? वापस जाएं</button>
                 </div>
             );
         }
