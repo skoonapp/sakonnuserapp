@@ -154,58 +154,66 @@ const LoginScreen: React.FC = () => {
 
         return (
              <div className="w-full max-w-sm">
+                <div className="mb-4 bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-3 rounded-xl shadow-lg text-center relative overflow-hidden animate-shimmer">
+                    <h2 className="text-base font-bold">नए यूज़र्स को मिलते हैं</h2>
+                    <p className="text-xl font-extrabold">5 मुफ़्त मैसेज!</p>
+                </div>
+
                 <div className="text-center mb-6">
-                    <div className="w-full max-w-xs mx-auto text-center bg-gradient-to-r from-cyan-400 to-purple-600 text-white rounded-2xl shadow-xl p-6 border-2 border-white/30 relative overflow-hidden animate-shimmer">
-                        <p className="font-bold text-xl">नए यूज़र्स को मिलते हैं</p>
-                        <p className="font-extrabold text-3xl tracking-wide mt-1">5 मुफ़्त मैसेज!</p>
-                    </div>
-                    <h1 className="text-4xl md:text-5xl font-bold text-white animate-title-glow mt-4">SakoonApp</h1>
-                    <p className="mt-2 text-base md:text-lg text-cyan-200">अकेलापन अब बीतेगा, सकून से जी पाएगा</p>
+                    <h1 className="text-4xl md:text-5xl font-bold text-white animate-title-glow">SakoonApp</h1>
+                    <p className="mt-2 text-base md:text-lg text-cyan-200">User Portal Login</p>
+                    <p className="mt-1 text-slate-300">
+                        अकेलापन अब बीतेगा, सकून से जी पाएगा
+                    </p>
                 </div>
 
                 <div className="w-full bg-slate-900/60 backdrop-blur-sm border border-white/20 p-6 md:p-8 rounded-2xl">
-                    <h2 className="text-center font-bold text-white text-xl mb-6">लॉग इन करें</h2>
                      <form onSubmit={onPhoneSubmit}>
                         <div className="relative mb-4">
                             <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400"><PhoneIcon className="w-5 h-5" /><span className="ml-2">+91</span></div>
                             <input type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value.replace(/[^0-9]/g, '').slice(0, 10))} placeholder="मोबाइल नंबर" className="w-full bg-slate-800/30 border border-white/20 text-white placeholder-cyan-300/50 text-lg rounded-xl block pl-20 p-3.5 focus:ring-cyan-400 focus:border-cyan-400 focus:outline-none" required />
                         </div>
                         <button type="submit" disabled={loading} className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3.5 rounded-xl transition-colors disabled:bg-cyan-800">
-                            {loading ? 'OTP भेजा जा रहा है...' : 'OTP पाएं'}
+                            {loading ? 'Sending OTP...' : 'Send OTP'}
                         </button>
                     </form>
 
                     <div className="flex items-center my-6">
                         <hr className="flex-grow border-white/20" />
-                        <span className="px-4 text-slate-400">या</span>
+                        <span className="px-4 text-slate-400">OR</span>
                         <hr className="flex-grow border-white/20" />
                     </div>
 
                     <button onClick={signInWithGoogle} disabled={loading} className="w-full flex items-center justify-center gap-3 bg-white text-slate-800 font-bold py-3.5 rounded-xl transition-colors hover:bg-slate-200 disabled:bg-slate-300">
                         <GoogleIcon/>
-                        <span>Google से जारी रखें</span>
+                        <span>Sign in with Google</span>
                     </button>
-                    {error && <p className="text-red-300 bg-red-900/50 p-3 rounded-lg text-center mt-4 text-sm">{error}</p>}
+                    
+                    {error && <p className="text-red-300 bg-red-900/50 p-3 rounded-lg text-center mt-6 text-sm">{error}</p>}
+                    
+                    <div className="text-center text-slate-400 text-xs mt-6 pt-6 border-t border-white/10">
+                        <p>🔐 Secure Login with OTP Authentication • App Version: 1.0.0 (Beta)</p>
+                    </div>
                 </div>
             </div>
         );
     };
 
     return (
-        <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-start pt-8 sm:pt-12 p-4 relative overflow-hidden">
+        <div className="min-h-screen bg-slate-950 flex flex-col p-4 relative overflow-hidden">
             <div className="absolute inset-0 z-0">
                 <div 
                     className="absolute inset-0 bg-cover bg-no-repeat opacity-20 animate-ken-burns" 
-                    style={{backgroundImage: `url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1964&auto=format&fit=crop')`}}
+                    style={{backgroundImage: `url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1964&auto-format&fit=crop')`}}
                 ></div>
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent"></div>
             </div>
 
-            <div className="relative z-10 flex flex-col items-center justify-center w-full">
+            <main className="relative z-10 flex flex-col items-center justify-center w-full flex-grow py-8">
                 {renderContent()}
-            </div>
+            </main>
             
-            <footer className="absolute bottom-4 left-0 right-0 text-center text-xs text-slate-500 z-10 px-4">
+            <footer className="relative z-10 shrink-0 text-center text-xs text-slate-500 px-4">
                 <p>SakoonApp by Metxfitt Pvt. Ltd. | © 2025 All Rights Reserved</p>
                 <p>Contact: support@sakoonapp.com | Follow us: @SakoonApp</p>
             </footer>
