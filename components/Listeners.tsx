@@ -55,15 +55,21 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
 
       {/* Token Purchase Section */}
       <section>
-        <div className="text-center pb-4 border-b border-slate-200 dark:border-slate-700">
+        <div className="text-center pb-3 border-b border-slate-200 dark:border-slate-700">
             <h3 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100 flex items-center justify-center gap-3">
                 <WalletIcon className="w-8 h-8 text-indigo-500"/>
                 <span>MT Plans</span>
             </h3>
-            <p className="text-base text-slate-600 dark:text-slate-400 mt-2">Money Token खरीदें और अपनी सुविधानुसार कॉल या चैट के लिए उपयोग करें।</p>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Money Token खरीदें और अपनी सुविधानुसार कॉल या चैट के लिए उपयोग करें।</p>
         </div>
         
-        <div className="max-w-3xl mx-auto pt-6">
+        <div className="my-4 flex justify-center items-center flex-wrap gap-x-4 gap-y-2 text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-900/50 py-2 px-4 rounded-full max-w-md mx-auto">
+            <span>📞 कॉल = 2 MT/मिनट</span>
+            <div className="w-px h-4 bg-slate-300 dark:bg-slate-700 hidden sm:block"></div>
+            <span>💬 चैट = 1 MT/2 मैसेज</span>
+        </div>
+        
+        <div className="max-w-3xl mx-auto pt-2">
             <div className="grid grid-cols-2 sm:grid-cols-3 border-2 border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden divide-x-2 divide-y-2 divide-slate-200 dark:divide-slate-800">
                 {tokenOptions.map((option, index) => (
                     <div key={option.tokens} className="bg-white dark:bg-slate-900 p-4 flex flex-col items-center justify-between transition-all hover:shadow-lg hover:-translate-y-1">
@@ -85,18 +91,18 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
                 ))}
             </div>
         </div>
-        
-        <div className="text-center mt-6 bg-slate-100 dark:bg-slate-900/50 p-4 rounded-lg max-w-md mx-auto border border-slate-200 dark:border-slate-800">
-            <p className="font-semibold text-slate-700 dark:text-slate-200">📞 कॉल = 2 MT/मिनट</p>
-            <p className="font-semibold text-slate-700 dark:text-slate-200 mt-1">💬 चैट = 1 MT/2 मैसेज</p>
-            <hr className="my-4 border-slate-300 dark:border-slate-700" />
+      </section>
+
+      {/* DT Plans Section Header */}
+      <section className="mt-8">
+        <div className="text-center py-4 border-y border-slate-200 dark:border-slate-700">
             <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100">DT Plans</h2>
             <p className="text-base text-slate-600 dark:text-slate-400 mt-2">Direct Plans से फिक्स मिनट और मैसेज के लिए उपयोग करें।</p>
         </div>
       </section>
 
       {/* Plan Cards Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-2 border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden divide-y-2 md:divide-y-0 md:divide-x-2 divide-slate-200 dark:divide-slate-800 mt-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-2 border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden divide-y-2 md:divide-y-0 md:divide-x-2 divide-slate-200 dark:divide-slate-800">
         {planPairs.map((pair) => (
           <PlanCard 
             key={pair.tierName}

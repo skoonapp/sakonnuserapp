@@ -62,28 +62,28 @@ const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPop
   const isAnyPlanLoading = loadingPlan !== null;
 
   return (
-    <div className={`relative ${popularContainerStyles} p-4 flex flex-col text-center items-center hover:-translate-y-1 transition-all duration-300`}>
+    <div className={`relative ${popularContainerStyles} p-3 flex flex-col text-center items-center hover:-translate-y-1 transition-all duration-300`}>
       {isPopular && (
         <div className="absolute top-0 -translate-y-1/2 bg-gradient-to-r from-orange-400 to-amber-500 text-white text-sm font-bold px-5 py-1.5 rounded-full shadow-lg animate-pulse z-10">
           सबसे लोकप्रिय
         </div>
       )}
-      <div className="mb-4 mt-2 w-full flex justify-center items-center gap-2">
+      <div className="mb-3 mt-1 w-full flex justify-center items-center gap-2">
         {isPopular && <StarIcon className="w-6 h-6 text-amber-400" />}
-        <p className={`text-2xl font-bold ${tierStyles}`}>{tierName}</p>
+        <p className={`text-xl font-bold ${tierStyles}`}>{tierName}</p>
         {isPopular && <StarIcon className="w-6 h-6 text-amber-400" />}
       </div>
       
       <div className="w-full grid grid-cols-2 gap-3 divide-x divide-slate-200 dark:divide-slate-800">
         {/* Call Option */}
         <div className="flex flex-col items-center px-2">
-            <div className="flex-grow flex flex-col items-center text-center justify-center py-3">
+            <div className="flex-grow flex flex-col items-center text-center justify-center py-2">
                 <div className="flex items-center justify-center gap-2 mb-2">
                     <PhoneIcon className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
                     <h4 className="text-base font-semibold text-cyan-800 dark:text-cyan-300">कॉलिंग</h4>
                 </div>
                 <div className="mb-2">
-                    <p className="text-2xl">
+                    <p className="text-xl">
                         <span className="font-extrabold text-slate-900 dark:text-slate-100">{callPlan.duration.split(' ')[0]}</span>
                         <span className="font-semibold text-slate-600 dark:text-slate-400 ml-1.5">{callPlan.duration.split(' ')[1]}</span>
                     </p>
@@ -100,13 +100,13 @@ const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPop
 
         {/* Chat Option */}
         <div className="flex flex-col items-center px-2">
-            <div className="flex-grow flex flex-col items-center text-center justify-center py-3">
+            <div className="flex-grow flex flex-col items-center text-center justify-center py-2">
                 <div className="flex items-center justify-center gap-2 mb-2">
                     <ChatIcon className="w-5 h-5 text-teal-600 dark:text-teal-400" />
                     <h4 className="text-base font-semibold text-teal-800 dark:text-teal-300">चैट</h4>
                 </div>
                  <div className="mb-2">
-                    <p className="text-2xl">
+                    <p className="text-xl">
                         <span className="font-extrabold text-slate-900 dark:text-slate-100">{chatPlan.messages}</span>
                         <span className="font-semibold text-slate-600 dark:text-slate-400 ml-1.5">मैसेज</span>
                     </p>
