@@ -10,7 +10,6 @@ import { useWallet } from '../hooks/useWallet';
 interface PlansViewProps {
   currentUser: User;
   wallet: ReturnType<typeof useWallet>;
-  onWalletClick: () => void;
 }
 
 // --- Icons ---
@@ -29,21 +28,10 @@ const MTCoinIcon: React.FC<{ className?: string; idSuffix?: string }> = ({ class
         </svg>
     </div>
 );
-
-const HistoryIcon: React.FC<{ className?: string }> = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}>
-      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 000-1.5h-3.25V5z" clipRule="evenodd" />
-    </svg>
-);
-const ChevronRightIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}>
-    <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
-  </svg>
-);
 // --- End Icons ---
 
 
-const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onWalletClick }) => {
+const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet }) => {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const [paymentSessionId, setPaymentSessionId] = useState<string | null>(null);
@@ -120,36 +108,6 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onWalletClic
         </div>
       )}
       
-      {/* New History Preview Card */}
-       <button
-          onClick={onWalletClick}
-          className="w-full text-left bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-4 mb-6 transition-transform hover:scale-[1.02] border border-slate-200 dark:border-slate-800"
-          aria-label="View full wallet history"
-        >
-          <div className="flex justify-between items-center mb-3">
-            <div className="flex items-center gap-2">
-              <HistoryIcon className="w-6 h-6 text-cyan-600 dark:text-cyan-400" />
-              <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">Recent Activity</h3>
-            </div>
-            <div className="flex items-center gap-1 text-sm font-semibold text-cyan-600 dark:text-cyan-400">
-                <span>View All</span>
-                <ChevronRightIcon className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-2 text-sm">
-            {/* Mock Recent Recharge */}
-            <div className="flex justify-between items-center text-slate-600 dark:text-slate-300">
-              <span>Recharge: 10 min DT Calling</span>
-              <span className="font-semibold text-green-600 dark:text-green-400">+ ₹99</span>
-            </div>
-            {/* Mock Recent Usage */}
-            <div className="flex justify-between items-center text-slate-600 dark:text-slate-300">
-              <span>Usage: Call (4 Min)</span>
-              <span className="font-semibold text-red-600 dark:text-red-400">- 8 MT</span>
-            </div>
-          </div>
-        </button>
-
       {/* Token Purchase Section */}
       <section>
         <div className="text-center pb-4 border-b border-slate-200 dark:border-slate-700">
