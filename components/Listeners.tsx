@@ -29,6 +29,18 @@ const MTCoinIcon: React.FC<{ className?: string; idSuffix?: string }> = ({ class
         </svg>
     </div>
 );
+
+const DTPlanIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
+        <defs>
+            <linearGradient id="dt-plan-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#22d3ee" /> {/* cyan-400 */}
+                <stop offset="100%" stopColor="#10b981" /> {/* emerald-500 */}
+            </linearGradient>
+        </defs>
+        <path fill="url(#dt-plan-grad)" d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4V6h16v12z M10.41 15.41L12.59 13H7v-2h5.59l-2.18-2.41L12 7l4 4-4 4-1.59-1.59z"/>
+    </svg>
+);
 // --- End Icons ---
 
 
@@ -60,12 +72,12 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
                   <WalletIcon className="w-8 h-8 text-indigo-500"/>
                   <span>MT Plans</span>
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Money Token खरीदकर जरूरत के हिसाब से कॉल या चैट कर सकते हैं।</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Money Token खरीदकर कॉल या चैट कर सकते हैं।</p>
           </div>
           
-          <div className="w-1/3 mx-auto mt-2 border-t border-slate-200 dark:border-slate-700"></div>
+          <div className="w-1/3 mx-auto mt-2 mb-3 border-t border-slate-200 dark:border-slate-700"></div>
 
-          <div className="mt-3">
+          <div>
               <div className="mb-3 flex justify-center items-center flex-wrap gap-x-4 gap-y-2 text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-900/50 py-2 px-4 rounded-full max-w-md mx-auto">
                   <span>📞 कॉल = 2 MT/मिनट</span>
                   <div className="w-px h-4 bg-slate-300 dark:bg-slate-700 hidden sm:block"></div>
@@ -100,7 +112,10 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
       {/* DT Plans Section Header */}
       <section className="mt-4">
         <div className="text-center py-4 border-y border-slate-200 dark:border-slate-700">
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100">DT Plans</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100 flex items-center justify-center gap-3">
+                <DTPlanIcon className="w-8 h-8"/>
+                <span>DT Plans</span>
+            </h2>
             <p className="text-base text-slate-600 dark:text-slate-400 mt-2">Direct Plans में तय मिनट और मैसेज मिलते हैं।</p>
         </div>
       </section>
