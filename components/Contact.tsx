@@ -70,7 +70,7 @@ const Contact: React.FC<ContactProps> = ({ isOpen, onToggle }) => {
         aria-expanded={isOpen}
       >
         <div>
-          <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">अपना संदेश भेजें</h2>
+          <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">अपना संदेश भेजें</h2>
           <p className="text-slate-500 dark:text-slate-400">कोई सवाल या सुझाव है? हमें बताएं।</p>
         </div>
         <span className={`transform transition-transform duration-300 ${isOpen ? 'rotate-180' : 'rotate-0'}`}>

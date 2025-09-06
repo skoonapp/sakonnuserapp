@@ -22,7 +22,7 @@ const FAQ: React.FC<FAQProps> = ({ isOpen, onToggle }) => {
         aria-expanded={isOpen}
         aria-controls="faq-list"
       >
-        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">आपके सवालों के जवाब</h2>
+        <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">आपके सवालों के जवाब</h2>
         <span className={`transform transition-transform duration-300 ${isOpen ? 'rotate-180' : 'rotate-0'}`}>
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
