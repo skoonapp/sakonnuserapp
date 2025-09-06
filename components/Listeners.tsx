@@ -14,11 +14,22 @@ interface PlansViewProps {
 }
 
 // --- Icons ---
-const WalletIcon: React.FC<{ className?: string }> = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
-        <path d="M21,18V6A3,3,0,0,0,18,3H5A3,3,0,0,0,2,6V18A3,3,0,0,0,5,21H18A3,3,0,0,0,21,18ZM5,5H18a1,1,0,0,1,1,1V8H4V6A1,1,0,0,1,5,5ZM15,15a1,1,0,1,1,1-1A1,1,0,0,1,15,15Z" />
-    </svg>
+const MTPlanIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <div className={`relative inline-block ${className}`}>
+        <svg viewBox="0 0 48 48" className="w-full h-full">
+            <defs>
+                <linearGradient id="mt-plan-grad-icon" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#8b5cf6" /> {/* violet-500 */}
+                    <stop offset="100%" stopColor="#4f46e5" /> {/* indigo-600 */}
+                </linearGradient>
+            </defs>
+            <circle cx="24" cy="24" r="22" fill="url(#mt-plan-grad-icon)" />
+            <circle cx="24" cy="24" r="18" fill="none" stroke="#FFFFFF" strokeWidth="1.5" strokeOpacity="0.5"/>
+            <text x="50%" y="54%" dominantBaseline="middle" textAnchor="middle" fontFamily="Poppins, sans-serif" fontSize="16" fontWeight="bold" fill="white">MT</text>
+        </svg>
+    </div>
 );
+
 
 const MTCoinIcon: React.FC<{ className?: string; idSuffix?: string }> = ({ className, idSuffix = '1' }) => (
     <div className={`relative inline-block ${className}`}>
@@ -73,7 +84,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
       <section>
           <div className="text-center mb-2">
               <h3 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100 flex items-center justify-center gap-3">
-                  <WalletIcon className="w-8 h-8 text-indigo-500"/>
+                  <MTPlanIcon className="w-8 h-8"/>
                   <span>MT Plans</span>
               </h3>
               <p className="text-base text-slate-600 dark:text-slate-400 mt-2">Money Token खरीदकर कॉल या चैट कर सकते हैं।</p>
@@ -91,18 +102,16 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
               <div className="max-w-3xl mx-auto">
                   <div className="grid grid-cols-2 sm:grid-cols-3 border-2 border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden divide-x-2 divide-y-2 divide-slate-200 dark:divide-slate-800">
                       {tokenOptions.map((option, index) => (
-                          <div key={option.tokens} className="bg-white dark:bg-slate-900 p-2.5 flex flex-col items-center justify-between transition-all hover:shadow-lg hover:-translate-y-1 min-h-[230px]">
-                              <div className="text-center flex-grow flex flex-col justify-center">
-                                  <div className="flex items-center justify-center gap-2">
-                                      <MTCoinIcon className="w-8 h-8" idSuffix={String(index)} />
-                                      <span className="text-2xl font-bold text-slate-800 dark:text-slate-100">{option.tokens}</span>
-                                  </div>
-                                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">MT</p>
+                          <div key={option.tokens} className="bg-white dark:bg-slate-900 p-4 flex flex-col items-center justify-between transition-all hover:shadow-lg hover:-translate-y-1 min-h-[230px]">
+                              <div className="text-center">
+                                  <MTCoinIcon className="w-12 h-12 mx-auto" idSuffix={String(index)} />
+                                  <p className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 mt-2">{option.tokens}</p>
+                                  <p className="text-base text-slate-500 dark:text-slate-400">Money Tokens</p>
                               </div>
                               <button 
                                   onClick={() => onPurchase({ tokens: option.tokens, price: option.price })}
                                   disabled={loadingPlan !== null}
-                                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1.5 px-4 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed text-sm mt-2"
+                                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed text-base mt-4"
                               >
                                   {loadingPlan === `mt_${option.tokens}` ? 'प्रोसेसिंग...' : `₹${option.price} Buy`}
                               </button>
