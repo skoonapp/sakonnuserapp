@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { db, auth, serverTimestamp } from '../utils/firebase';
 

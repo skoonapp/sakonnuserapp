@@ -14,45 +14,12 @@ interface PlansViewProps {
 }
 
 // --- Icons ---
-const MTPlanIcon: React.FC<{ className?: string }> = ({ className }) => (
-    <div className={`relative inline-block ${className}`}>
-        <svg viewBox="0 0 48 48" className="w-full h-full">
-            <defs>
-                <linearGradient id="mt-plan-grad-icon" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#8b5cf6" /> {/* violet-500 */}
-                    <stop offset="100%" stopColor="#4f46e5" /> {/* indigo-600 */}
-                </linearGradient>
-            </defs>
-            <circle cx="24" cy="24" r="22" fill="url(#mt-plan-grad-icon)" />
-            <circle cx="24" cy="24" r="18" fill="none" stroke="#FFFFFF" strokeWidth="1.5" strokeOpacity="0.5"/>
-            <text x="50%" y="54%" dominantBaseline="middle" textAnchor="middle" fontFamily="Poppins, sans-serif" fontSize="16" fontWeight="bold" fill="white">MT</text>
-        </svg>
-    </div>
-);
-
-
 const MTCoinIcon: React.FC<{ className?: string; idSuffix?: string }> = ({ className, idSuffix = '1' }) => (
     <div className={`relative inline-block ${className}`}>
         <svg viewBox="0 0 48 48" className="w-full h-full">
             <defs><linearGradient id={`gold-gradient-${idSuffix}`} x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stopColor="#FFD700" /><stop offset="100%" stopColor="#FFA500" /></linearGradient></defs>
             <circle cx="24" cy="24" r="22" fill={`url(#gold-gradient-${idSuffix})`} stroke="#DAA520" strokeWidth="2"/><circle cx="24" cy="24" r="18" fill="none" stroke="#FFFFFF" strokeWidth="1.5" strokeOpacity="0.5"/>
             <text x="50%" y="54%" dominantBaseline="middle" textAnchor="middle" fontFamily="Poppins, sans-serif" fontSize="16" fontWeight="bold" fill="#8B4513">MT</text>
-        </svg>
-    </div>
-);
-
-const DTPlanIcon: React.FC<{ className?: string }> = ({ className }) => (
-    <div className={`relative inline-block ${className}`}>
-        <svg viewBox="0 0 48 48" className="w-full h-full">
-            <defs>
-                <linearGradient id="dt-plan-grad-icon" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#22d3ee" /> {/* cyan-400 */}
-                    <stop offset="100%" stopColor="#10b981" /> {/* emerald-500 */}
-                </linearGradient>
-            </defs>
-            <circle cx="24" cy="24" r="22" fill="url(#dt-plan-grad-icon)" />
-            <circle cx="24" cy="24" r="18" fill="none" stroke="#FFFFFF" strokeWidth="1.5" strokeOpacity="0.5"/>
-            <text x="50%" y="54%" dominantBaseline="middle" textAnchor="middle" fontFamily="Poppins, sans-serif" fontSize="16" fontWeight="bold" fill="white">DT</text>
         </svg>
     </div>
 );
@@ -83,11 +50,10 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
       {/* Token Purchase Section */}
       <section>
           <div className="text-center mb-2">
-              <h3 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100 flex items-center justify-center gap-3">
-                  <MTPlanIcon className="w-8 h-8"/>
-                  <span>MT Plans</span>
-              </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">Money Token खरीदकर कॉल या चैट कर सकते हैं।</p>
+              <div className="inline-block bg-gradient-to-r from-violet-500 to-indigo-600 text-white font-bold text-xl md:text-2xl px-8 py-2 rounded-full shadow-lg mb-2">
+                MT Plans
+              </div>
+              <p className="text-sm font-bold text-slate-600 dark:text-slate-400 mt-2">Money Token खरीदकर कॉल या चैट कर सकते हैं।</p>
           </div>
           
           <div className="w-1/3 mx-auto mt-2 mb-3 border-t border-slate-200 dark:border-slate-700"></div>
@@ -108,7 +74,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
                             : 'bg-white dark:bg-slate-900';
 
                         return (
-                          <div key={option.tokens} className={`relative ${popularContainerStyles} p-3 flex flex-col items-center justify-between transition-all hover:shadow-lg hover:-translate-y-1 min-h-[160px]`}>
+                          <div key={option.tokens} className={`relative ${popularContainerStyles} p-3 flex flex-col items-center justify-between transition-all hover:shadow-lg hover:-translate-y-1 min-h-[145px]`}>
                               {isPopular && (
                                   <div className="absolute top-0 -translate-y-1/2 bg-gradient-to-r from-orange-400 to-amber-500 text-white text-sm font-bold px-4 py-1 rounded-full shadow-lg animate-pulse z-10">
                                       लोकप्रिय
@@ -137,11 +103,10 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
       {/* DT Plans Section Header */}
       <section className="mt-4">
         <div className="text-center py-4 border-y border-slate-200 dark:border-slate-700">
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100 flex items-center justify-center gap-3">
-                <DTPlanIcon className="w-8 h-8"/>
-                <span>DT Plans</span>
-            </h2>
-            <p className="text-base text-slate-600 dark:text-slate-400 mt-2">Direct Plans में तय मिनट और मैसेज मिलते हैं।</p>
+            <div className="inline-block bg-gradient-to-r from-cyan-400 to-emerald-500 text-white font-bold text-xl md:text-2xl px-8 py-2 rounded-full shadow-lg mb-2">
+                DT Plans
+            </div>
+            <p className="text-base font-bold text-slate-600 dark:text-slate-400 mt-2">Direct Plans में तय मिनट और मैसेज मिलते हैं।</p>
         </div>
       </section>
 
