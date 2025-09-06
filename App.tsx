@@ -325,7 +325,6 @@ const App: React.FC = () => {
         <HomeView 
             currentUser={user} 
             wallet={wallet} 
-            onWalletClick={handleWalletOpen}
         />,
         <CallsView onStartSession={handleStartSession} currentUser={user} />,
         <ChatsView onStartSession={handleStartSession} currentUser={user} />,
