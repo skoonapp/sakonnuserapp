@@ -14,6 +14,25 @@ const WarningIcon: React.FC<{ className?: string }> = ({ className }) => (
     </svg>
 );
 
+const LANGUAGES = [
+  { value: 'hindi', label: 'हिंदी (Hindi)' },
+  { value: 'bhojpuri', label: 'भोजपुरी (Bhojpuri)' },
+  { value: 'awadhi', label: 'अवधी (Awadhi)' },
+  { value: 'english', label: 'अंग्रेज़ी (English)' },
+  { value: 'bangla', label: 'बंगाली (Bangla)' },
+  { value: 'tamil', label: 'तमिल (Tamil)' },
+  { value: 'telugu', label: 'तेलुगु (Telugu)' },
+  { value: 'marathi', label: 'मराठी (Marathi)' },
+  { value: 'gujarati', label: 'गुजराती (Gujarati)' },
+  { value: 'punjabi', label: 'पंजाबी (Punjabi)' },
+  { value: 'urdu', label: 'उर्दू (Urdu)' },
+  { value: 'malayalam', label: 'मलयालम (Malayalam)' },
+  { value: 'kannada', label: 'कन्नड़ (Kannada)' },
+  { value: 'odia', label: 'ओड़िया (Odia)' },
+  { value: 'assamese', label: 'असमिया (Assamese)' },
+  { value: 'maithili', label: 'मैथिली (Maithili)' },
+];
+
 
 const ApplyAsListener: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
@@ -26,6 +45,7 @@ const ApplyAsListener: React.FC = () => {
     bankName: '',
     upiId: '',
     profession: '',
+    languages: [] as string[],
   });
   const [email, setEmail] = useState('');
   const [applied, setApplied] = useState(false);
@@ -44,6 +64,19 @@ const ApplyAsListener: React.FC = () => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
+  
+  const handleLanguageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = e.target;
+    setFormData(prev => {
+        const currentLanguages = prev.languages;
+        if (checked) {
+            return { ...prev, languages: [...currentLanguages, value] };
+        } else {
+            return { ...prev, languages: currentLanguages.filter(lang => lang !== value) };
+        }
+    });
+  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,6 +101,10 @@ const ApplyAsListener: React.FC = () => {
     }
      if (!formData.profession) {
         setError("कृपया अपना पेशा चुनें।");
+        return;
+    }
+    if (formData.languages.length === 0) {
+        setError("कृपया कम से कम एक भाषा चुनें।");
         return;
     }
     const hasBankDetails = formData.bankAccount.trim() && formData.ifsc.trim() && formData.bankName.trim();
@@ -213,6 +250,30 @@ const ApplyAsListener: React.FC = () => {
             </select>
           </div>
       </div>
+      
+      {/* Language Selection */}
+       <fieldset className="border border-slate-300 dark:border-slate-700 rounded-lg p-4">
+        <legend className="px-2 font-semibold text-slate-700 dark:text-slate-300">आप कौन सी भाषाएँ बोलते हैं? <span className="text-red-500">*</span></legend>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-3 gap-x-4 mt-2">
+            {LANGUAGES.map(lang => (
+                <div key={lang.value} className="flex items-center">
+                    <input
+                        type="checkbox"
+                        id={`lang-${lang.value}`}
+                        name="languages"
+                        value={lang.value}
+                        checked={formData.languages.includes(lang.value)}
+                        onChange={handleLanguageChange}
+                        className="h-4 w-4 rounded border-slate-400 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500 bg-slate-100 dark:bg-slate-800"
+                    />
+                    <label htmlFor={`lang-${lang.value}`} className="ml-2 text-sm text-slate-700 dark:text-slate-300 select-none">
+                        {lang.label}
+                    </label>
+                </div>
+            ))}
+        </div>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-3">कम से कम एक भाषा चुनें।</p>
+      </fieldset>
 
 
       {/* Payment Details */}

@@ -1,42 +1,54 @@
 
+
 import React from 'react';
 import type { FaqItem } from '../types';
 
 // New Answer Renderer component to handle numbered lists and bold text
 const AnswerRenderer: React.FC<{ text: string }> = ({ text }) => {
-    // Using a regex to check for the list pattern to be more robust
-    if (!/\n\s*1\./.test(text)) {
-        return <p>{text}</p>;
+    // Generic markdown parser for bold text (**text**)
+    const parseMarkdown = (line: string) => {
+        // Split by the markdown delimiter, but keep the delimiter itself in the array for processing
+        const parts = line.split(/(\*\*.*?\*\*)/g).filter(Boolean);
+        
+        return parts.map((part, index) => {
+            if (part.startsWith('**') && part.endsWith('**')) {
+                // If it's a bold part, render a <strong> tag
+                return <strong key={index} className="font-semibold text-slate-700 dark:text-slate-200">{part.slice(2, -2)}</strong>;
+            }
+            // Otherwise, return the plain text part
+            return part;
+        });
+    };
+
+    // Check for a numbered list pattern in the answer text
+    if (/\n\s*1\./.test(text)) {
+        const parts = text.split('\n');
+        const introduction = parts[0];
+        const listItems = parts.slice(1).filter(item => item.trim() !== '');
+
+        return (
+            // Use a div that supports word breaking to prevent overflow
+            <div className="break-words">
+                <p className="mb-3">{parseMarkdown(introduction)}</p>
+                <ol className="list-decimal list-inside space-y-2">
+                    {listItems.map((item, index) => (
+                        <li key={index}>
+                            {parseMarkdown(item.replace(/^\d+\.\s*/, ''))}
+                        </li>
+                    ))}
+                </ol>
+            </div>
+        );
     }
 
-    const parts = text.split('\n');
-    const introduction = parts[0];
-    const listItems = parts.slice(1).filter(item => item.trim() !== '');
-
+    // Handle simple paragraphs with potential markdown and ensure word breaking
     return (
-        <div>
-            <p className="mb-3">{introduction}</p>
-            <ol className="list-decimal list-inside space-y-2">
-                {listItems.map((item, index) => {
-                    const cleanItem = item.replace(/^\d+\.\s*/, '');
-                    // Simple markdown-like parser for bold text (**text**)
-                    const itemParts = cleanItem.split(/(\*\*.*?\*\*)/g).filter(Boolean);
-                    
-                    return (
-                        <li key={index}>
-                            {itemParts.map((part, partIndex) => {
-                                if (part.startsWith('**') && part.endsWith('**')) {
-                                    return <strong key={partIndex} className="font-semibold text-slate-700 dark:text-slate-200">{part.slice(2, -2)}</strong>;
-                                }
-                                return part;
-                            })}
-                        </li>
-                    );
-                })}
-            </ol>
-        </div>
+        <p className="break-words">
+            {parseMarkdown(text)}
+        </p>
     );
 };
+
 
 interface FAQItemProps extends FaqItem {
   isOpen: boolean;
