@@ -47,11 +47,20 @@ type UsageHistoryItem = {
     balance: string;
 };
 
+const daysAgo = (days: number) => new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+
 const MOCK_USAGE_HISTORY: UsageHistoryItem[] = [
-    { id: 1, date: '2024-09-03T11:00:00Z', type: 'Call', duration: '4 Min', deduction: 'DT Plan Used', balance: '6 Min Left in Plan' },
-    { id: 2, date: '2024-09-02T18:00:00Z', type: 'Chat', duration: '10 Messages', deduction: '5 MT Deducted', balance: '42 MT' },
-    { id: 3, date: '2024-09-01T12:00:00Z', type: 'Call', duration: '5 Min', deduction: '10 MT Deducted', balance: '50 MT' }
+    { id: 1, date: daysAgo(0.2), type: 'Call', duration: '4 Min', deduction: 'DT Plan Used', balance: '6 Min Left' },
+    { id: 2, date: daysAgo(1), type: 'Chat', duration: '10 Messages', deduction: '5 MT Deducted', balance: '42 MT' },
+    { id: 3, date: daysAgo(1.5), type: 'Call', duration: '5 Min', deduction: '10 MT Deducted', balance: '50 MT' },
+    { id: 4, date: daysAgo(2), type: 'Chat', duration: '20 Messages', deduction: 'DT Plan Used', balance: '15 Msg Left' },
+    { id: 5, date: daysAgo(3), type: 'Call', duration: '12 Min', deduction: '24 MT Deducted', balance: '60 MT' },
+    { id: 6, date: daysAgo(4.1), type: 'Call', duration: '2 Min', deduction: 'DT Plan Used', balance: '28 Min Left' },
+    { id: 7, date: daysAgo(5), type: 'Chat', duration: '5 Messages', deduction: '2.5 MT Deducted', balance: '84 MT' },
+    { id: 8, date: daysAgo(6), type: 'Call', duration: '15 Min', deduction: 'DT Plan Used', balance: '12 Min Left' },
+    { id: 9, date: daysAgo(6.5), type: 'Chat', duration: '12 Messages', deduction: '6 MT Deducted', balance: '86.5 MT' },
 ];
+
 // --- END MOCK DATA ---
 
 // --- ICONS ---
@@ -59,6 +68,11 @@ const CallUsageIcon: React.FC<{ className?: string }> = ({ className }) => (<svg
 const ChatUsageIcon: React.FC<{ className?: string }> = ({ className }) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}><path d="M3 4a2 2 0 012-2h10a2 2 0 012 2v5.5a2 2 0 01-2 2h-5.586l-2.707 2.707A1 1 0 015 13.586V11.5a2 2 0 01-2-2V4z" /></svg>);
 const ReceiptIcon: React.FC<{ className?: string }> = ({ className }) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}><path d="M3.5 2.75a.75.75 0 00-1.5 0v14.5a.75.75 0 001.5 0v-4.5h13v4.5a.75.75 0 001.5 0V2.75a.75.75 0 00-1.5 0v4.5h-13V2.75z" /><path d="M6.25 7.5a.75.75 0 000 1.5h7.5a.75.75 0 000-1.5h-7.5z" /></svg>);
 const ChartIcon: React.FC<{ className?: string }> = ({ className }) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}><path d="M15.5 2.5a3 3 0 00-3-3h-5a3 3 0 00-3 3v15a3 3 0 003 3h5a3 3 0 003-3v-15z" /><path fillRule="evenodd" d="M11 5.5a1 1 0 00-1-1h-1a1 1 0 00-1 1v2a1 1 0 001 1h1a1 1 0 001-1v-2zM9 10.5a1 1 0 011-1h1a1 1 0 110 2h-1a1 1 0 01-1-1zM7 14.5a1 1 0 00-1-1h-1a1 1 0 100 2h1a1 1 0 001-1z" clipRule="evenodd" /></svg>);
+const RefreshIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}>
+        <path fillRule="evenodd" d="M15.312 11.424a5.5 5.5 0 01-9.201-4.462.75.75 0 011.06-1.06 4 4 0 006.082 3.252.75.75 0 011.06 1.061zm-10.624-1.848a.75.75 0 01-1.06-1.061 4 4 0 00-3.252 6.082.75.75 0 01-1.06 1.06 5.5 5.5 0 014.462-9.201.75.75 0 011.06 1.06z" clipRule="evenodd" />
+    </svg>
+);
 // --- END ICONS ---
 
 const HomeHistory: React.FC<HomeHistoryProps> = ({ onPurchase }) => {
@@ -115,9 +129,10 @@ const HomeHistory: React.FC<HomeHistoryProps> = ({ onPurchase }) => {
                             {item.status === 'Success' && item.plan && (
                                 <button 
                                     onClick={() => onPurchase(item.plan!)}
-                                    className="text-sm font-bold text-cyan-600 dark:text-cyan-400 hover:underline"
+                                    className="flex items-center justify-center gap-1.5 bg-gradient-to-r from-teal-400 to-cyan-500 text-white font-bold py-1.5 px-4 rounded-full text-xs shadow-md hover:shadow-lg transition-all transform hover:scale-105"
                                 >
-                                    Buy Again
+                                    <RefreshIcon className="w-4 h-4" />
+                                    <span>Buy Again</span>
                                 </button>
                             )}
                         </div>
