@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PlanCard from './PlanCard';
 import { CALL_PLANS, CHAT_PLANS } from '../constants';
 import type { User, Plan as PlanType } from '../types';
-import { paymentService } from '../services/paymentService';
-import CashfreeModal from './CashfreeModal';
 import { useWallet } from '../hooks/useWallet';
 import HomeHistory from './HomeHistory';
 
@@ -11,6 +9,8 @@ import HomeHistory from './HomeHistory';
 interface PlansViewProps {
   currentUser: User;
   wallet: ReturnType<typeof useWallet>;
+  onPurchase: (plan: PlanType | { tokens: number; price: number }) => void;
+  loadingPlan: string | null;
 }
 
 // --- Icons ---
@@ -32,12 +32,7 @@ const MTCoinIcon: React.FC<{ className?: string; idSuffix?: string }> = ({ class
 // --- End Icons ---
 
 
-const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet }) => {
-  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
-  const [paymentSessionId, setPaymentSessionId] = useState<string | null>(null);
-  const [paymentDescription, setPaymentDescription] = useState('');
-
+const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, loadingPlan }) => {
   const tokenOptions = [
     { tokens: 10, price: 50 },
     { tokens: 20, price: 99 },
@@ -46,50 +41,6 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet }) => {
     { tokens: 250, price: 1125 },
     { tokens: 500, price: 2250 },
   ];
-
-  const handleTokenPurchase = async (tokens: number, price: number) => {
-    const planKey = `mt_${tokens}`;
-    setLoadingPlan(planKey);
-    setFeedback(null);
-    try {
-      const sessionId = await paymentService.buyTokens(tokens, price);
-      setPaymentDescription(`${tokens} MT`);
-      setPaymentSessionId(sessionId);
-    } catch (error: any) {
-       setFeedback({ type: 'error', message: `Payment failed to start: ${error.message || 'Please check your connection and try again.'}` });
-       setTimeout(() => setFeedback(null), 5000);
-    } finally {
-        setLoadingPlan(null);
-    }
-  };
-  
-  const handleDTPlanPurchase = async (planData: PlanType, type: 'call' | 'chat') => {
-      const planKey = `${type}_${planData.name}`;
-      setLoadingPlan(planKey);
-      setFeedback(null);
-      try {
-        const sessionId = await paymentService.buyDTPlan(planData);
-        setPaymentDescription(planData.name || 'Plan');
-        setPaymentSessionId(sessionId);
-    } catch (error: any) {
-        setFeedback({ type: 'error', message: `Payment failed to start: ${error.message || 'Please check your connection and try again.'}` });
-        setTimeout(() => setFeedback(null), 5000);
-    } finally {
-        setLoadingPlan(null);
-    }
-  };
-
-  const handleModalClose = (status: 'success' | 'failure' | 'closed') => {
-    if (status === 'success') {
-        setFeedback({ type: 'success', message: `Payment for ${paymentDescription} is processing! Your balance will update shortly.` });
-    } else if (status === 'failure') {
-        setFeedback({ type: 'error', message: 'Payment failed. Please try again.' });
-    }
-    // For 'closed', we don't show any message.
-    setPaymentSessionId(null);
-    setPaymentDescription('');
-    setTimeout(() => setFeedback(null), 5000);
-  };
 
   const planPairs = CALL_PLANS.map((callPlan, index) => ({
     callPlan,
@@ -100,16 +51,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet }) => {
 
   return (
     <div className="container mx-auto px-4 pt-2 pb-6">
-      
-      {paymentSessionId && <CashfreeModal paymentSessionId={paymentSessionId} onClose={handleModalClose} />}
-
-      {feedback && (
-        <div className={`p-4 mb-4 rounded-lg text-center font-semibold animate-fade-in-down ${feedback.type === 'success' ? 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300'}`}>
-            {feedback.message}
-        </div>
-      )}
-      
-      <HomeHistory />
+      <HomeHistory onPurchase={onPurchase} />
 
       {/* Token Purchase Section */}
       <section>
@@ -133,7 +75,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet }) => {
                             <p className="text-slate-500 dark:text-slate-400 mb-4">MT</p>
                         </div>
                         <button 
-                            onClick={() => handleTokenPurchase(option.tokens, option.price)}
+                            onClick={() => onPurchase({ tokens: option.tokens, price: option.price })}
                             disabled={loadingPlan !== null}
                             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
                         >
@@ -162,7 +104,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet }) => {
             callPlan={pair.callPlan}
             chatPlan={pair.chatPlan}
             isPopular={pair.isPopular}
-            onPurchase={handleDTPlanPurchase}
+            onPurchase={onPurchase}
             loadingPlan={loadingPlan}
           />
         ))}

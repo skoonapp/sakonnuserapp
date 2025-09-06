@@ -6,7 +6,7 @@ interface PlanCardProps {
   callPlan: Plan;
   chatPlan: Plan;
   isPopular?: boolean;
-  onPurchase: (planData: Plan, type: 'call' | 'chat') => void;
+  onPurchase: (planData: Plan) => void;
   loadingPlan: string | null;
 }
 
@@ -90,7 +90,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPop
                 </div>
             </div>
             <button
-              onClick={() => onPurchase(callPlan, 'call')}
+              onClick={() => onPurchase(callPlan)}
               disabled={isAnyPlanLoading}
               className="w-full mt-auto bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-500 dark:hover:bg-cyan-400 text-white font-bold py-2 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
             >
@@ -113,7 +113,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPop
                 </div>
             </div>
             <button
-              onClick={() => onPurchase(chatPlan, 'chat')}
+              onClick={() => onPurchase(chatPlan)}
               disabled={isAnyPlanLoading}
               className="w-full mt-auto bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
             >

@@ -1,6 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
+import type { Plan } from '../types';
+import { CALL_PLANS, CHAT_PLANS } from '../constants';
 
-// --- MOCK DATA (Copied from Wallet.tsx) ---
+
+interface HomeHistoryProps {
+    onPurchase: (plan: Plan | { tokens: number; price: number }) => void;
+}
+
+
+// --- MOCK DATA (Enriched with plan objects) ---
 type RechargeStatus = 'Success' | 'Failed' | 'Pending';
 type RechargeHistoryItem = {
     id: number;
@@ -10,15 +18,25 @@ type RechargeHistoryItem = {
     planDetails: string;
     status: RechargeStatus;
     refundInfo?: string;
+    plan?: Plan | { tokens: number; price: number };
 };
 
-const MOCK_RECHARGE_HISTORY: RechargeHistoryItem[] = [
+// FIX: Use 'as const' to prevent TypeScript from widening the 'status' property to a generic string, ensuring it matches the 'RechargeStatus' type.
+const MOCK_RECHARGE_HISTORY: RechargeHistoryItem[] = ([
     { id: 1, date: '2024-09-03T16:00:00Z', amount: 99, planType: 'DT Calling', planDetails: '10 min', status: 'Success' },
     { id: 2, date: '2024-09-02T20:30:00Z', amount: 50, planType: 'MT Pack', planDetails: '10 MT', status: 'Failed', refundInfo: '₹50 refunded to UPI – 3 Sep' },
     { id: 3, date: '2024-09-01T16:30:00Z', amount: 20, planType: 'DT Chat', planDetails: '8 messages', status: 'Success' },
     { id: 4, date: '2024-08-30T09:00:00Z', amount: 230, planType: 'MT Pack', planDetails: '50 MT', status: 'Pending' },
     { id: 5, date: '2024-08-28T18:45:00Z', amount: 145, planType: 'DT Calling', planDetails: '15 min', status: 'Success' },
-];
+] as const).map(item => { // Add plan objects for "Buy Again" functionality
+    if (item.planType === 'MT Pack') {
+        return { ...item, plan: { tokens: parseInt(item.planDetails.split(' ')[0]), price: item.amount } };
+    }
+    const planList = item.planType === 'DT Calling' ? CALL_PLANS : CHAT_PLANS;
+    const foundPlan = planList.find(p => p.price === item.amount);
+    return { ...item, plan: foundPlan };
+});
+
 
 type UsageHistoryItem = {
     id: number;
@@ -39,9 +57,11 @@ const MOCK_USAGE_HISTORY: UsageHistoryItem[] = [
 // --- ICONS ---
 const CallUsageIcon: React.FC<{ className?: string }> = ({ className }) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" /></svg>);
 const ChatUsageIcon: React.FC<{ className?: string }> = ({ className }) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}><path d="M3 4a2 2 0 012-2h10a2 2 0 012 2v5.5a2 2 0 01-2 2h-5.586l-2.707 2.707A1 1 0 015 13.586V11.5a2 2 0 01-2-2V4z" /></svg>);
+const ReceiptIcon: React.FC<{ className?: string }> = ({ className }) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}><path d="M3.5 2.75a.75.75 0 00-1.5 0v14.5a.75.75 0 001.5 0v-4.5h13v4.5a.75.75 0 001.5 0V2.75a.75.75 0 00-1.5 0v4.5h-13V2.75z" /><path d="M6.25 7.5a.75.75 0 000 1.5h7.5a.75.75 0 000-1.5h-7.5z" /></svg>);
+const ChartIcon: React.FC<{ className?: string }> = ({ className }) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}><path d="M15.5 2.5a3 3 0 00-3-3h-5a3 3 0 00-3 3v15a3 3 0 003 3h5a3 3 0 003-3v-15z" /><path fillRule="evenodd" d="M11 5.5a1 1 0 00-1-1h-1a1 1 0 00-1 1v2a1 1 0 001 1h1a1 1 0 001-1v-2zM9 10.5a1 1 0 011-1h1a1 1 0 110 2h-1a1 1 0 01-1-1zM7 14.5a1 1 0 00-1-1h-1a1 1 0 100 2h1a1 1 0 001-1z" clipRule="evenodd" /></svg>);
 // --- END ICONS ---
 
-const HomeHistory: React.FC = () => {
+const HomeHistory: React.FC<HomeHistoryProps> = ({ onPurchase }) => {
     const [openTab, setOpenTab] = useState<'recharge' | 'usage' | null>(null);
     const historyRef = useRef<HTMLDivElement>(null);
 
@@ -92,8 +112,11 @@ const HomeHistory: React.FC = () => {
                         </div>
                         <div className="flex justify-between items-end mt-2">
                             <p className="text-sm text-slate-400 dark:text-slate-500">{formatDate(item.date)}</p>
-                            {item.status === 'Success' && (
-                                <button className="text-sm font-bold text-cyan-600 dark:text-cyan-400 hover:underline">
+                            {item.status === 'Success' && item.plan && (
+                                <button 
+                                    onClick={() => onPurchase(item.plan!)}
+                                    className="text-sm font-bold text-cyan-600 dark:text-cyan-400 hover:underline"
+                                >
                                     Buy Again
                                 </button>
                             )}
@@ -130,23 +153,25 @@ const HomeHistory: React.FC = () => {
     };
 
     return (
-        <section ref={historyRef} className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 mb-6 overflow-hidden">
-            <div className="bg-slate-100 dark:bg-slate-800/80 p-1 grid grid-cols-2 gap-1">
+        <section ref={historyRef} className="bg-gradient-to-br from-slate-50 to-cyan-50 dark:from-slate-900 dark:to-cyan-950/50 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 mb-6 overflow-hidden">
+            <div className="p-2 grid grid-cols-2 gap-2">
                 <button 
                     onClick={() => handleTabClick('recharge')} 
-                    className={`w-full py-3 rounded-full font-bold transition-colors text-sm ${openTab === 'recharge' ? 'bg-white dark:bg-slate-900 text-cyan-600 dark:text-cyan-300' : 'bg-transparent text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50'}`}
+                    className={`w-full py-3 rounded-xl font-bold transition-all duration-300 text-sm shadow-md flex items-center justify-center gap-2 transform hover:scale-105 ${openTab === 'recharge' ? 'bg-white dark:bg-slate-900 text-cyan-600 dark:text-cyan-300 scale-105' : 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white'}`}
                     aria-label="Toggle recharge history"
                     aria-expanded={openTab === 'recharge'}
                 >
-                    Recharge History
+                    <ReceiptIcon className="w-5 h-5"/>
+                    <span>Recharge History</span>
                 </button>
                 <button 
                     onClick={() => handleTabClick('usage')} 
-                    className={`w-full py-3 rounded-full font-bold transition-colors text-sm ${openTab === 'usage' ? 'bg-white dark:bg-slate-900 text-cyan-600 dark:text-cyan-300' : 'bg-transparent text-slate-700 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50'}`}
+                    className={`w-full py-3 rounded-xl font-bold transition-all duration-300 text-sm shadow-md flex items-center justify-center gap-2 transform hover:scale-105 ${openTab === 'usage' ? 'bg-white dark:bg-slate-900 text-cyan-600 dark:text-cyan-300 scale-105' : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'}`}
                     aria-label="Toggle usage history"
                     aria-expanded={openTab === 'usage'}
                 >
-                    Usage History
+                    <ChartIcon className="w-5 h-5"/>
+                    <span>Usage History</span>
                 </button>
             </div>
             <div className={`transition-all duration-500 ease-in-out ${openTab ? 'max-h-[60vh]' : 'max-h-0'} overflow-hidden`}>

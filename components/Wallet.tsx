@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import type { useWallet } from '../hooks/useWallet';
+import type { Plan } from '../types';
+import { CALL_PLANS, CHAT_PLANS } from '../constants';
+
 
 type WalletProps = {
     wallet: ReturnType<typeof useWallet>;
     onClose: () => void;
     onNavigateHome: () => void;
-    initialTab: 'recharge' | 'usage';
+    onPurchase: (plan: Plan | { tokens: number; price: number }) => void;
+    loadingPlan: string | null;
 };
 
 // --- MOCK DATA (Replace with actual data fetching) ---
@@ -18,15 +22,27 @@ type RechargeHistoryItem = {
     planDetails: string;
     status: RechargeStatus;
     refundInfo?: string;
+    plan?: Plan | { tokens: number; price: number };
 };
 
-const MOCK_RECHARGE_HISTORY: RechargeHistoryItem[] = [
+// FIX: Use 'as const' to prevent TypeScript from widening the 'status' property to a generic string, ensuring it matches the 'RechargeStatus' type.
+const MOCK_RECHARGE_HISTORY: RechargeHistoryItem[] = ([
     { id: 1, date: '2024-09-03T16:00:00Z', amount: 99, planType: 'DT Calling', planDetails: '10 min', status: 'Success' },
     { id: 2, date: '2024-09-02T20:30:00Z', amount: 50, planType: 'MT Pack', planDetails: '10 MT', status: 'Failed', refundInfo: '₹50 refunded to UPI – 3 Sep' },
     { id: 3, date: '2024-09-01T16:30:00Z', amount: 20, planType: 'DT Chat', planDetails: '8 messages', status: 'Success' },
     { id: 4, date: '2024-08-30T09:00:00Z', amount: 230, planType: 'MT Pack', planDetails: '50 MT', status: 'Pending' },
     { id: 5, date: '2024-08-28T18:45:00Z', amount: 145, planType: 'DT Calling', planDetails: '15 min', status: 'Success' },
-];
+] as const).map(item => { // Add plan objects for "Buy Again" functionality
+    if (item.planType === 'MT Pack') {
+        return { ...item, plan: { tokens: parseInt(item.planDetails.split(' ')[0]), price: item.amount } };
+    }
+    const planList = item.planType === 'DT Calling' ? CALL_PLANS : CHAT_PLANS;
+    const foundPlan = planList.find(p => p.price === item.amount);
+    return { ...item, plan: foundPlan };
+});
+
+const lastSuccessfulRecharge = MOCK_RECHARGE_HISTORY.find(item => item.status === 'Success');
+
 
 type UsageHistoryItem = {
     id: number;
@@ -73,8 +89,8 @@ const RefreshIcon: React.FC<{ className?: string }> = ({ className }) => (
 // --- END ICONS ---
 
 
-const Wallet: React.FC<WalletProps> = ({ wallet, onClose, onNavigateHome, initialTab }) => {
-    const [activeTab, setActiveTab] = useState<'recharge' | 'usage'>(initialTab);
+const Wallet: React.FC<WalletProps> = ({ wallet, onClose, onNavigateHome, onPurchase, loadingPlan }) => {
+    const [activeTab, setActiveTab] = useState<'recharge' | 'usage'>('recharge');
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -152,8 +168,12 @@ const Wallet: React.FC<WalletProps> = ({ wallet, onClose, onNavigateHome, initia
                             </div>
                              <div className="flex justify-between items-end mt-2">
                                 <p className="text-sm text-slate-400 dark:text-slate-500">{formatDate(item.date)}</p>
-                                {item.status === 'Success' && (
-                                    <button onClick={onNavigateHome} className="text-sm font-bold text-cyan-600 dark:text-cyan-400 hover:underline">
+                                {item.status === 'Success' && item.plan && (
+                                    <button 
+                                        onClick={() => onPurchase(item.plan!)} 
+                                        className="text-sm font-bold text-cyan-600 dark:text-cyan-400 hover:underline disabled:opacity-50"
+                                        disabled={!!loadingPlan}
+                                    >
                                         Buy Again
                                     </button>
                                 )}
@@ -194,7 +214,11 @@ const Wallet: React.FC<WalletProps> = ({ wallet, onClose, onNavigateHome, initia
                     <button onClick={onNavigateHome} className="w-full bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-bold py-3.5 px-4 rounded-xl hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-2">
                         <span className="text-lg">+</span> Add Money
                     </button>
-                    <button onClick={onNavigateHome} className="w-full bg-teal-500 text-white font-bold py-3.5 px-4 rounded-xl hover:bg-teal-600 transition-colors flex items-center justify-center gap-2">
+                    <button 
+                        onClick={() => lastSuccessfulRecharge?.plan && onPurchase(lastSuccessfulRecharge.plan)}
+                        disabled={!lastSuccessfulRecharge?.plan || !!loadingPlan}
+                        className="w-full bg-teal-500 text-white font-bold py-3.5 px-4 rounded-xl hover:bg-teal-600 transition-colors flex items-center justify-center gap-2 disabled:bg-slate-400 disabled:cursor-not-allowed"
+                    >
                         <RefreshIcon className="w-5 h-5"/>
                         Buy Again
                     </button>

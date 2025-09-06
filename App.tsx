@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
-import type { User, Listener, CallSession, ChatSession, ActiveView } from './types';
+import type { User, Listener, CallSession, ChatSession, ActiveView, Plan } from './types';
 import { auth, db, functions } from './utils/firebase';
 import { handleCallEnd, handleChat } from './utils/earnings';
 import { useWallet } from './hooks/useWallet';
+import { paymentService } from './services/paymentService';
+
 
 // Import Components
 import SplashScreen from './components/SplashScreen';
@@ -15,6 +17,8 @@ import ChatUI from './components/ChatUI';
 import RechargeModal from './components/RechargeModal';
 import ViewLoader from './components/ViewLoader';
 import WelcomeModal from './components/WelcomeModal';
+import CashfreeModal from './components/CashfreeModal';
+
 
 // --- Lazy Load Views for Code Splitting ---
 const HomeView = lazy(() => import('./components/Listeners'));
@@ -59,6 +63,12 @@ const App: React.FC = () => {
     const [showWelcomeModal, setShowWelcomeModal] = useState(false);
     const [showWallet, setShowWallet] = useState(false);
     const [initialWalletTab, setInitialWalletTab] = useState<'recharge' | 'usage'>('recharge');
+
+    // --- Centralized Payment State ---
+    const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+    const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+    const [paymentSessionId, setPaymentSessionId] = useState<string | null>(null);
+    const [paymentDescription, setPaymentDescription] = useState('');
     
     // --- Session State ---
     const [activeCallSession, setActiveCallSession] = useState<CallSession | null>(null);
@@ -309,10 +319,51 @@ const App: React.FC = () => {
         setActiveChatSession(null);
     }, [user, activeChatSession]);
     
-    const handleWalletOpen = useCallback((tab: 'recharge' | 'usage') => {
-        setInitialWalletTab(tab);
+    const handleWalletOpen = useCallback(() => {
         setShowWallet(true);
     }, []);
+
+    const handleNavigateHome = useCallback(() => {
+        setShowWallet(false);
+        navigateTo(0);
+    }, [navigateTo]);
+
+    // --- Centralized Purchase Handler ---
+    const handlePurchase = async (plan: Plan | { tokens: number; price: number }) => {
+        const isTokenPlan = 'tokens' in plan;
+        const planKey = isTokenPlan ? `mt_${plan.tokens}` : `${plan.type}_${plan.name}`;
+        
+        setLoadingPlan(planKey);
+        setFeedback(null);
+        try {
+            let sessionId;
+            if (isTokenPlan) {
+                sessionId = await paymentService.buyTokens(plan.tokens, plan.price);
+                setPaymentDescription(`${plan.tokens} MT`);
+            } else {
+                sessionId = await paymentService.buyDTPlan(plan);
+                setPaymentDescription(plan.name || 'Plan');
+            }
+            setPaymentSessionId(sessionId);
+        } catch (error: any) {
+            setFeedback({ type: 'error', message: `Payment failed to start: ${error.message || 'Please check your connection and try again.'}` });
+            setTimeout(() => setFeedback(null), 5000);
+        } finally {
+            setLoadingPlan(null);
+        }
+    };
+    
+    const handleModalClose = (status: 'success' | 'failure' | 'closed') => {
+        if (status === 'success') {
+            setFeedback({ type: 'success', message: `Payment for ${paymentDescription} is processing! Your balance will update shortly.` });
+        } else if (status === 'failure') {
+            setFeedback({ type: 'error', message: 'Payment failed. Please try again.' });
+        }
+        setPaymentSessionId(null);
+        setPaymentDescription('');
+        setTimeout(() => setFeedback(null), 5000);
+    };
+
 
     // --- Render Logic ---
     
@@ -325,6 +376,8 @@ const App: React.FC = () => {
         <HomeView 
             currentUser={user} 
             wallet={wallet} 
+            onPurchase={handlePurchase}
+            loadingPlan={loadingPlan}
         />,
         <CallsView onStartSession={handleStartSession} currentUser={user} />,
         <ChatsView onStartSession={handleStartSession} currentUser={user} />,
@@ -345,8 +398,15 @@ const App: React.FC = () => {
                 isDarkMode={isDarkMode} 
                 toggleDarkMode={toggleDarkMode} 
                 wallet={wallet}
+                onWalletClick={handleWalletOpen}
             />
             
+            {feedback && (
+                <div className={`fixed top-16 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-md z-40 p-3 rounded-lg text-center font-semibold animate-fade-in-down ${feedback.type === 'success' ? 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300'}`}>
+                    {feedback.message}
+                </div>
+            )}
+
             <main
                 className="flex-grow overflow-hidden pt-16 pb-16" // Main container hides overflow for swiping
                 onTouchStart={handleTouchStart}
@@ -386,7 +446,7 @@ const App: React.FC = () => {
             <AICompanionButton onClick={() => setShowAICompanion(true)} />
             
             <Suspense fallback={<div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center"><ViewLoader /></div>}>
-                {showWallet && <Wallet wallet={wallet} onClose={() => setShowWallet(false)} onNavigateHome={() => { setShowWallet(false); navigateTo(0); }} initialTab={initialWalletTab} />}
+                {showWallet && <Wallet wallet={wallet} onClose={() => setShowWallet(false)} onNavigateHome={handleNavigateHome} onPurchase={handlePurchase} loadingPlan={loadingPlan} />}
                 {showAICompanion && <AICompanion user={user} onClose={() => setShowAICompanion(false)} onNavigateToServices={() => { navigateTo(1); setShowAICompanion(false); }} />}
                 {showPolicy === 'terms' && <TermsAndConditions onClose={() => setShowPolicy(null)} />}
                 {showPolicy === 'privacy' && <PrivacyPolicy onClose={() => setShowPolicy(null)} />}
@@ -396,6 +456,9 @@ const App: React.FC = () => {
             {showRechargeModal && (
                 <RechargeModal onClose={() => setShowRechargeModal(false)} onNavigateHome={() => { navigateTo(0); setShowRechargeModal(false); }} />
             )}
+            
+            {paymentSessionId && <CashfreeModal paymentSessionId={paymentSessionId} onClose={handleModalClose} />}
+
         </div>
     );
 };
