@@ -70,14 +70,14 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
               <div className="inline-block bg-gradient-to-r from-violet-500 to-indigo-600 text-white font-bold text-xl md:text-2xl px-8 py-2 rounded-full shadow-lg mb-2">
                 MT Plans
               </div>
-              <p className="text-base font-bold text-slate-600 dark:text-slate-400 mt-2">Money Token खरीदकर कॉल या चैट कर सकते हैं।</p>
+              <p className="text-sm font-semibold text-slate-600 dark:text-slate-400 mt-2">Money Token खरीदकर कॉल या चैट कर सकते हैं।</p>
           </div>
           
           <div className="w-1/3 mx-auto mt-2 mb-3 border-t border-slate-200 dark:border-slate-700"></div>
 
           <div>
                <div className="text-center mb-3">
-                  <p className="text-base font-bold text-slate-600 dark:text-slate-400">
+                  <p className="text-sm font-semibold text-slate-600 dark:text-slate-400">
                     📞 कॉल = 2 MT/मिनट  •  💬 चैट = 1 MT/2 मैसेज
                   </p>
               </div>
@@ -125,7 +125,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
             <div className="inline-block bg-gradient-to-r from-cyan-400 to-emerald-500 text-white font-bold text-xl md:text-2xl px-8 py-2 rounded-full shadow-lg mb-2">
                 DT Plans
             </div>
-            <p className="text-base font-bold text-slate-600 dark:text-slate-400 mt-2">Direct Plans में तय मिनट और मैसेज मिलते हैं।</p>
+            <p className="text-sm font-semibold text-slate-600 dark:text-slate-400 mt-2">Direct Time में Fix मिनट और मैसेज मिलते हैं।</p>
         </div>
       </section>
 
