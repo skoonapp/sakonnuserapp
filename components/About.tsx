@@ -13,6 +13,7 @@ interface ProfileViewProps {
   deferredPrompt: any; // The event from beforeinstallprompt
   onInstallClick: () => void;
   onLogout: () => void;
+  onWalletClick: () => void;
 }
 
 // --- Icons ---
@@ -20,6 +21,12 @@ const InstallIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
         <path d="M12 1.5a.75.75 0 01.75.75V12h-1.5V2.25A.75.75 0 0112 1.5z" />
         <path fillRule="evenodd" d="M3.75 13.5a.75.75 0 00-1.5 0v4.5a3 3 0 003 3h10.5a3 3 0 003-3v-4.5a.75.75 0 00-1.5 0v4.5a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-4.5zm5.03-3.03a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l2.25-2.25a.75.75 0 10-1.06-1.06L12 12.69 8.78 9.47z" clipRule="evenodd" />
+    </svg>
+);
+
+const WalletIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+        <path d="M21,18V6A3,3,0,0,0,18,3H5A3,3,0,0,0,2,6V18A3,3,0,0,0,5,21H18A3,3,0,0,0,21,18ZM5,5H18a1,1,0,0,1,1,1V8H4V6A1,1,0,0,1,5,5ZM15,15a1,1,0,1,1,1-1A1,1,0,0,1,15,15Z" />
     </svg>
 );
 
@@ -38,7 +45,8 @@ const ProfileView: React.FC<ProfileViewProps> = ({
   onShowCancellationPolicy,
   deferredPrompt,
   onInstallClick,
-  onLogout
+  onLogout,
+  onWalletClick
 }) => {
   const [openAccordion, setOpenAccordion] = useState<'faq' | 'contact' | null>(null);
 
@@ -126,7 +134,14 @@ const ProfileView: React.FC<ProfileViewProps> = ({
             </div>
             
             <div className="p-6 text-center">
-              <div className="flex justify-center">
+              <div className="flex justify-center items-center gap-4">
+                  <button
+                      onClick={onWalletClick}
+                      className="flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:scale-105"
+                  >
+                      <WalletIcon className="w-5 h-5" />
+                      <span>My Wallet</span>
+                  </button>
                   <button
                       onClick={onLogout}
                       className="flex items-center gap-2 bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:scale-105"

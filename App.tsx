@@ -389,6 +389,7 @@ const App: React.FC = () => {
             deferredPrompt={deferredInstallPrompt}
             onInstallClick={handleInstallClick}
             onLogout={handleLogout}
+            onWalletClick={handleWalletOpen}
         />
     ];
 
@@ -398,7 +399,6 @@ const App: React.FC = () => {
                 isDarkMode={isDarkMode} 
                 toggleDarkMode={toggleDarkMode} 
                 wallet={wallet}
-                onWalletClick={handleWalletOpen}
             />
             
             {feedback && (
