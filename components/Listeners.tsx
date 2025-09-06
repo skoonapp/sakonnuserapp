@@ -30,14 +30,14 @@ const MTCoinIcon: React.FC<{ className?: string; idSuffix?: string }> = ({ class
     </div>
 );
 
-const CallIcon: React.FC<{ className?: string }> = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
-        <path fillRule="evenodd" d="M1.5 4.5a3 3 0 013-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 01-.694 1.955l-1.293.97c-.135.101-.164.298-.083.465a7.48 7.48 0 003.429 3.429c.167.081.364.052.465-.083l.97-1.293a1.875 1.875 0 011.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 01-3 3h-2.25C6.542 22.5 1.5 17.458 1.5 9.75V4.5z" clipRule="evenodd" />
+const HistoryIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}>
+      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 000-1.5h-3.25V5z" clipRule="evenodd" />
     </svg>
 );
-const ChatIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
-    <path fillRule="evenodd" d="M4.848 2.771A49.144 49.144 0 0112 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.901 48.901 0 01-3.476.383.39.39 0 00-.297.17l-2.755 4.133a.75.75 0 01-1.248 0l-2.755-4.133a.39.39 0 00-.297-.17 48.9 48.9 0 01-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.68 3.348-3.97zM6.75 8.25a.75.75 0 01.75-.75h9a.75.75 0 010 1.5h-9a.75.75 0 01-.75-.75zm.75 2.25a.75.75 0 000 1.5H12a.75.75 0 000-1.5H7.5z" clipRule="evenodd" />
+const ChevronRightIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}>
+    <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
   </svg>
 );
 // --- End Icons ---
@@ -48,19 +48,6 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onWalletClic
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const [paymentSessionId, setPaymentSessionId] = useState<string | null>(null);
   const [paymentDescription, setPaymentDescription] = useState('');
-
-  const tokenBalance = wallet.tokens || 0;
-  const now = Date.now();
-  const validPlans = (wallet.activePlans || []).filter(p => p.expiryTimestamp > now);
-
-  const callMinutes = validPlans
-      .filter(p => p.type === 'call')
-      .reduce((sum, p) => sum + (p.minutes || 0), 0);
-
-  const totalMessages = validPlans
-      .filter(p => p.type === 'chat')
-      .reduce((sum, p) => sum + (p.messages || 0), 0);
-
 
   const tokenOptions = [
     { tokens: 10, price: 50 },
@@ -133,26 +120,35 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onWalletClic
         </div>
       )}
       
-      {/* New Balance Card */}
-       <button onClick={onWalletClick} className="w-full text-left bg-gradient-to-r from-cyan-50 to-blue-100 dark:from-slate-800 dark:to-slate-900 rounded-2xl shadow-lg p-4 flex items-center justify-around mb-6 transition-transform hover:scale-[1.02] border border-cyan-200 dark:border-slate-700">
-          <div className="flex flex-col items-center" title={`${tokenBalance} MT`}>
-              <MTCoinIcon className="w-8 h-8 mb-1" idSuffix="balance-card" />
-              <span className="font-bold text-2xl text-slate-700 dark:text-slate-100">{tokenBalance}</span>
-              <span className="text-xs text-slate-500 dark:text-slate-400">MT</span>
+      {/* New History Preview Card */}
+       <button
+          onClick={onWalletClick}
+          className="w-full text-left bg-white dark:bg-slate-900 rounded-2xl shadow-lg p-4 mb-6 transition-transform hover:scale-[1.02] border border-slate-200 dark:border-slate-800"
+          aria-label="View full wallet history"
+        >
+          <div className="flex justify-between items-center mb-3">
+            <div className="flex items-center gap-2">
+              <HistoryIcon className="w-6 h-6 text-cyan-600 dark:text-cyan-400" />
+              <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">Recent Activity</h3>
+            </div>
+            <div className="flex items-center gap-1 text-sm font-semibold text-cyan-600 dark:text-cyan-400">
+                <span>View All</span>
+                <ChevronRightIcon className="w-5 h-5" />
+            </div>
           </div>
-          <div className="w-px h-10 bg-cyan-200 dark:bg-slate-700"></div>
-          <div className="flex flex-col items-center" title={`${callMinutes} मिनट कॉल`}>
-              <CallIcon className="w-7 h-7 text-green-500 mb-1"/>
-              <span className="font-bold text-2xl text-slate-700 dark:text-slate-100">{callMinutes}</span>
-              <span className="text-xs text-slate-500 dark:text-slate-400">Call Mins</span>
+          <div className="space-y-2 text-sm">
+            {/* Mock Recent Recharge */}
+            <div className="flex justify-between items-center text-slate-600 dark:text-slate-300">
+              <span>Recharge: 10 min DT Calling</span>
+              <span className="font-semibold text-green-600 dark:text-green-400">+ ₹99</span>
+            </div>
+            {/* Mock Recent Usage */}
+            <div className="flex justify-between items-center text-slate-600 dark:text-slate-300">
+              <span>Usage: Call (4 Min)</span>
+              <span className="font-semibold text-red-600 dark:text-red-400">- 8 MT</span>
+            </div>
           </div>
-          <div className="w-px h-10 bg-cyan-200 dark:bg-slate-700"></div>
-          <div className="flex flex-col items-center" title={`${totalMessages} मैसेज`}>
-              <ChatIcon className="w-7 h-7 text-blue-500 mb-1"/>
-              <span className="font-bold text-2xl text-slate-700 dark:text-slate-100">{totalMessages}</span>
-              <span className="text-xs text-slate-500 dark:text-slate-400">Messages</span>
-          </div>
-      </button>
+        </button>
 
       {/* Token Purchase Section */}
       <section>
@@ -162,9 +158,6 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onWalletClic
                 <span>MT Plans</span>
             </h3>
             <p className="text-base text-slate-600 dark:text-slate-400 mt-2">Money Token खरीदें और अपनी सुविधानुसार कॉल या चैट के लिए उपयोग करें।</p>
-            <div className="bg-cyan-100 dark:bg-cyan-900/50 text-cyan-800 dark:text-cyan-200 text-sm font-semibold px-4 py-2 rounded-full inline-block mt-4">
-                Note: सभी प्लान 30 दिनों के लिए मान्य होंगे।
-            </div>
         </div>
         
         <div className="max-w-3xl mx-auto pt-6">
