@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { db, auth, serverTimestamp } from '../utils/firebase';
 
 // Icon for privacy note
@@ -16,8 +16,8 @@ const WarningIcon: React.FC<{ className?: string }> = ({ className }) => (
 
 const LANGUAGES = [
   { value: 'hindi', label: 'हिंदी (Hindi)' },
-  { value: 'bhojpuri', label: 'भोजपुरी (Bhojpuri)' },
   { value: 'awadhi', label: 'अवधी (Awadhi)' },
+  { value: 'bhojpuri', label: 'भोजपुरी (Bhojpuri)' },
   { value: 'english', label: 'अंग्रेज़ी (English)' },
   { value: 'bangla', label: 'बंगाली (Bangla)' },
   { value: 'tamil', label: 'तमिल (Tamil)' },
@@ -51,6 +51,8 @@ const ApplyAsListener: React.FC = () => {
   const [applied, setApplied] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
+  const languageDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const user = auth.currentUser;
@@ -58,6 +60,18 @@ const ApplyAsListener: React.FC = () => {
         setFormData(prev => ({ ...prev, phone: user.phoneNumber?.replace('+91', '') || '' }));
         setEmail(user.email || '');
     }
+  }, []);
+  
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+        if (languageDropdownRef.current && !languageDropdownRef.current.contains(event.target as Node)) {
+            setLanguageDropdownOpen(false);
+        }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -252,28 +266,50 @@ const ApplyAsListener: React.FC = () => {
       </div>
       
       {/* Language Selection */}
-       <fieldset className="border border-slate-300 dark:border-slate-700 rounded-lg p-4">
-        <legend className="px-2 font-semibold text-slate-700 dark:text-slate-300">आप कौन सी भाषाएँ बोलते हैं? <span className="text-red-500">*</span></legend>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-3 gap-x-4 mt-2">
-            {LANGUAGES.map(lang => (
-                <div key={lang.value} className="flex items-center">
-                    <input
-                        type="checkbox"
-                        id={`lang-${lang.value}`}
-                        name="languages"
-                        value={lang.value}
-                        checked={formData.languages.includes(lang.value)}
-                        onChange={handleLanguageChange}
-                        className="h-4 w-4 rounded border-slate-400 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500 bg-slate-100 dark:bg-slate-800"
-                    />
-                    <label htmlFor={`lang-${lang.value}`} className="ml-2 text-sm text-slate-700 dark:text-slate-300 select-none">
-                        {lang.label}
-                    </label>
-                </div>
-            ))}
-        </div>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-3">कम से कम एक भाषा चुनें।</p>
-      </fieldset>
+      <div className="relative" ref={languageDropdownRef}>
+          <label className="block text-md font-medium text-slate-700 dark:text-slate-300 mb-2">
+              आप कौन सी भाषाएँ बोलते हैं? <span className="text-red-500">*</span>
+          </label>
+          <button
+              type="button"
+              onClick={() => setLanguageDropdownOpen(!languageDropdownOpen)}
+              className="w-full p-3 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-cyan-500 transition text-left flex justify-between items-center"
+              aria-haspopup="listbox"
+              aria-expanded={languageDropdownOpen}
+          >
+              <span className={`truncate ${formData.languages.length > 0 ? 'text-slate-900 dark:text-slate-100' : 'text-slate-500'}`}>
+                  {formData.languages.length > 0
+                      ? `${formData.languages.length} ${formData.languages.length > 1 ? 'भाषाएँ' : 'भाषा'} चुनी गईं`
+                      : 'भाषा चुनें'}
+              </span>
+              <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 text-slate-400 transition-transform ${languageDropdownOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+          </button>
+          {languageDropdownOpen && (
+              <div className="absolute z-10 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg shadow-lg max-h-60 overflow-y-auto" role="listbox">
+                  <div className="p-2 space-y-1">
+                      {LANGUAGES.map(lang => (
+                          <label key={lang.value} htmlFor={`lang-${lang.value}`} className="flex items-center p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer">
+                              <input
+                                  type="checkbox"
+                                  id={`lang-${lang.value}`}
+                                  name="languages"
+                                  value={lang.value}
+                                  checked={formData.languages.includes(lang.value)}
+                                  onChange={handleLanguageChange}
+                                  className="h-4 w-4 rounded border-slate-400 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500 bg-slate-100 dark:bg-slate-800"
+                              />
+                              <span className="ml-3 text-sm text-slate-700 dark:text-slate-300 select-none">
+                                  {lang.label}
+                              </span>
+                          </label>
+                      ))}
+                  </div>
+              </div>
+          )}
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">कम से कम एक भाषा चुनें।</p>
+      </div>
 
 
       {/* Payment Details */}
