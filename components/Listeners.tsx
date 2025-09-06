@@ -31,15 +31,19 @@ const MTCoinIcon: React.FC<{ className?: string; idSuffix?: string }> = ({ class
 );
 
 const DTPlanIcon: React.FC<{ className?: string }> = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className}>
-        <defs>
-            <linearGradient id="dt-plan-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#22d3ee" /> {/* cyan-400 */}
-                <stop offset="100%" stopColor="#10b981" /> {/* emerald-500 */}
-            </linearGradient>
-        </defs>
-        <path fill="url(#dt-plan-grad)" d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4V6h16v12z M10.41 15.41L12.59 13H7v-2h5.59l-2.18-2.41L12 7l4 4-4 4-1.59-1.59z"/>
-    </svg>
+    <div className={`relative inline-block ${className}`}>
+        <svg viewBox="0 0 48 48" className="w-full h-full">
+            <defs>
+                <linearGradient id="dt-plan-grad-icon" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#22d3ee" /> {/* cyan-400 */}
+                    <stop offset="100%" stopColor="#10b981" /> {/* emerald-500 */}
+                </linearGradient>
+            </defs>
+            <circle cx="24" cy="24" r="22" fill="url(#dt-plan-grad-icon)" />
+            <circle cx="24" cy="24" r="18" fill="none" stroke="#FFFFFF" strokeWidth="1.5" strokeOpacity="0.5"/>
+            <text x="50%" y="54%" dominantBaseline="middle" textAnchor="middle" fontFamily="Poppins, sans-serif" fontSize="16" fontWeight="bold" fill="white">DT</text>
+        </svg>
+    </div>
 );
 // --- End Icons ---
 
@@ -72,7 +76,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
                   <WalletIcon className="w-8 h-8 text-indigo-500"/>
                   <span>MT Plans</span>
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Money Token खरीदकर कॉल या चैट कर सकते हैं।</p>
+              <p className="text-base text-slate-600 dark:text-slate-400 mt-2">Money Token खरीदकर कॉल या चैट कर सकते हैं।</p>
           </div>
           
           <div className="w-1/3 mx-auto mt-2 mb-3 border-t border-slate-200 dark:border-slate-700"></div>
@@ -87,18 +91,18 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
               <div className="max-w-3xl mx-auto">
                   <div className="grid grid-cols-2 sm:grid-cols-3 border-2 border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden divide-x-2 divide-y-2 divide-slate-200 dark:divide-slate-800">
                       {tokenOptions.map((option, index) => (
-                          <div key={option.tokens} className="bg-white dark:bg-slate-900 p-4 flex flex-col items-center justify-between transition-all hover:shadow-lg hover:-translate-y-1">
-                              <div className="text-center">
+                          <div key={option.tokens} className="bg-white dark:bg-slate-900 p-2.5 flex flex-col items-center justify-between transition-all hover:shadow-lg hover:-translate-y-1 min-h-[230px]">
+                              <div className="text-center flex-grow flex flex-col justify-center">
                                   <div className="flex items-center justify-center gap-2">
-                                      <MTCoinIcon className="w-7 h-7" idSuffix={String(index)} />
+                                      <MTCoinIcon className="w-8 h-8" idSuffix={String(index)} />
                                       <span className="text-2xl font-bold text-slate-800 dark:text-slate-100">{option.tokens}</span>
                                   </div>
-                                  <p className="text-slate-500 dark:text-slate-400 mb-4">MT</p>
+                                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">MT</p>
                               </div>
                               <button 
                                   onClick={() => onPurchase({ tokens: option.tokens, price: option.price })}
                                   disabled={loadingPlan !== null}
-                                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
+                                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1.5 px-4 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed text-sm mt-2"
                               >
                                   {loadingPlan === `mt_${option.tokens}` ? 'प्रोसेसिंग...' : `₹${option.price} Buy`}
                               </button>

@@ -62,7 +62,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPop
   const isAnyPlanLoading = loadingPlan !== null;
 
   return (
-    <div className={`relative ${popularContainerStyles} p-2.5 flex flex-col text-center items-center hover:-translate-y-1 transition-all duration-300`}>
+    <div className={`relative ${popularContainerStyles} p-2.5 flex flex-col text-center items-center hover:-translate-y-1 transition-all duration-300 min-h-[230px]`}>
       {isPopular && (
         <div className="absolute top-0 -translate-y-1/2 bg-gradient-to-r from-orange-400 to-amber-500 text-white text-sm font-bold px-5 py-1.5 rounded-full shadow-lg animate-pulse z-10">
           सबसे लोकप्रिय
@@ -74,7 +74,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPop
         {isPopular && <StarIcon className="w-6 h-6 text-amber-400" />}
       </div>
       
-      <div className="w-full grid grid-cols-2 gap-2 divide-x divide-slate-200 dark:divide-slate-800">
+      <div className="w-full grid grid-cols-2 gap-2 divide-x divide-slate-200 dark:divide-slate-800 flex-grow">
         {/* Call Option */}
         <div className="flex flex-col items-center px-1.5">
             <div className="flex-grow flex flex-col items-center text-center justify-center py-1.5">
@@ -83,9 +83,9 @@ const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPop
                     <h4 className="text-sm font-semibold text-cyan-800 dark:text-cyan-300">कॉलिंग</h4>
                 </div>
                 <div className="mb-1.5">
-                    <p className="text-lg">
+                    <p className="text-2xl">
                         <span className="font-extrabold text-slate-900 dark:text-slate-100">{callPlan.duration.split(' ')[0]}</span>
-                        <span className="font-semibold text-slate-600 dark:text-slate-400 ml-1">{callPlan.duration.split(' ')[1]}</span>
+                        <span className="font-semibold text-slate-600 dark:text-slate-400 ml-1 text-base">{callPlan.duration.split(' ')[1]}</span>
                     </p>
                 </div>
             </div>
@@ -106,9 +106,9 @@ const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPop
                     <h4 className="text-sm font-semibold text-teal-800 dark:text-teal-300">चैट</h4>
                 </div>
                  <div className="mb-1.5">
-                    <p className="text-lg">
+                    <p className="text-2xl">
                         <span className="font-extrabold text-slate-900 dark:text-slate-100">{chatPlan.messages}</span>
-                        <span className="font-semibold text-slate-600 dark:text-slate-400 ml-1">मैसेज</span>
+                        <span className="font-semibold text-slate-600 dark:text-slate-400 ml-1 text-base">मैसेज</span>
                     </p>
                 </div>
             </div>
