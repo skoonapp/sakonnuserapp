@@ -99,15 +99,15 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
                               )}
                               <div className="text-center">
                                   <div className="flex justify-center items-center gap-2">
-                                      <MTCoinIcon className="w-7 h-7" idSuffix={String(index)} />
-                                      <span className="text-3xl font-extrabold text-slate-800 dark:text-slate-100">{option.tokens}</span>
+                                      <MTCoinIcon className="w-6 h-6" idSuffix={String(index)} />
+                                      <span className="text-2xl font-extrabold text-slate-800 dark:text-slate-100">{option.tokens}</span>
                                   </div>
                                   <p className="text-sm font-semibold text-slate-600 dark:text-slate-400">Money Token</p>
                               </div>
                               <button 
                                   onClick={() => onPurchase({ tokens: option.tokens, price: option.price })}
                                   disabled={loadingPlan !== null}
-                                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed text-base mt-3"
+                                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed text-sm mt-3"
                               >
                                   {loadingPlan === `mt_${option.tokens}` ? 'प्रोसेसिंग...' : `₹${option.price} Buy`}
                               </button>
@@ -145,48 +145,39 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
       </div>
 
       {/* Secure Payments Section */}
-      <section className="mt-6 text-center bg-white dark:bg-slate-900 p-6 md:p-8 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 max-w-3xl mx-auto">
-        <h3 className="text-3xl font-bold text-slate-800 dark:text-slate-100">सुरक्षित पेमेंट</h3>
+      <section className="mt-4 text-center bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 max-w-3xl mx-auto">
+        <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-100">सुरक्षित पेमेंट</h3>
 
-        <div className="my-6 flex flex-wrap justify-around items-center gap-x-6 gap-y-4 text-slate-500 dark:text-slate-400">
-            <div className="flex items-center gap-3">
-                <ShieldCheckIcon className="w-8 h-8"/>
-                <div>
-                    <span className="font-semibold text-sm block">Secure</span>
-                    <span className="text-xs block">Checkout</span>
-                </div>
+        <div className="my-4 flex flex-wrap justify-center items-center gap-x-4 sm:gap-x-6 gap-y-2 text-slate-600 dark:text-slate-400">
+            <div className="flex items-center gap-2">
+                <ShieldCheckIcon className="w-5 h-5 text-cyan-500"/>
+                <span className="font-semibold text-xs">Secure Checkout</span>
             </div>
-            <div className="flex items-center gap-3">
-                <TrophyIcon className="w-8 h-8"/>
-                <div>
-                    <span className="font-semibold text-sm block">Satisfaction</span>
-                    <span className="text-xs block">Guaranteed</span>
-                </div>
+            <div className="flex items-center gap-2">
+                <TrophyIcon className="w-5 h-5 text-amber-500"/>
+                <span className="font-semibold text-xs">Satisfaction Guaranteed</span>
             </div>
-            <div className="flex items-center gap-3">
-                <PadlockIcon className="w-8 h-8"/>
-                <div>
-                    <span className="font-semibold text-sm block">Privacy</span>
-                    <span className="text-xs block">Protected</span>
-                </div>
+            <div className="flex items-center gap-2">
+                <PadlockIcon className="w-5 h-5 text-slate-500"/>
+                <span className="font-semibold text-xs">Privacy Protected</span>
             </div>
         </div>
 
-        <div className="flex flex-col items-center gap-y-3 my-4">
+        <div className="flex flex-col items-center gap-y-2 my-3">
           <div className="flex justify-center items-center gap-x-6 sm:gap-x-8">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-6 object-contain" />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg" alt="UPI" className="h-6 object-contain" />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Paytm_Logo_(standalone).svg" alt="Paytm" className="h-6 object-contain" />
+              <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-5 object-contain" />
+              <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg" alt="UPI" className="h-5 object-contain" />
+              <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Paytm_Logo_(standalone).svg" alt="Paytm" className="h-5 object-contain" />
           </div>
           <div className="flex justify-center items-center gap-x-6 sm:gap-x-8">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/7/71/PhonePe_Logo.svg" alt="PhonePe" className="h-6 object-contain" />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="Google Pay" className="h-6 object-contain" />
+              <img src="https://upload.wikimedia.org/wikipedia/commons/7/71/PhonePe_Logo.svg" alt="PhonePe" className="h-5 object-contain" />
+              <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="Google Pay" className="h-5 object-contain" />
           </div>
         </div>
         <p className="text-sm font-semibold text-green-600 dark:text-green-400">
           सभी लेन-देन 100% सुरक्षित और गोपनीय हैं।
         </p>
-        <p className="mt-2 text-slate-600 dark:text-slate-400 max-w-lg mx-auto">
+        <p className="mt-1 text-xs text-slate-600 dark:text-slate-400 max-w-lg mx-auto">
           यदि किसी कारण से आपका भुगतान असफल हो जाता है, तो रिफंड की राशि 5-7 व्यावसायिक दिनों के भीतर आपके मूल खाते में वापस जमा कर दी जाएगी।
         </p>
       </section>
