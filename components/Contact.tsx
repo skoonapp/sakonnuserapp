@@ -82,9 +82,6 @@ const Contact: React.FC = () => {
           
           <div className={`transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
             <div className="p-6 pt-0">
-                <p className="text-md text-slate-500 dark:text-slate-400 mb-6">
-                आप हमें <a href="mailto:appsakoon@gmail.com" className="text-cyan-600 dark:text-cyan-300 font-semibold hover:underline">appsakoon@gmail.com</a> पर ईमेल भी कर सकते हैं।
-                </p>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label htmlFor="name" className="block text-md font-medium text-slate-700 dark:text-slate-300 mb-2">नाम <span className="text-red-500">*</span></label>
