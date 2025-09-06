@@ -55,46 +55,50 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
 
       {/* Token Purchase Section */}
       <section>
-        <div className="text-center pb-3 border-b border-slate-200 dark:border-slate-700">
-            <h3 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100 flex items-center justify-center gap-3">
-                <WalletIcon className="w-8 h-8 text-indigo-500"/>
-                <span>MT Plans</span>
-            </h3>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Money Token खरीदें और अपनी सुविधानुसार कॉल या चैट के लिए उपयोग करें।</p>
-        </div>
-        
-        <div className="my-4 flex justify-center items-center flex-wrap gap-x-4 gap-y-2 text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-900/50 py-2 px-4 rounded-full max-w-md mx-auto">
-            <span>📞 कॉल = 2 MT/मिनट</span>
-            <div className="w-px h-4 bg-slate-300 dark:bg-slate-700 hidden sm:block"></div>
-            <span>💬 चैट = 1 MT/2 मैसेज</span>
-        </div>
-        
-        <div className="max-w-3xl mx-auto pt-2">
-            <div className="grid grid-cols-2 sm:grid-cols-3 border-2 border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden divide-x-2 divide-y-2 divide-slate-200 dark:divide-slate-800">
-                {tokenOptions.map((option, index) => (
-                    <div key={option.tokens} className="bg-white dark:bg-slate-900 p-4 flex flex-col items-center justify-between transition-all hover:shadow-lg hover:-translate-y-1">
-                        <div className="text-center">
-                            <div className="flex items-center justify-center gap-2">
-                                <MTCoinIcon className="w-7 h-7" idSuffix={String(index)} />
-                                <span className="text-2xl font-bold text-slate-800 dark:text-slate-100">{option.tokens}</span>
-                            </div>
-                            <p className="text-slate-500 dark:text-slate-400 mb-4">MT</p>
-                        </div>
-                        <button 
-                            onClick={() => onPurchase({ tokens: option.tokens, price: option.price })}
-                            disabled={loadingPlan !== null}
-                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
-                        >
-                            {loadingPlan === `mt_${option.tokens}` ? 'प्रोसेसिंग...' : `₹${option.price} Buy`}
-                        </button>
-                    </div>
-                ))}
-            </div>
-        </div>
+          <div className="text-center mb-2">
+              <h3 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100 flex items-center justify-center gap-3">
+                  <WalletIcon className="w-8 h-8 text-indigo-500"/>
+                  <span>MT Plans</span>
+              </h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Money Token खरीदें और अपनी सुविधानुसार कॉल या चैट के लिए उपयोग करें।</p>
+          </div>
+          
+          <div className="w-1/3 mx-auto mt-2 border-t border-slate-200 dark:border-slate-700"></div>
+
+          <div className="mt-3">
+              <div className="mb-3 flex justify-center items-center flex-wrap gap-x-4 gap-y-2 text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-900/50 py-2 px-4 rounded-full max-w-md mx-auto">
+                  <span>📞 कॉल = 2 MT/मिनट</span>
+                  <div className="w-px h-4 bg-slate-300 dark:bg-slate-700 hidden sm:block"></div>
+                  <span>💬 चैट = 1 MT/2 मैसेज</span>
+              </div>
+              
+              <div className="max-w-3xl mx-auto">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 border-2 border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden divide-x-2 divide-y-2 divide-slate-200 dark:divide-slate-800">
+                      {tokenOptions.map((option, index) => (
+                          <div key={option.tokens} className="bg-white dark:bg-slate-900 p-4 flex flex-col items-center justify-between transition-all hover:shadow-lg hover:-translate-y-1">
+                              <div className="text-center">
+                                  <div className="flex items-center justify-center gap-2">
+                                      <MTCoinIcon className="w-7 h-7" idSuffix={String(index)} />
+                                      <span className="text-2xl font-bold text-slate-800 dark:text-slate-100">{option.tokens}</span>
+                                  </div>
+                                  <p className="text-slate-500 dark:text-slate-400 mb-4">MT</p>
+                              </div>
+                              <button 
+                                  onClick={() => onPurchase({ tokens: option.tokens, price: option.price })}
+                                  disabled={loadingPlan !== null}
+                                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
+                              >
+                                  {loadingPlan === `mt_${option.tokens}` ? 'प्रोसेसिंग...' : `₹${option.price} Buy`}
+                              </button>
+                          </div>
+                      ))}
+                  </div>
+              </div>
+          </div>
       </section>
 
       {/* DT Plans Section Header */}
-      <section className="mt-8">
+      <section className="mt-6">
         <div className="text-center py-4 border-y border-slate-200 dark:border-slate-700">
             <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100">DT Plans</h2>
             <p className="text-base text-slate-600 dark:text-slate-400 mt-2">Direct Plans से फिक्स मिनट और मैसेज के लिए उपयोग करें।</p>
