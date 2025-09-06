@@ -5,7 +5,6 @@ interface HeaderProps {
   isDarkMode: boolean;
   toggleDarkMode: () => void;
   wallet: ReturnType<typeof useWallet>;
-  onWalletClick: () => void;
 }
 
 // --- Icons ---
@@ -44,7 +43,7 @@ const ChatIcon: React.FC<{ className?: string }> = ({ className }) => (
 // --- End Icons ---
 
 
-const Header: React.FC<HeaderProps> = ({ isDarkMode, toggleDarkMode, wallet, onWalletClick }) => {
+const Header: React.FC<HeaderProps> = ({ isDarkMode, toggleDarkMode, wallet }) => {
   const now = Date.now();
   const activePlans = (wallet.activePlans || []).filter(p => p.expiryTimestamp > now);
 
@@ -69,10 +68,9 @@ const Header: React.FC<HeaderProps> = ({ isDarkMode, toggleDarkMode, wallet, onW
         {/* Right Section */}
         <div className="flex items-center gap-2">
             {/* Wallet Balance */}
-            <button 
-                onClick={onWalletClick}
-                className="flex items-center gap-2.5 bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-full px-3 py-1 transition-colors hover:bg-slate-200/70 dark:hover:bg-slate-800/80"
-                aria-label="Open wallet history"
+            <div 
+                className="flex items-center gap-2.5 bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-full px-3 py-1"
+                aria-label="Wallet balance"
             >
                 {/* MT Balance */}
                 <div className="flex items-center gap-1">
@@ -95,7 +93,7 @@ const Header: React.FC<HeaderProps> = ({ isDarkMode, toggleDarkMode, wallet, onW
                     <ChatIcon className="w-5 h-5 text-cyan-500" />
                     <span className="font-bold text-slate-800 dark:text-slate-100 text-md">{totalMessages}</span>
                 </div>
-            </button>
+            </div>
             
             {/* Dark Mode Toggle */}
              <button

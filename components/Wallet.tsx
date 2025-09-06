@@ -5,6 +5,7 @@ type WalletProps = {
     wallet: ReturnType<typeof useWallet>;
     onClose: () => void;
     onNavigateHome: () => void;
+    initialTab: 'recharge' | 'usage';
 };
 
 // --- MOCK DATA (Replace with actual data fetching) ---
@@ -72,8 +73,8 @@ const RefreshIcon: React.FC<{ className?: string }> = ({ className }) => (
 // --- END ICONS ---
 
 
-const Wallet: React.FC<WalletProps> = ({ wallet, onClose, onNavigateHome }) => {
-    const [activeTab, setActiveTab] = useState<'recharge' | 'usage'>('recharge');
+const Wallet: React.FC<WalletProps> = ({ wallet, onClose, onNavigateHome, initialTab }) => {
+    const [activeTab, setActiveTab] = useState<'recharge' | 'usage'>(initialTab);
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);

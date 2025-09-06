@@ -58,6 +58,7 @@ const App: React.FC = () => {
     const [showRechargeModal, setShowRechargeModal] = useState(false);
     const [showWelcomeModal, setShowWelcomeModal] = useState(false);
     const [showWallet, setShowWallet] = useState(false);
+    const [initialWalletTab, setInitialWalletTab] = useState<'recharge' | 'usage'>('recharge');
     
     // --- Session State ---
     const [activeCallSession, setActiveCallSession] = useState<CallSession | null>(null);
@@ -308,6 +309,11 @@ const App: React.FC = () => {
         setActiveChatSession(null);
     }, [user, activeChatSession]);
     
+    const handleWalletOpen = useCallback((tab: 'recharge' | 'usage') => {
+        setInitialWalletTab(tab);
+        setShowWallet(true);
+    }, []);
+
     // --- Render Logic ---
     
     if (isInitializing || wallet.loading) return <SplashScreen />;
@@ -319,6 +325,7 @@ const App: React.FC = () => {
         <HomeView 
             currentUser={user} 
             wallet={wallet} 
+            onWalletClick={handleWalletOpen}
         />,
         <CallsView onStartSession={handleStartSession} currentUser={user} />,
         <ChatsView onStartSession={handleStartSession} currentUser={user} />,
@@ -339,7 +346,6 @@ const App: React.FC = () => {
                 isDarkMode={isDarkMode} 
                 toggleDarkMode={toggleDarkMode} 
                 wallet={wallet}
-                onWalletClick={() => setShowWallet(true)}
             />
             
             <main
@@ -381,7 +387,7 @@ const App: React.FC = () => {
             <AICompanionButton onClick={() => setShowAICompanion(true)} />
             
             <Suspense fallback={<div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center"><ViewLoader /></div>}>
-                {showWallet && <Wallet wallet={wallet} onClose={() => setShowWallet(false)} onNavigateHome={() => { setShowWallet(false); navigateTo(0); }} />}
+                {showWallet && <Wallet wallet={wallet} onClose={() => setShowWallet(false)} onNavigateHome={() => { setShowWallet(false); navigateTo(0); }} initialTab={initialWalletTab} />}
                 {showAICompanion && <AICompanion user={user} onClose={() => setShowAICompanion(false)} onNavigateToServices={() => { navigateTo(1); setShowAICompanion(false); }} />}
                 {showPolicy === 'terms' && <TermsAndConditions onClose={() => setShowPolicy(null)} />}
                 {showPolicy === 'privacy' && <PrivacyPolicy onClose={() => setShowPolicy(null)} />}
