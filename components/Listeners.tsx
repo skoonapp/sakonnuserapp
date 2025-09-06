@@ -107,7 +107,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
                               <button 
                                   onClick={() => onPurchase({ tokens: option.tokens, price: option.price })}
                                   disabled={loadingPlan !== null}
-                                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed text-sm mt-3"
+                                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed text-base mt-3"
                               >
                                   {loadingPlan === `mt_${option.tokens}` ? 'प्रोसेसिंग...' : `₹${option.price} Buy`}
                               </button>
