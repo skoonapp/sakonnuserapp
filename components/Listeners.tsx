@@ -3,7 +3,6 @@ import PlanCard from './PlanCard';
 import { CALL_PLANS, CHAT_PLANS } from '../constants';
 import type { User, Plan as PlanType } from '../types';
 import { useWallet } from '../hooks/useWallet';
-import HomeHistory from './HomeHistory';
 
 
 interface PlansViewProps {
@@ -62,8 +61,6 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
 
   return (
     <div className="container mx-auto px-4 pt-2 pb-6">
-      <HomeHistory onPurchase={onPurchase} />
-
       {/* Token Purchase Section */}
       <section>
           <div className="text-center mb-2">
