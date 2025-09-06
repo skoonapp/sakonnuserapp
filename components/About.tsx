@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { User } from '../types';
 import FAQ from './FAQ';
 import Contact from './Contact';
@@ -40,6 +40,11 @@ const ProfileView: React.FC<ProfileViewProps> = ({
   onInstallClick,
   onLogout
 }) => {
+  const [openAccordion, setOpenAccordion] = useState<'faq' | 'contact' | null>(null);
+
+  const handleAccordionToggle = (section: 'faq' | 'contact') => {
+      setOpenAccordion(prev => (prev === section ? null : section));
+  };
 
   return (
     <div className="bg-slate-50 dark:bg-slate-950">
@@ -105,9 +110,20 @@ const ProfileView: React.FC<ProfileViewProps> = ({
               </div>
             )}
             
-            <div className="p-6"><FAQ /></div>
-            
-            <div className="p-6"><Contact /></div>
+            {/* New Combined FAQ and Contact Section */}
+            <div className="p-6">
+                <div className="max-w-2xl mx-auto bg-slate-50 dark:bg-slate-900/50 rounded-xl shadow-md border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <FAQ
+                        isOpen={openAccordion === 'faq'}
+                        onToggle={() => handleAccordionToggle('faq')}
+                    />
+                    <div className="border-t border-slate-200 dark:border-slate-800"></div>
+                    <Contact
+                        isOpen={openAccordion === 'contact'}
+                        onToggle={() => handleAccordionToggle('contact')}
+                    />
+                </div>
+            </div>
             
             <div className="p-6 text-center">
               <div className="flex justify-center">

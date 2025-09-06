@@ -16,21 +16,21 @@ const WarningIcon: React.FC<{ className?: string }> = ({ className }) => (
 
 const LANGUAGES = [
   { value: 'hindi', label: 'हिंदी (Hindi)' },
+  { value: 'urdu', label: 'उर्दू (Urdu)' },
   { value: 'awadhi', label: 'अवधी (Awadhi)' },
   { value: 'bhojpuri', label: 'भोजपुरी (Bhojpuri)' },
-  { value: 'english', label: 'अंग्रेज़ी (English)' },
+  { value: 'maithili', label: 'मैथिली (Maithili)' },
+  { value: 'punjabi', label: 'पंजाबी (Punjabi)' },
   { value: 'bangla', label: 'बंगाली (Bangla)' },
+  { value: 'gujarati', label: 'गुजराती (Gujarati)' },
+  { value: 'marathi', label: 'मराठी (Marathi)' },
+  { value: 'english', label: 'अंग्रेज़ी (English)' },
   { value: 'tamil', label: 'तमिल (Tamil)' },
   { value: 'telugu', label: 'तेलुगु (Telugu)' },
-  { value: 'marathi', label: 'मराठी (Marathi)' },
-  { value: 'gujarati', label: 'गुजराती (Gujarati)' },
-  { value: 'punjabi', label: 'पंजाबी (Punjabi)' },
-  { value: 'urdu', label: 'उर्दू (Urdu)' },
-  { value: 'malayalam', label: 'मलयालम (Malayalam)' },
   { value: 'kannada', label: 'कन्नड़ (Kannada)' },
+  { value: 'malayalam', label: 'मलयालम (Malayalam)' },
   { value: 'odia', label: 'ओड़िया (Odia)' },
   { value: 'assamese', label: 'असमिया (Assamese)' },
-  { value: 'maithili', label: 'मैथिली (Maithili)' },
 ];
 
 
