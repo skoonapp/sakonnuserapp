@@ -63,7 +63,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
   const tokenOptions = [
     { tokens: 10, price: 50 },
     { tokens: 20, price: 99 },
-    { tokens: 50, price: 230 },
+    { tokens: 50, price: 230, isPopular: true },
     { tokens: 100, price: 450 },
     { tokens: 250, price: 1125 },
     { tokens: 500, price: 2250 },
@@ -101,8 +101,19 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
               
               <div className="max-w-3xl mx-auto">
                   <div className="grid grid-cols-2 sm:grid-cols-3 border-2 border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden divide-x-2 divide-y-2 divide-slate-200 dark:divide-slate-800">
-                      {tokenOptions.map((option, index) => (
-                          <div key={option.tokens} className="bg-white dark:bg-slate-900 p-3 flex flex-col items-center justify-between transition-all hover:shadow-lg hover:-translate-y-1 min-h-[160px]">
+                      {tokenOptions.map((option, index) => {
+                        const isPopular = option.isPopular ?? false;
+                        const popularContainerStyles = isPopular
+                            ? 'bg-gradient-to-br from-cyan-50 to-blue-200 dark:from-cyan-950/60 dark:to-blue-950/60 scale-105 z-10'
+                            : 'bg-white dark:bg-slate-900';
+
+                        return (
+                          <div key={option.tokens} className={`relative ${popularContainerStyles} p-3 flex flex-col items-center justify-between transition-all hover:shadow-lg hover:-translate-y-1 min-h-[160px]`}>
+                              {isPopular && (
+                                  <div className="absolute top-0 -translate-y-1/2 bg-gradient-to-r from-orange-400 to-amber-500 text-white text-sm font-bold px-4 py-1 rounded-full shadow-lg animate-pulse z-10">
+                                      लोकप्रिय
+                                  </div>
+                              )}
                               <div className="text-center">
                                   <MTCoinIcon className="w-8 h-8 mx-auto" idSuffix={String(index)} />
                                   <p className="text-xl font-extrabold text-slate-800 dark:text-slate-100 mt-2">{option.tokens}</p>
@@ -116,7 +127,8 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
                                   {loadingPlan === `mt_${option.tokens}` ? 'प्रोसेसिंग...' : `₹${option.price} Buy`}
                               </button>
                           </div>
-                      ))}
+                        )
+                      })}
                   </div>
               </div>
           </div>
