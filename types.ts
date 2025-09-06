@@ -23,6 +23,7 @@ export interface User {
   activePlans?: ActivePlan[]; // Replaces purchasedPlans subcollection
   freeMessagesRemaining?: number;
   hasSeenWelcome?: boolean;
+  fcmToken?: string;
 }
 
 export interface Listener {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import type { User, Listener, CallSession, ChatSession, ActiveView, Plan } from './types';
-import { auth, db, functions } from './utils/firebase';
+import { auth, db, functions, messaging } from './utils/firebase';
 import { handleCallEnd, handleChat } from './utils/earnings';
 import { useWallet } from './hooks/useWallet';
 import { paymentService } from './services/paymentService';
@@ -69,6 +69,7 @@ const App: React.FC = () => {
     const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const [paymentSessionId, setPaymentSessionId] = useState<string | null>(null);
     const [paymentDescription, setPaymentDescription] = useState('');
+    const [foregroundNotification, setForegroundNotification] = useState<{ title: string; body: string } | null>(null);
     
     // --- Session State ---
     const [activeCallSession, setActiveCallSession] = useState<CallSession | null>(null);
@@ -175,6 +176,49 @@ const App: React.FC = () => {
         window.addEventListener('popstate', handlePopState);
         return () => window.removeEventListener('popstate', handlePopState);
     }, []);
+
+    // --- Firebase Cloud Messaging Setup ---
+    useEffect(() => {
+        if (!user || !messaging) return;
+
+        const setupNotifications = async () => {
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    const currentToken = await messaging.getToken();
+                    if (currentToken) {
+                        const userRef = db.collection('users').doc(user.uid);
+                        const userDoc = await userRef.get();
+                        const existingToken = userDoc.data()?.fcmToken;
+
+                        if (existingToken !== currentToken) {
+                            await userRef.update({ fcmToken: currentToken });
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error('An error occurred while setting up notifications.', err);
+            }
+        };
+
+        const timer = setTimeout(() => setupNotifications(), 3000);
+
+        // Handle foreground messages
+        const unsubscribeOnMessage = messaging.onMessage((payload) => {
+            if (payload.notification) {
+                setForegroundNotification({
+                    title: payload.notification.title || 'New Notification',
+                    body: payload.notification.body || '',
+                });
+                setTimeout(() => setForegroundNotification(null), 6000);
+            }
+        });
+
+        return () => {
+            clearTimeout(timer);
+            unsubscribeOnMessage();
+        };
+    }, [user]);
 
 
     // --- Handlers ---
@@ -403,6 +447,28 @@ const App: React.FC = () => {
             {feedback && (
                 <div className={`fixed top-16 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-md z-40 p-3 rounded-lg text-center font-semibold animate-fade-in-down ${feedback.type === 'success' ? 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300'}`}>
                     {feedback.message}
+                </div>
+            )}
+
+            {foregroundNotification && (
+                <div
+                    className="fixed top-20 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-md z-50 p-4 rounded-xl text-left animate-fade-in-down bg-white dark:bg-slate-800 shadow-2xl border border-slate-200 dark:border-slate-700 cursor-pointer"
+                    onClick={() => setForegroundNotification(null)}
+                >
+                    <div className="flex items-start gap-3">
+                        <div className="bg-cyan-100 dark:bg-cyan-900/50 p-2 rounded-full mt-1 shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-cyan-600 dark:text-cyan-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-slate-800 dark:text-slate-100">{foregroundNotification.title}</h3>
+                            <p className="font-normal text-sm text-slate-600 dark:text-slate-300">{foregroundNotification.body}</p>
+                        </div>
+                         <button onClick={() => setForegroundNotification(null)} className="absolute top-2 right-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors" aria-label="Close notification">
+                            <CloseIcon className="w-5 h-5" />
+                        </button>
+                    </div>
                 </div>
             )}
 
