@@ -319,6 +319,7 @@ const App: React.FC = () => {
         <HomeView 
             currentUser={user} 
             wallet={wallet} 
+            onWalletClick={() => setShowWallet(true)}
         />,
         <CallsView onStartSession={handleStartSession} currentUser={user} />,
         <ChatsView onStartSession={handleStartSession} currentUser={user} />,
@@ -339,7 +340,6 @@ const App: React.FC = () => {
                 isDarkMode={isDarkMode} 
                 toggleDarkMode={toggleDarkMode} 
                 wallet={wallet}
-                onWalletClick={() => setShowWallet(true)}
             />
             
             <main
