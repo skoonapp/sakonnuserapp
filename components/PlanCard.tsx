@@ -62,37 +62,37 @@ const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPop
   const isAnyPlanLoading = loadingPlan !== null;
 
   return (
-    <div className={`relative ${popularContainerStyles} p-4 flex flex-col text-center items-center hover:-translate-y-1 transition-all duration-300 min-h-[230px]`}>
+    <div className={`relative ${popularContainerStyles} p-3 flex flex-col text-center items-center hover:-translate-y-1 transition-all duration-300 min-h-[190px]`}>
       {isPopular && (
-        <div className="absolute top-0 -translate-y-1/2 bg-gradient-to-r from-orange-400 to-amber-500 text-white text-sm font-bold px-5 py-1.5 rounded-full shadow-lg animate-pulse z-10">
-          सबसे लोकप्रिय
+        <div className="absolute top-0 -translate-y-1/2 bg-gradient-to-r from-orange-400 to-amber-500 text-white text-sm font-bold px-4 py-1 rounded-full shadow-lg animate-pulse z-10">
+          लोकप्रिय
         </div>
       )}
-      <div className="mb-4 w-full flex justify-center items-center gap-2">
-        {isPopular && <StarIcon className="w-6 h-6 text-amber-400" />}
-        <p className={`text-xl font-bold ${tierStyles}`}>{tierName}</p>
-        {isPopular && <StarIcon className="w-6 h-6 text-amber-400" />}
+      <div className="mb-3 w-full flex justify-center items-center gap-2">
+        {isPopular && <StarIcon className="w-5 h-5 text-amber-400" />}
+        <p className={`text-lg font-bold ${tierStyles}`}>{tierName}</p>
+        {isPopular && <StarIcon className="w-5 h-5 text-amber-400" />}
       </div>
       
-      <div className="w-full grid grid-cols-2 gap-4 divide-x divide-slate-200 dark:divide-slate-800 flex-grow">
+      <div className="w-full grid grid-cols-2 gap-3 divide-x divide-slate-200 dark:divide-slate-800 flex-grow">
         {/* Call Option */}
         <div className="flex flex-col items-center px-2">
-            <div className="flex-grow flex flex-col items-center text-center justify-center py-2">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                    <PhoneIcon className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
-                    <h4 className="text-base font-semibold text-cyan-800 dark:text-cyan-300">कॉलिंग</h4>
+            <div className="flex-grow flex flex-col items-center text-center justify-center py-1">
+                <div className="flex items-center justify-center gap-1.5 mb-1.5">
+                    <PhoneIcon className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                    <h4 className="text-sm font-semibold text-cyan-800 dark:text-cyan-300">कॉलिंग</h4>
                 </div>
                 <div className="mb-2">
-                    <p className="text-3xl">
+                    <p className="text-2xl">
                         <span className="font-extrabold text-slate-900 dark:text-slate-100">{callPlan.duration.split(' ')[0]}</span>
-                        <span className="font-semibold text-slate-600 dark:text-slate-400 ml-1.5 text-lg">{callPlan.duration.split(' ')[1]}</span>
+                        <span className="font-semibold text-slate-600 dark:text-slate-400 ml-1 text-base">{callPlan.duration.split(' ')[1]}</span>
                     </p>
                 </div>
             </div>
             <button
               onClick={() => onPurchase(callPlan)}
               disabled={isAnyPlanLoading}
-              className="w-full mt-auto bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-500 dark:hover:bg-cyan-400 text-white font-bold py-2.5 text-base rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
+              className="w-full mt-auto bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-500 dark:hover:bg-cyan-400 text-white font-bold py-2 text-sm rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
             >
               {loadingPlan === callPlanKey ? 'प्रोसेसिंग...' : `₹${callPlan.price} खरीदें`}
             </button>
@@ -100,22 +100,22 @@ const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPop
 
         {/* Chat Option */}
         <div className="flex flex-col items-center px-2">
-            <div className="flex-grow flex flex-col items-center text-center justify-center py-2">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                    <ChatIcon className="w-5 h-5 text-teal-600 dark:text-teal-400" />
-                    <h4 className="text-base font-semibold text-teal-800 dark:text-teal-300">चैट</h4>
+            <div className="flex-grow flex flex-col items-center text-center justify-center py-1">
+                <div className="flex items-center justify-center gap-1.5 mb-1.5">
+                    <ChatIcon className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                    <h4 className="text-sm font-semibold text-teal-800 dark:text-teal-300">चैट</h4>
                 </div>
                  <div className="mb-2">
-                    <p className="text-3xl">
+                    <p className="text-2xl">
                         <span className="font-extrabold text-slate-900 dark:text-slate-100">{chatPlan.messages}</span>
-                        <span className="font-semibold text-slate-600 dark:text-slate-400 ml-1.5 text-lg">मैसेज</span>
+                        <span className="font-semibold text-slate-600 dark:text-slate-400 ml-1 text-base">मैसेज</span>
                     </p>
                 </div>
             </div>
             <button
               onClick={() => onPurchase(chatPlan)}
               disabled={isAnyPlanLoading}
-              className="w-full mt-auto bg-teal-500 hover:bg-teal-600 text-white font-bold py-2.5 text-base rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
+              className="w-full mt-auto bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 text-sm rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
             >
               {loadingPlan === chatPlanKey ? 'प्रोसेसिंग...' : `₹${chatPlan.price} खरीदें`}
             </button>
