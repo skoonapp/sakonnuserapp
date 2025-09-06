@@ -57,71 +57,78 @@ const StatusBadge: React.FC<{ status: RechargeStatus }> = ({ status }) => {
 };
 
 
-const HomeHistory: React.FC<{ onViewAllClick: () => void }> = ({ onViewAllClick }) => {
-    const [activeTab, setActiveTab] = useState<'recharge' | 'usage'>('recharge');
+const HomeHistory: React.FC = () => {
+    const [openTab, setOpenTab] = useState<'recharge' | 'usage' | null>(null);
+
+    const handleTabClick = (tab: 'recharge' | 'usage') => {
+        setOpenTab(currentOpenTab => (currentOpenTab === tab ? null : tab));
+    };
     
     return (
         <section className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 mb-6 overflow-hidden">
-            <div className="p-4">
-                 <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">
-                        Recent Activity
-                    </h3>
-                    <button onClick={onViewAllClick} className="text-sm font-bold text-cyan-600 dark:text-cyan-400 hover:underline">
-                        View All
-                    </button>
-                </div>
-                {/* Tabs */}
-                <div className="relative bg-slate-100 dark:bg-slate-800/80 p-1 rounded-full flex">
-                    <div 
-                        className="absolute top-1 bottom-1 w-1/2 bg-white dark:bg-slate-900 rounded-full shadow-md transition-transform duration-300 ease-in-out" 
-                        style={{ transform: activeTab === 'recharge' ? 'translateX(0%)' : 'translateX(100%)' }}
-                    ></div>
-                    <button onClick={() => setActiveTab('recharge')} className={`relative z-10 w-1/2 py-2 rounded-full font-bold transition-colors text-sm ${activeTab === 'recharge' ? 'text-cyan-600 dark:text-cyan-300' : 'text-slate-700 dark:text-slate-300'}`}>
-                        Recharge
-                    </button>
-                    <button onClick={() => setActiveTab('usage')} className={`relative z-10 w-1/2 py-2 rounded-full font-bold transition-colors text-sm ${activeTab === 'usage' ? 'text-cyan-600 dark:text-cyan-300' : 'text-slate-700 dark:text-slate-300'}`}>
-                        Usage
-                    </button>
-                </div>
+            {/* Tabs are now the main control */}
+            <div className="relative bg-slate-100 dark:bg-slate-800/80 p-1 flex">
+                <div 
+                    className="absolute top-1 bottom-1 w-1/2 bg-white dark:bg-slate-900 rounded-full shadow-md transition-all duration-300 ease-in-out" 
+                    style={{ 
+                        transform: openTab === 'recharge' ? 'translateX(0%)' : 'translateX(100%)',
+                        opacity: openTab ? 1 : 0
+                    }}
+                ></div>
+                <button 
+                    onClick={() => handleTabClick('recharge')} 
+                    className={`relative z-10 w-1/2 py-2.5 rounded-full font-bold transition-colors text-sm ${openTab === 'recharge' ? 'text-cyan-600 dark:text-cyan-300' : 'text-slate-700 dark:text-slate-300'}`}
+                    aria-expanded={openTab === 'recharge'}
+                >
+                    Recharge History
+                </button>
+                <button 
+                    onClick={() => handleTabClick('usage')} 
+                    className={`relative z-10 w-1/2 py-2.5 rounded-full font-bold transition-colors text-sm ${openTab === 'usage' ? 'text-cyan-600 dark:text-cyan-300' : 'text-slate-700 dark:text-slate-300'}`}
+                    aria-expanded={openTab === 'usage'}
+                >
+                    Usage History
+                </button>
             </div>
             
-            {/* History List */}
-            <div className="px-4 pb-4 space-y-3">
-                 {activeTab === 'recharge' && MOCK_RECHARGE_HISTORY.map(item => (
-                    <div key={item.id} className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700/50">
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <p className="font-bold text-md text-slate-800 dark:text-slate-100">₹{item.amount}</p>
-                                <p className="text-xs text-slate-500 dark:text-slate-400">{item.planType} ({item.planDetails})</p>
+            {/* Accordion Content */}
+            <div className={`transition-all duration-500 ease-in-out ${openTab ? 'max-h-[1000px]' : 'max-h-0'} overflow-hidden`}>
+                <div className="p-4 pt-3 space-y-3">
+                    {openTab === 'recharge' && MOCK_RECHARGE_HISTORY.map(item => (
+                        <div key={item.id} className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700/50">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <p className="font-bold text-md text-slate-800 dark:text-slate-100">₹{item.amount}</p>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">{item.planType} ({item.planDetails})</p>
+                                </div>
+                                <StatusBadge status={item.status} />
                             </div>
-                            <StatusBadge status={item.status} />
+                            {item.status === 'Failed' && item.refundInfo && (
+                                <div className="mt-2 text-xs text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/40 p-1.5 rounded-md">
+                                    {item.refundInfo}
+                                </div>
+                            )}
                         </div>
-                        {item.status === 'Failed' && item.refundInfo && (
-                            <div className="mt-2 text-xs text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/40 p-1.5 rounded-md">
-                                {item.refundInfo}
-                            </div>
-                        )}
-                    </div>
-                 ))}
+                    ))}
 
-                {activeTab === 'usage' && MOCK_USAGE_HISTORY.map(item => {
-                    const Icon = item.type === 'Call' ? CallUsageIcon : ChatUsageIcon;
-                    return (
-                        <div key={item.id} className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700/50 flex items-center gap-3">
-                            <div className={`p-2 rounded-full ${item.type === 'Call' ? 'bg-green-100 dark:bg-green-500/10' : 'bg-blue-100 dark:bg-blue-500/10'}`}>
-                                <Icon className={`w-5 h-5 ${item.type === 'Call' ? 'text-green-600' : 'text-blue-600'}`} />
+                    {openTab === 'usage' && MOCK_USAGE_HISTORY.map(item => {
+                        const Icon = item.type === 'Call' ? CallUsageIcon : ChatUsageIcon;
+                        return (
+                            <div key={item.id} className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700/50 flex items-center gap-3">
+                                <div className={`p-2 rounded-full ${item.type === 'Call' ? 'bg-green-100 dark:bg-green-500/10' : 'bg-blue-100 dark:bg-blue-500/10'}`}>
+                                    <Icon className={`w-5 h-5 ${item.type === 'Call' ? 'text-green-600' : 'text-blue-600'}`} />
+                                </div>
+                                <div className="flex-grow">
+                                    <p className="font-bold text-sm text-slate-800 dark:text-slate-100">{item.type} - {item.duration}</p>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">{item.deduction}</p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="font-bold text-sm text-slate-700 dark:text-slate-200">{item.balance}</p>
+                                </div>
                             </div>
-                            <div className="flex-grow">
-                                <p className="font-bold text-sm text-slate-800 dark:text-slate-100">{item.type} - {item.duration}</p>
-                                <p className="text-xs text-slate-500 dark:text-slate-400">{item.deduction}</p>
-                            </div>
-                            <div className="text-right">
-                                <p className="font-bold text-sm text-slate-700 dark:text-slate-200">{item.balance}</p>
-                            </div>
-                        </div>
-                    );
-                })}
+                        );
+                    })}
+                </div>
             </div>
         </section>
     );

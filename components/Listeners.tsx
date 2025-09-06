@@ -11,7 +11,6 @@ import HomeHistory from './HomeHistory';
 interface PlansViewProps {
   currentUser: User;
   wallet: ReturnType<typeof useWallet>;
-  onWalletClick: () => void;
 }
 
 // --- Icons ---
@@ -33,7 +32,7 @@ const MTCoinIcon: React.FC<{ className?: string; idSuffix?: string }> = ({ class
 // --- End Icons ---
 
 
-const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onWalletClick }) => {
+const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet }) => {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const [paymentSessionId, setPaymentSessionId] = useState<string | null>(null);
@@ -110,7 +109,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onWalletClic
         </div>
       )}
       
-      <HomeHistory onViewAllClick={onWalletClick} />
+      <HomeHistory />
 
       {/* Token Purchase Section */}
       <section>
