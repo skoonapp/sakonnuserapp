@@ -21,13 +21,15 @@ type RechargeHistoryItem = {
     plan?: Plan | { tokens: number; price: number };
 };
 
+const daysAgo = (days: number) => new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+
 // FIX: Use 'as const' to prevent TypeScript from widening the 'status' property to a generic string, ensuring it matches the 'RechargeStatus' type.
 const MOCK_RECHARGE_HISTORY: RechargeHistoryItem[] = ([
-    { id: 1, date: '2024-09-03T16:00:00Z', amount: 99, planType: 'DT Calling', planDetails: '10 min', status: 'Success' },
-    { id: 2, date: '2024-09-02T20:30:00Z', amount: 50, planType: 'MT Pack', planDetails: '10 MT', status: 'Failed', refundInfo: '₹50 refunded to UPI – 3 Sep' },
-    { id: 3, date: '2024-09-01T16:30:00Z', amount: 20, planType: 'DT Chat', planDetails: '8 messages', status: 'Success' },
-    { id: 4, date: '2024-08-30T09:00:00Z', amount: 230, planType: 'MT Pack', planDetails: '50 MT', status: 'Pending' },
-    { id: 5, date: '2024-08-28T18:45:00Z', amount: 145, planType: 'DT Calling', planDetails: '15 min', status: 'Success' },
+    { id: 1, date: daysAgo(0.5), amount: 99, planType: 'DT Calling', planDetails: '10 min', status: 'Success' },
+    { id: 2, date: daysAgo(1.2), amount: 50, planType: 'MT Pack', planDetails: '10 MT', status: 'Failed', refundInfo: '₹50 refunded to UPI' },
+    { id: 3, date: daysAgo(2.5), amount: 20, planType: 'DT Chat', planDetails: '8 messages', status: 'Success' },
+    { id: 4, date: daysAgo(4), amount: 230, planType: 'MT Pack', planDetails: '50 MT', status: 'Pending' },
+    { id: 5, date: daysAgo(6), amount: 145, planType: 'DT Calling', planDetails: '15 min', status: 'Success' },
 ] as const).map(item => { // Add plan objects for "Buy Again" functionality
     if (item.planType === 'MT Pack') {
         return { ...item, plan: { tokens: parseInt(item.planDetails.split(' ')[0]), price: item.amount } };
@@ -47,7 +49,7 @@ type UsageHistoryItem = {
     balance: string;
 };
 
-const daysAgo = (days: number) => new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+
 
 const MOCK_USAGE_HISTORY: UsageHistoryItem[] = [
     { id: 1, date: daysAgo(0.2), type: 'Call', duration: '4 Min', deduction: 'DT Plan Used', balance: '6 Min Left' },
