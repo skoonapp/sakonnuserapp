@@ -60,7 +60,7 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
                   <WalletIcon className="w-8 h-8 text-indigo-500"/>
                   <span>MT Plans</span>
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Money Token खरीदें और अपनी सुविधानुसार कॉल या चैट के लिए उपयोग करें।</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Money Token खरीदकर जरूरत के हिसाब से कॉल या चैट कर सकते हैं।</p>
           </div>
           
           <div className="w-1/3 mx-auto mt-2 border-t border-slate-200 dark:border-slate-700"></div>
@@ -98,10 +98,10 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
       </section>
 
       {/* DT Plans Section Header */}
-      <section className="mt-6">
+      <section className="mt-4">
         <div className="text-center py-4 border-y border-slate-200 dark:border-slate-700">
             <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100">DT Plans</h2>
-            <p className="text-base text-slate-600 dark:text-slate-400 mt-2">Direct Plans से फिक्स मिनट और मैसेज के लिए उपयोग करें।</p>
+            <p className="text-base text-slate-600 dark:text-slate-400 mt-2">Direct Plans में तय मिनट और मैसेज मिलते हैं।</p>
         </div>
       </section>
 
