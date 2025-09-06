@@ -81,9 +81,11 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
                                   </div>
                               )}
                               <div className="text-center">
-                                  <MTCoinIcon className="w-8 h-8 mx-auto" idSuffix={String(index)} />
-                                  <p className="text-xl font-extrabold text-slate-800 dark:text-slate-100 mt-2">{option.tokens}</p>
-                                  <p className="text-xs text-slate-500 dark:text-slate-400">Money Tokens</p>
+                                  <div className="flex justify-center items-center gap-2">
+                                      <MTCoinIcon className="w-9 h-9" idSuffix={String(index)} />
+                                      <span className="text-4xl font-extrabold text-slate-800 dark:text-slate-100">{option.tokens}</span>
+                                  </div>
+                                  <p className="text-lg font-semibold text-slate-600 dark:text-slate-400">MT</p>
                               </div>
                               <button 
                                   onClick={() => onPurchase({ tokens: option.tokens, price: option.price })}
