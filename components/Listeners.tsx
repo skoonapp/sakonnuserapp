@@ -102,16 +102,16 @@ const PlansView: React.FC<PlansViewProps> = ({ currentUser, wallet, onPurchase, 
               <div className="max-w-3xl mx-auto">
                   <div className="grid grid-cols-2 sm:grid-cols-3 border-2 border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden divide-x-2 divide-y-2 divide-slate-200 dark:divide-slate-800">
                       {tokenOptions.map((option, index) => (
-                          <div key={option.tokens} className="bg-white dark:bg-slate-900 p-3 flex flex-col items-center justify-between transition-all hover:shadow-lg hover:-translate-y-1 min-h-[190px]">
+                          <div key={option.tokens} className="bg-white dark:bg-slate-900 p-3 flex flex-col items-center justify-between transition-all hover:shadow-lg hover:-translate-y-1 min-h-[160px]">
                               <div className="text-center">
-                                  <MTCoinIcon className="w-10 h-10 mx-auto" idSuffix={String(index)} />
-                                  <p className="text-2xl font-extrabold text-slate-800 dark:text-slate-100 mt-2">{option.tokens}</p>
-                                  <p className="text-sm text-slate-500 dark:text-slate-400">Money Tokens</p>
+                                  <MTCoinIcon className="w-8 h-8 mx-auto" idSuffix={String(index)} />
+                                  <p className="text-xl font-extrabold text-slate-800 dark:text-slate-100 mt-2">{option.tokens}</p>
+                                  <p className="text-xs text-slate-500 dark:text-slate-400">Money Tokens</p>
                               </div>
                               <button 
                                   onClick={() => onPurchase({ tokens: option.tokens, price: option.price })}
                                   disabled={loadingPlan !== null}
-                                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed text-sm mt-3"
+                                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed text-base mt-3"
                               >
                                   {loadingPlan === `mt_${option.tokens}` ? 'प्रोसेसिंग...' : `₹${option.price} Buy`}
                               </button>

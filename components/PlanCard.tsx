@@ -62,7 +62,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPop
   const isAnyPlanLoading = loadingPlan !== null;
 
   return (
-    <div className={`relative ${popularContainerStyles} p-3 flex flex-col text-center items-center hover:-translate-y-1 transition-all duration-300 min-h-[190px]`}>
+    <div className={`relative ${popularContainerStyles} p-3 flex flex-col text-center items-center hover:-translate-y-1 transition-all duration-300 min-h-[160px]`}>
       {isPopular && (
         <div className="absolute top-0 -translate-y-1/2 bg-gradient-to-r from-orange-400 to-amber-500 text-white text-sm font-bold px-4 py-1 rounded-full shadow-lg animate-pulse z-10">
           लोकप्रिय
@@ -83,16 +83,16 @@ const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPop
                     <h4 className="text-sm font-semibold text-cyan-800 dark:text-cyan-300">कॉलिंग</h4>
                 </div>
                 <div className="mb-2">
-                    <p className="text-2xl">
+                    <p className="text-xl">
                         <span className="font-extrabold text-slate-900 dark:text-slate-100">{callPlan.duration.split(' ')[0]}</span>
-                        <span className="font-semibold text-slate-600 dark:text-slate-400 ml-1 text-base">{callPlan.duration.split(' ')[1]}</span>
+                        <span className="font-semibold text-slate-600 dark:text-slate-400 ml-1 text-sm">{callPlan.duration.split(' ')[1]}</span>
                     </p>
                 </div>
             </div>
             <button
               onClick={() => onPurchase(callPlan)}
               disabled={isAnyPlanLoading}
-              className="w-full mt-auto bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-500 dark:hover:bg-cyan-400 text-white font-bold py-2 text-sm rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
+              className="w-full mt-auto bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-500 dark:hover:bg-cyan-400 text-white font-bold py-2 text-base rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
             >
               {loadingPlan === callPlanKey ? 'प्रोसेसिंग...' : `₹${callPlan.price} खरीदें`}
             </button>
@@ -106,16 +106,16 @@ const PlanCard: React.FC<PlanCardProps> = ({ tierName, callPlan, chatPlan, isPop
                     <h4 className="text-sm font-semibold text-teal-800 dark:text-teal-300">चैट</h4>
                 </div>
                  <div className="mb-2">
-                    <p className="text-2xl">
+                    <p className="text-xl">
                         <span className="font-extrabold text-slate-900 dark:text-slate-100">{chatPlan.messages}</span>
-                        <span className="font-semibold text-slate-600 dark:text-slate-400 ml-1 text-base">मैसेज</span>
+                        <span className="font-semibold text-slate-600 dark:text-slate-400 ml-1 text-sm">मैसेज</span>
                     </p>
                 </div>
             </div>
             <button
               onClick={() => onPurchase(chatPlan)}
               disabled={isAnyPlanLoading}
-              className="w-full mt-auto bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 text-sm rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
+              className="w-full mt-auto bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 text-base rounded-lg transition-colors shadow-md disabled:bg-slate-400 disabled:cursor-not-allowed"
             >
               {loadingPlan === chatPlanKey ? 'प्रोसेसिंग...' : `₹${chatPlan.price} खरीदें`}
             </button>
