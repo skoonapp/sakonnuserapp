@@ -316,7 +316,11 @@ const App: React.FC = () => {
     if (activeChatSession) return <ChatUI session={activeChatSession} user={user} onLeave={handleChatSessionEnd} />;
     
     const viewComponents = [
-        <HomeView currentUser={user} />,
+        <HomeView 
+            currentUser={user} 
+            wallet={wallet} 
+            onWalletClick={() => setShowWallet(true)} 
+        />,
         <CallsView onStartSession={handleStartSession} currentUser={user} />,
         <ChatsView onStartSession={handleStartSession} currentUser={user} />,
         <ProfileView 
@@ -333,11 +337,8 @@ const App: React.FC = () => {
     return (
         <div className="relative w-full max-w-md mx-auto bg-slate-100 dark:bg-slate-950 flex flex-col h-screen shadow-2xl transition-colors duration-300 overflow-hidden">
             <Header 
-                currentUser={user} 
                 isDarkMode={isDarkMode} 
                 toggleDarkMode={toggleDarkMode} 
-                wallet={wallet}
-                onWalletClick={() => setShowWallet(true)} 
             />
             
             <main

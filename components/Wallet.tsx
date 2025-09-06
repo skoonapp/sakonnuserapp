@@ -114,11 +114,15 @@ const Wallet: React.FC<WalletProps> = ({ wallet, onClose, onNavigateHome }) => {
 
                 {/* Tabs */}
                 <div className="px-4 pt-2">
-                    <div className="bg-slate-200 dark:bg-slate-800 p-1 rounded-xl grid grid-cols-2 gap-1">
-                        <button onClick={() => setActiveTab('recharge')} className={`py-2.5 px-2 rounded-lg font-bold transition-colors text-sm ${activeTab === 'recharge' ? 'bg-white dark:bg-slate-900 text-cyan-600 dark:text-cyan-300 shadow-md' : 'text-slate-600 dark:text-slate-400'}`}>
+                    <div className="relative bg-slate-200 dark:bg-slate-800/80 p-1 rounded-full flex">
+                        <div 
+                            className="absolute top-1 bottom-1 w-1/2 bg-white dark:bg-slate-900 rounded-full shadow-md transition-transform duration-300 ease-in-out" 
+                            style={{ transform: activeTab === 'recharge' ? 'translateX(0%)' : 'translateX(100%)' }}
+                        ></div>
+                        <button onClick={() => setActiveTab('recharge')} className={`relative z-10 w-1/2 py-2.5 rounded-full font-bold transition-colors text-sm ${activeTab === 'recharge' ? 'text-cyan-600 dark:text-cyan-300' : 'text-slate-700 dark:text-slate-300'}`}>
                             Recharge History
                         </button>
-                        <button onClick={() => setActiveTab('usage')} className={`py-2.5 px-2 rounded-lg font-bold transition-colors text-sm ${activeTab === 'usage' ? 'bg-white dark:bg-slate-900 text-cyan-600 dark:text-cyan-300 shadow-md' : 'text-slate-600 dark:text-slate-400'}`}>
+                        <button onClick={() => setActiveTab('usage')} className={`relative z-10 w-1/2 py-2.5 rounded-full font-bold transition-colors text-sm ${activeTab === 'usage' ? 'text-cyan-600 dark:text-cyan-300' : 'text-slate-700 dark:text-slate-300'}`}>
                             Usage History
                         </button>
                     </div>
