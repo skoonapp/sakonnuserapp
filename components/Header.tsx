@@ -7,6 +7,7 @@ interface HeaderProps {
   isDarkMode: boolean;
   toggleDarkMode: () => void;
   wallet: ReturnType<typeof useWallet>;
+  onWalletClick: () => void;
 }
 
 // --- Icons ---
@@ -40,7 +41,7 @@ const ChatIcon: React.FC<{ className?: string }> = ({ className }) => (
 // --- End Icons ---
 
 
-const Header: React.FC<HeaderProps> = ({ currentUser, isDarkMode, toggleDarkMode, wallet }) => {
+const Header: React.FC<HeaderProps> = ({ currentUser, isDarkMode, toggleDarkMode, wallet, onWalletClick }) => {
   const tokenBalance = wallet.tokens || 0;
   const now = Date.now();
   const validPlans = (wallet.activePlans || []).filter(p => p.expiryTimestamp > now);
@@ -66,7 +67,11 @@ const Header: React.FC<HeaderProps> = ({ currentUser, isDarkMode, toggleDarkMode
         {/* Right Section */}
         <div className="flex items-center gap-2">
             {currentUser && (
-              <div className="flex items-center space-x-2 md:space-x-3 bg-slate-100 dark:bg-slate-900 px-2 py-1.5 rounded-full">
+              <button 
+                onClick={onWalletClick}
+                className="flex items-center space-x-2 md:space-x-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 px-2 py-1.5 rounded-full transition-colors"
+                aria-label="Open wallet and transaction history"
+              >
                   <div className="flex items-center space-x-1" title={`${tokenBalance} MT`}>
                       <CustomMTIcon className="w-5 h-5"/>
                       <span className="font-bold text-sm text-slate-700 dark:text-slate-100">{tokenBalance}</span>
@@ -76,12 +81,12 @@ const Header: React.FC<HeaderProps> = ({ currentUser, isDarkMode, toggleDarkMode
                       <CallIcon className="w-5 h-5 text-green-500"/>
                       <span className="font-bold text-sm text-slate-700 dark:text-slate-100">{callMinutes}</span>
                   </div>
-                  <div className="w-px h-4 bg-slate-300 dark:bg-slate-700"></div>
+                  <div className="w-px h-4 bg-slate-300 dark:border-slate-700"></div>
                   <div className="flex items-center space-x-1" title={`${totalMessages} मैसेज`}>
                       <ChatIcon className="w-5 h-5 text-cyan-500"/>
                       <span className="font-bold text-sm text-slate-700 dark:text-slate-100">{totalMessages}</span>
                   </div>
-              </div>
+              </button>
             )}
              <button
                 onClick={toggleDarkMode}

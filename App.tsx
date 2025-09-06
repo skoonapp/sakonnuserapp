@@ -25,6 +25,7 @@ const AICompanion = lazy(() => import('./components/AICompanion'));
 const TermsAndConditions = lazy(() => import('./components/TermsAndConditions'));
 const PrivacyPolicy = lazy(() => import('./components/PrivacyPolicy'));
 const CancellationRefundPolicy = lazy(() => import('./components/CancellationRefundPolicy'));
+const Wallet = lazy(() => import('./components/Wallet'));
 
 // --- Icons for Install Banner ---
 const InstallIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -56,6 +57,7 @@ const App: React.FC = () => {
     const [showPolicy, setShowPolicy] = useState<'terms' | 'privacy' | 'cancellation' | null>(null);
     const [showRechargeModal, setShowRechargeModal] = useState(false);
     const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+    const [showWallet, setShowWallet] = useState(false);
     
     // --- Session State ---
     const [activeCallSession, setActiveCallSession] = useState<CallSession | null>(null);
@@ -330,7 +332,13 @@ const App: React.FC = () => {
 
     return (
         <div className="relative w-full max-w-md mx-auto bg-slate-100 dark:bg-slate-950 flex flex-col h-screen shadow-2xl transition-colors duration-300 overflow-hidden">
-            <Header currentUser={user} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} wallet={wallet} />
+            <Header 
+                currentUser={user} 
+                isDarkMode={isDarkMode} 
+                toggleDarkMode={toggleDarkMode} 
+                wallet={wallet}
+                onWalletClick={() => setShowWallet(true)} 
+            />
             
             <main
                 className="flex-grow overflow-hidden pt-16 pb-16" // Main container hides overflow for swiping
@@ -370,7 +378,8 @@ const App: React.FC = () => {
             )}
             <AICompanionButton onClick={() => setShowAICompanion(true)} />
             
-            <Suspense fallback={null}>
+            <Suspense fallback={<div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center"><ViewLoader /></div>}>
+                {showWallet && <Wallet wallet={wallet} onClose={() => setShowWallet(false)} onNavigateHome={() => { setShowWallet(false); navigateTo(0); }} />}
                 {showAICompanion && <AICompanion user={user} onClose={() => setShowAICompanion(false)} onNavigateToServices={() => { navigateTo(1); setShowAICompanion(false); }} />}
                 {showPolicy === 'terms' && <TermsAndConditions onClose={() => setShowPolicy(null)} />}
                 {showPolicy === 'privacy' && <PrivacyPolicy onClose={() => setShowPolicy(null)} />}
